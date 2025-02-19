@@ -1,0 +1,8 @@
+7/4/2023,25:29.2,supervisor,Event - 2023,"PEC Board Barcode Found. Board Barcode: 111"
+7/4/2023,25:37.3,supervisor,Event - 30012,"A component has been rejected. Slot: 25, Reference ID: SH_RF_HBDSM-4, Circuit Number: 4, Pick Row: 0, Pick Column: 0, Sub Row: 0, Sub Column: 0, Barcode: "
+7/4/2023,25:42.6,supervisor,Event - 30012,"A component has been rejected. Slot: 25, Reference ID: SH_RF_HBDSM-2, Circuit Number: 2, Pick Row: 0, Pick Column: 0, Sub Row: 0, Sub Column: 0, Barcode: "
+7/4/2023,26:38.1,supervisor,Event - 30011,"A component has been successfully placed on the board. Reference ID: SH_RF_HBDSM-3, Circuit Number: 3, Hd: B1, Spin: 2, Feeder Slot: 25, Pick Row: 0, Pick Column: 0, Sub Row: 0, Sub Column: 0, Barcode: "
+7/4/2023,26:40.4,supervisor,Event - 30011,"A component has been successfully placed on the board. Reference ID: SH_RF_HBDSM-1, Circuit Number: 1, Hd: B1, Spin: 2, Feeder Slot: 25, Pick Row: 0, Pick Column: 0, Sub Row: 0, Sub Column: 0, Barcode: "
+7/4/2023,26:42.7,supervisor,Event - 30011,"A component has been successfully placed on the board. Reference ID: SH_RF_HBDSM-4, Circuit Number: 4, Hd: B1, Spin: 2, Feeder Slot: 25, Pick Row: 0, Pick Column: 0, Sub Row: 0, Sub Column: 0, Barcode: "
+7/4/2023,26:45.1,supervisor,Event - 30011,"A component has been successfully placed on the board. Reference ID: SH_RF_HBDSM-2, Circuit Number: 2, Hd: B1, Spin: 2, Feeder Slot: 25, Pick Row: 0, Pick Column: 0, Sub Row: 0, Sub Column: 0, Barcode: "
+7/4/2023,26:45.2,supervisor,Event - 2002,"Board completed.  Product: Spyder-TOP.upf. Lane: 1. Barcode: 111"

@@ -1,0 +1,219 @@
+
+.demo-logo-vertical {
+  // margin: 16px 0;
+  // color: rgba(255, 255, 255, 0.65);
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  font-weight: lighter;
+  height: 45px;
+  line-height: 45px;
+  background-color: #177bff;
+  color: #fff;
+}
+
+.bg-login {
+  background: url(../images/bg-login.jpg) no-repeat fixed;
+  background-size: cover;
+  .logo {
+    height: 88px;
+    margin: 0 auto;
+    display: block;
+    position: fixed;
+    left: 32px;
+    top: 32px;
+    border-radius: 0 0 10px 10px;
+  }
+}
+.content-wrapper {
+  height: 100%;
+  .breadcrumb {
+    margin-left: 26px;
+    color: rgba(255, 255, 255, 0.65);
+    .ant-breadcrumb-separator,
+    li:last-child {
+      color: rgba(255, 255, 255, 0.65);
+    }
+    position: absolute;
+    top: 11px;
+    left: 13%;
+  }
+}
+.content {
+  background-color: white;
+  // height: 100%;
+  // margin: 16px;
+  padding: 15px;
+  // border-radius: 10px;
+  height: calc(100vh - 45px);
+}
+.bg-content {
+  // background: url(../images/bg-content.jpg) no-repeat center fixed;
+  // background-size: cover;
+  
+  background-color: #fff;  //177bff
+}
+.search-wrapper {
+  margin-bottom: 15px;
+}
+.table-machine {
+  border: 1px solid #f0f0f0;
+  th,
+  td {
+    padding: 10px;
+  }
+  th {
+    white-space: nowrap;
+    background-color: #fafafa;
+  }
+}
+.tools {
+  margin-bottom: 15px;
+}
+
+.myTable {
+  width: 100%;
+  th {
+    background-color: #fafafa;
+  }
+  th, td {
+    padding: 5px;
+  }
+}
+
+.custom-table .ant-table {
+  border: 1px solid #f0f0f0; /* 自定义的边框颜色 */
+}
+
+.custom-table .ant-table-container {
+  border: none; /* 去除内部容器边框 */
+}
+
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 5px; /* 滚动条宽度 */
+  height: 12px; /* 滚动条高度 */
+  // display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #c8c8c8;
+  border-radius: 10px; /* 圆角 */
+  border: 3px solid #c8c8c8; 
+  background-clip: content-box; /* 背景裁剪至内容框 */
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 10px; 
+}
+
+:hover::-webkit-scrollbar,
+:active::-webkit-scrollbar {
+  display: block;
+}
+
+
+.ant-menu{
+  background-color: #f5f6f7;
+}
+.custom-menu{
+  height: calc(100vh - 45px);
+  overflow: auto;
+}
+
+
+
+/* 整体容器样式 */
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+}
+
+/* 标签栏 */
+.tabs {
+  display: flex;
+  align-items: center;
+  // background-color: #333;
+  color: white;
+  padding: 2px 5px;
+  overflow-x: auto;
+  white-space: nowrap;
+  position: fixed;
+  left: 230px;
+  width: 80%;
+  z-index: 9999;
+  top: 10px;
+}
+
+/* 标签项样式 */
+.tab {
+  display: none;
+  margin-right: 5px;
+  padding: 2px 15px;
+  background-color: #555;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s ease;
+  font-size: 12px;
+}
+
+/* 激活标签样式 */
+.tab.active {
+  background-color: #008CBA;
+}
+
+/* 鼠标悬停时的样式 */
+.tab:hover {
+  background-color: #777;
+}
+
+/* 标签关闭按钮 */
+.close-tab {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+/* 关闭按钮悬停样式 */
+.close-tab:hover {
+  // background-color: #f44336;
+}
+
+/* 标签内容区域 */
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #fff;
+  border-top: 2px solid #ccc;
+}
+
+/* 防止标签栏内容超出显示 */
+.tabs-container::-webkit-scrollbar {
+  height: 2px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+
+.ant-pro-layout .ant-pro-layout-content {
+  padding-block: 0px!important;
+    padding-inline: 0px!important;
+}
