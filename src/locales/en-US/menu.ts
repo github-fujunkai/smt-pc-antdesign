@@ -52,4 +52,8 @@ export default {
   'menu.基础设置.菜单管理': 'menu',
   'menu.基础设置.角色管理': 'role',
   'menu.防错追溯.防错追溯': 'traceability',
+  'menu.工厂建模': 'xxx',
+  'menu.工厂建模.厂区管理': 'xxx',
+  'menu.工厂建模.车间管理': 'xxx',
+  'menu.工厂建模.创建产线': 'xxx',
 };
