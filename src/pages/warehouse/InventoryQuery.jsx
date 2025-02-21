@@ -389,9 +389,10 @@ const [WmsCountData, setWmsCountData] = useState();
             bordered
           />
         </div>
-      </div>
+        
         {/* 汇总方式 */}
         <WmsCount type={3} WmsCountData={WmsCountData} className="h-[35vh]" />
+      </div>
     </div>
   );
 };

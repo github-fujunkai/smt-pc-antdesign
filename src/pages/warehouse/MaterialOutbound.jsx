@@ -1,61 +1,50 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
-  Badge,
-  Dropdown,
-  Drawer,
-  Tooltip,
-  Switch,
-  Typography,
-  DatePicker,
-  Image,
-  Tag,
-  Table,
-  Modal,
-  Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
-  Button,
-  message,
-  Upload,
-  Tabs,
-} from "antd";
-import {
-  SearchOutlined,
   ExclamationCircleFilled,
-  PlusOutlined,
-  UploadOutlined,
-  DownloadOutlined,
   FileExcelOutlined,
-  SwapOutlined,
+  PlusOutlined,
   RollbackOutlined,
-} from "@ant-design/icons";
-import WmsCount from "./WmsCount";
-import http from "../../utils/http";
-import { config } from "../../utils/config";
-import api from "../../utils/api";
-import qs, { stringify } from "qs";
-import  dayjs from "dayjs";
-import { downloadCSV } from "../../utils/util";
-import { useAntdResizableHeader } from "@minko-fe/use-antd-resizable-header";
-import "@minko-fe/use-antd-resizable-header/index.css";
+  SearchOutlined,
+  SwapOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useAntdResizableHeader } from '@minko-fe/use-antd-resizable-header';
+import '@minko-fe/use-antd-resizable-header/index.css';
 import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tabs,
+  Tooltip,
+  Typography,
+  Upload,
+} from 'antd';
+import dayjs from 'dayjs';
+import qs from 'qs';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import api from '../../utils/api';
+import { config } from '../../utils/config';
+import http from '../../utils/http';
+import { downloadCSV } from '../../utils/util';
+import WmsCount from './WmsCount';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
@@ -69,7 +58,7 @@ const App = () => {
   };
 
   const onFinish = (values) => {
-    console.log("search values", values);
+    console.log('search values', values);
     if (tableParams.pagination?.current !== 1) {
       setTableParams(paginationInit);
     } else {
@@ -91,118 +80,106 @@ const App = () => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([
     {
-      title: "出库单",
-      dataIndex: "outboundOrderNumber",
-      key: "outboundOrderNumber",
+      title: '出库单',
+      dataIndex: 'outboundOrderNumber',
+      key: 'outboundOrderNumber',
       width: 100,
     },
     {
-      title: "制令单",
-      dataIndex: "orderNumber",
-      key: "orderNumber",
-      render: (text, record) => (
-        <span color="blue">{record.prodProductionOrder.orderNumber}</span>
-      ),
+      title: '制令单',
+      dataIndex: 'orderNumber',
+      key: 'orderNumber',
+      render: (text, record) => <span color="blue">{record.prodProductionOrder.orderNumber}</span>,
       width: 130,
     },
     {
-      title: "产线",
-      dataIndex: "productionAreaNameProcess",
-      key: "productionAreaNameProcess",
+      title: '产线',
+      dataIndex: 'productionAreaNameProcess',
+      key: 'productionAreaNameProcess',
       render: (text, record) => (
-        <span color="blue">
-          {record.prodProductionOrder.productionAreaNameProcess}
-        </span>
+        <span color="blue">{record.prodProductionOrder.productionAreaNameProcess}</span>
       ),
       width: 100,
     },
     {
-      title: "出库日期",
-      dataIndex: "outboundDate",
-      key: "outboundDate",
+      title: '出库日期',
+      dataIndex: 'outboundDate',
+      key: 'outboundDate',
       width: 100,
     },
     {
-      title: "发料人",
-      dataIndex: "issuer",
-      key: "issuer",
+      title: '发料人',
+      dataIndex: 'issuer',
+      key: 'issuer',
       width: 100,
     },
     {
-      title: "领料人",
-      dataIndex: "receiver",
-      key: "receiver",
+      title: '领料人',
+      dataIndex: 'receiver',
+      key: 'receiver',
       width: 100,
     },
     {
-      title: "确认人",
-      dataIndex: "approver",
-      key: "approver",
+      title: '确认人',
+      dataIndex: 'approver',
+      key: 'approver',
       width: 100,
     },
     {
-      title: "创建日期",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '创建日期',
+      dataIndex: 'createTime',
+      key: 'createTime',
       render: (_, record) => {
-        return dayjs(_).format("YYYY-MM-DD");
+        return dayjs(_).format('YYYY-MM-DD');
       },
       width: 130,
     },
     {
-      title: "出库单状态",
-      dataIndex: "outboundStatus",
-      key: "outboundStatus",
+      title: '出库单状态',
+      dataIndex: 'outboundStatus',
+      key: 'outboundStatus',
       render: (_, record) => {
         return record.outboundStatus === 0
-          ? "新增"
+          ? '新增'
           : record.outboundStatus === 1
-          ? "确认"
-          : "出库中";
+          ? '确认'
+          : '出库中';
       },
       width: 130,
     },
     {
-      title: "出库类型",
-      dataIndex: "outboundType",
-      key: "outboundType",
+      title: '出库类型',
+      dataIndex: 'outboundType',
+      key: 'outboundType',
       render: (_, record) => {
         return record.outboundType === 1
-          ? "产线领料"
+          ? '产线领料'
           : record.outboundType === 2
-          ? "维修领料"
+          ? '维修领料'
           : record.outboundType === 3
-          ? "退供应商"
-          : "产品制样";
+          ? '退供应商'
+          : '产品制样';
       },
       width: 100,
     },
     {
-      title: "操作",
-      dataIndex: "operation",
-      fixed: "right",
+      title: '操作',
+      dataIndex: 'operation',
+      fixed: 'right',
       render: (_, record) => {
         return (
           <Space>
-            <Typography.Link onClick={() => showCommonModal("create", record)}>
+            <Typography.Link onClick={() => showCommonModal('create', record)}>
               录入
             </Typography.Link>
-            <Typography.Link onClick={() => showModal("update", record)}>
-              修改
-            </Typography.Link>
+            <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
-            <Typography.Link onClick={() => removeShelf(record)}>
-              下架
-            </Typography.Link>
-            <Typography.Link onClick={() => showCommonModal("reissue", record)}>
+            <Typography.Link onClick={() => removeShelf(record)}>下架</Typography.Link>
+            <Typography.Link onClick={() => showCommonModal('reissue', record)}>
               补发
             </Typography.Link>
-            <Typography.Link onClick={() => showCommonModal("scan", record)}>
-              扫描
-            </Typography.Link>
-            <Typography.Link onClick={() => outConfirm(record)}>
-              确认
-            </Typography.Link>
+            <Typography.Link onClick={() => showCommonModal('scan', record)}>扫描</Typography.Link>
+            <Typography.Link onClick={() => outConfirm(record)}>确认</Typography.Link>
           </Space>
         );
       },
@@ -210,75 +187,70 @@ const App = () => {
   ]);
   const removeShelf = (record) => {
     confirm({
-      title: "下架确认",
+      title: '下架确认',
       icon: <ExclamationCircleFilled />,
-      content: "请确认是否下架?",
+      content: '请确认是否下架?',
       onOk() {
         http
           .del(
-            config.API_PREFIX +
-              "outbound/order/takenOffShelves?outboundOrderId=" +
-              `${record?.id}`,
-            {}
+            config.API_PREFIX + 'outbound/order/takenOffShelves?outboundOrderId=' + `${record?.id}`,
+            {},
           )
           .then((res) => {
             fetchData();
-            message.success("下架成功！");
+            message.success('下架成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
   const del = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
-          .del(config.API_PREFIX + "outbound/order" + `/${record?.id}`, {})
+          .del(config.API_PREFIX + 'outbound/order' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
 
   const del2 = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
-          .del(
-            config.API_PREFIX + "outbound/order/detail" + `/${record?.id}`,
-            {}
-          )
+          .del(config.API_PREFIX + 'outbound/order/detail' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
@@ -287,15 +259,15 @@ const App = () => {
   // 生成单号
   const getAddOrder = () => {
     http
-      .get(config.API_PREFIX + "outbound/order/generateOrderNumber", {})
+      .get(config.API_PREFIX + 'outbound/order/generateOrderNumber', {})
       .then((res) => {
-        formCreate.setFieldValue("outboundOrderNumber", res.bizData || "");
+        formCreate.setFieldValue('outboundOrderNumber', res.bizData || '');
       })
       .catch((err) => {});
   };
   //打开出库单
   const showModal = (action, record, confirm) => {
-    if (action === "update" && record) {
+    if (action === 'update' && record) {
       const {
         id,
         outboundOrderNumber,
@@ -326,7 +298,7 @@ const App = () => {
 
   const [isModalOpen1, setIsModalOpen1] = useState(false);
   const handlePrint = (action, record) => {
-    console.log("recordrecordrecord", record);
+    console.log('recordrecordrecord', record);
     activeId1 = record.id;
     setSelectedDetailRow(record);
     setIsModalOpen1(true);
@@ -336,7 +308,7 @@ const App = () => {
     formCreate
       .validateFields()
       .then((values) => {
-        console.log("values", values);
+        console.log('values', values);
         setLoadingOk(true);
         const {
           outboundOrderNumber,
@@ -353,21 +325,21 @@ const App = () => {
           receiver,
           outboundType,
           remark,
-          filePath: upLoadUrl || "",
+          filePath: upLoadUrl || '',
         };
         let action = null;
-        let msg = "";
-        let apiUrl = "";
-        console.log("activeId", activeId);
+        let msg = '';
+        let apiUrl = '';
+        console.log('activeId', activeId);
         if (activeId !== -1) {
           action = http.post;
           apiUrl = `${config.API_PREFIX}outbound/order`;
           params.id = activeId;
-          msg = "修改成功！";
+          msg = '修改成功！';
         } else {
           action = http.post;
           apiUrl = `${config.API_PREFIX}outbound/order`;
-          msg = "新增成功！";
+          msg = '新增成功！';
         }
         action(apiUrl, params)
           .then((res) => {
@@ -383,7 +355,7 @@ const App = () => {
           });
       })
       .catch((error) => {
-        console.log("Form validation error:", error);
+        console.log('Form validation error:', error);
       });
   };
 
@@ -411,7 +383,7 @@ const App = () => {
   const [prodproductionorder, setProdproductionorder] = useState([]);
   const getProdproductionorder = () => {
     http
-      .post(config.API_PREFIX + "prodproductionorder/page", {
+      .post(config.API_PREFIX + 'prodproductionorder/page', {
         current: 1,
         size: 10000,
       })
@@ -432,7 +404,7 @@ const App = () => {
     http
       .post(config.API_PREFIX + api.dictBaseFwa, {})
       .then((res) => {
-        console.log("dict", res);
+        console.log('dict', res);
         setDictBaseFwa(res?.bizData);
       })
       .catch((err) => {});
@@ -443,7 +415,7 @@ const App = () => {
   }, []);
   useEffect(() => {
     fetchData();
-    console.log("JSON.stringify(tableParams)]", JSON.stringify(tableParams));
+    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -461,7 +433,7 @@ const App = () => {
 
     // sequelize 举例
     // order: [[ 'created_at', 'desc' ], [ 'categoryId', 'desc' ]],
-    console.log("order, field", order, field);
+    console.log('order, field', order, field);
 
     // 多个传参举例-hzry
     // GET /api/resource?sort=created_at:desc,categoryId:asc
@@ -477,8 +449,8 @@ const App = () => {
       // 举例：lxy
       // orders[0].column: id
       // orders[0].asc: true
-      params["orders[0].column"] = field;
-      params["orders[0].asc"] = order === "ascend" ? true : false;
+      params['orders[0].column'] = field;
+      params['orders[0].asc'] = order === 'ascend' ? true : false;
     }
 
     const {
@@ -521,16 +493,16 @@ const App = () => {
     //   params.lotNo = lotNo;
     // }
     if (startTime) {
-      params.createTimeStart = startTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeStart = startTime.format('YYYY-MM-DD 00:00:00');
     }
     if (endTime) {
-      params.createTimeEnd = endTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeEnd = endTime.format('YYYY-MM-DD 00:00:00');
     }
     setWmsCountData(params);
     http
-      .get(config.API_PREFIX + "outbound/order/page", params)
+      .get(config.API_PREFIX + 'outbound/order/page', params)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
 
         setData(data?.records || []);
@@ -550,13 +522,13 @@ const App = () => {
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange: ", pagination, filters, sorter);
+    console.log('handleTableChange: ', pagination, filters, sorter);
     setTableParams({
       pagination,
       filters,
       ...sorter,
     });
-    console.log("tableParams1", tableParams);
+    console.log('tableParams1', tableParams);
 
     // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
@@ -565,101 +537,97 @@ const App = () => {
   };
   // 展开的子集
   const expandedRowRender = (record) => {
-    console.log("record", record.details);
+    console.log('record', record.details);
     const columns1 = [
       {
-        title: "料盘UID",
-        dataIndex: "materialUid",
-        key: "materialUid",
+        title: '料盘UID',
+        dataIndex: 'materialUid',
+        key: 'materialUid',
       },
       {
-        title: "料号",
-        dataIndex: "itemCode",
-        key: "itemCode",
+        title: '料号',
+        dataIndex: 'itemCode',
+        key: 'itemCode',
       },
       {
-        title: "供应商料号",
-        dataIndex: "supplierItemCode",
-        key: "supplierItemCode",
+        title: '供应商料号',
+        dataIndex: 'supplierItemCode',
+        key: 'supplierItemCode',
       },
       {
-        title: "物料描述",
-        dataIndex: "materialDescription",
-        key: "materialDescription",
+        title: '物料描述',
+        dataIndex: 'materialDescription',
+        key: 'materialDescription',
       },
       {
-        title: "批次号",
-        dataIndex: "lotNo",
-        key: "lotNo",
+        title: '批次号',
+        dataIndex: 'lotNo',
+        key: 'lotNo',
       },
       {
-        title: "包装数量",
-        dataIndex: "packageQty",
-        key: "packageQty",
+        title: '包装数量',
+        dataIndex: 'packageQty',
+        key: 'packageQty',
       },
       {
-        title: "出库数量",
-        dataIndex: "outboundQty",
-        key: "outboundQty",
+        title: '出库数量',
+        dataIndex: 'outboundQty',
+        key: 'outboundQty',
       },
       {
-        title: "DateCode",
-        dataIndex: "dateCode",
-        key: "dateCode",
+        title: 'DateCode',
+        dataIndex: 'dateCode',
+        key: 'dateCode',
       },
       {
-        title: "物料类型",
-        dataIndex: "itemCategory",
-        key: "itemCategory",
+        title: '物料类型',
+        dataIndex: 'itemCategory',
+        key: 'itemCategory',
       },
       {
-        title: "MSL",
-        dataIndex: "msl",
-        key: "msl",
+        title: 'MSL',
+        dataIndex: 'msl',
+        key: 'msl',
       },
       {
-        title: "有效期",
-        dataIndex: "expirationDate",
-        key: "expirationDate",
+        title: '有效期',
+        dataIndex: 'expirationDate',
+        key: 'expirationDate',
       },
       {
-        title: "库位",
-        dataIndex: "storageLocation",
-        key: "storageLocation",
+        title: '库位',
+        dataIndex: 'storageLocation',
+        key: 'storageLocation',
       },
       {
-        title: "创建日期",
-        dataIndex: "createTime",
-        key: "createTime",
+        title: '创建日期',
+        dataIndex: 'createTime',
+        key: 'createTime',
       },
       {
-        title: "操作员",
-        dataIndex: "updateBy",
-        key: "updateBy",
+        title: '操作员',
+        dataIndex: 'updateBy',
+        key: 'updateBy',
       },
       {
-        title: "发料类别",
-        dataIndex: "issueCategory",
-        key: "issueCategory",
+        title: '发料类别',
+        dataIndex: 'issueCategory',
+        key: 'issueCategory',
       },
       {
-        title: "扫描确认",
-        dataIndex: "scanConfirmed",
-        key: "scanConfirmed",
+        title: '扫描确认',
+        dataIndex: 'scanConfirmed',
+        key: 'scanConfirmed',
       },
       {
-        title: "操作",
-        key: "operation",
-        fixed: "right",
+        title: '操作',
+        key: 'operation',
+        fixed: 'right',
         render: (_, record) => {
           return (
             <Space>
-              <Typography.Link onClick={() => handlePrint("update", record)}>
-                截料
-              </Typography.Link>
-              <Typography.Link onClick={() => del2(record)}>
-                删除
-              </Typography.Link>
+              <Typography.Link onClick={() => handlePrint('update', record)}>截料</Typography.Link>
+              <Typography.Link onClick={() => del2(record)}>删除</Typography.Link>
             </Space>
           );
         },
@@ -671,9 +639,9 @@ const App = () => {
         dataSource={record?.details || []}
         pagination={false}
         size="small"
-        scroll={{ x: "max-content" }}
+        scroll={{ x: 'max-content' }}
         bordered
-        style={{ margin: "10px 10px 10px 0" }}
+        style={{ margin: '10px 10px 10px 0' }}
         className="custom-table"
       />
     );
@@ -684,46 +652,46 @@ const App = () => {
   const loadTemplate = () => {
     setLoadingDownload(true);
     http
-      .post(config.API_PREFIX + "outbound/order/downloadTemplate", {})
+      .post(config.API_PREFIX + 'outbound/order/downloadTemplate', {})
       .then((res) => {
-        downloadCSV(res, "上料表导入模板-CSV文件");
-        message.success("下载成功！");
+        downloadCSV(res, '上料表导入模板-CSV文件');
+        message.success('下载成功！');
         setLoadingDownload(false);
       })
       .catch((err) => {
         console.log(err);
-        message.error("下载失败！");
+        message.error('下载失败！');
         setLoadingDownload(false);
       });
   };
-  const [upLoadUrl, setUpLoadUrl] = useState("");
+  const [upLoadUrl, setUpLoadUrl] = useState('');
   const handleCustomRequest = ({ file, onSuccess, onError }) => {
     setLoadingUpload(true);
     // 创建一个 FormData 对象，用于构建包含文件的请求
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
     http
-      .post(config.API_PREFIX + "common/upload/fileCSV", formData)
+      .post(config.API_PREFIX + 'common/upload/fileCSV', formData)
       .then((res) => {
-        setUpLoadUrl(res?.bizData?.url || "");
-        message.success("导入成功！");
+        setUpLoadUrl(res?.bizData?.url || '');
+        message.success('导入成功！');
         onSuccess(); // 通知 Ant Design Upload 组件上传成功
         setLoadingUpload(false);
         fetchData();
       })
       .catch((err) => {
         console.log(err);
-        message.error("导入失败！");
+        message.error('导入失败！');
         onError();
         setLoadingUpload(false);
       });
   };
   const outConfirm = (record) => {
     confirm({
-      title: "确认",
+      title: '确认',
       icon: <ExclamationCircleFilled />,
-      content: "是否确认出库单？",
+      content: '是否确认出库单？',
       onOk() {
         http
           .get(
@@ -732,34 +700,34 @@ const App = () => {
               `?${qs.stringify({
                 outboundOrderId: record.id,
               })}`,
-            {}
+            {},
           )
           .then((res) => {
-            message.success("操作成功");
+            message.success('操作成功');
             fetchData();
           })
           .catch((err) => {});
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
   // 弹窗组件
   const [isCommonModal, setIsCommonModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState([]);
-  const [selectedAction, setSelectedAction] = useState("");
+  const [selectedAction, setSelectedAction] = useState('');
   const showCommonModal = (action, record, confirm) => {
     console.log(action, record, confirm);
-    if (action === "reissue") {
+    if (action === 'reissue') {
       if (record.outboundStatus == 2) {
-        message.warning("出库中的出库单不允许补发！");
+        message.warning('出库中的出库单不允许补发！');
         return;
       }
     }
-    if (action === "create") {
+    if (action === 'create') {
       if (record.outboundStatus == 1) {
-        message.warning("确认状态的出库单不允许录入！");
+        message.warning('确认状态的出库单不允许录入！');
         return;
       }
     }
@@ -775,29 +743,27 @@ const App = () => {
   const [selectedDetailRow, setSelectedDetailRow] = useState({});
 
   // --------------------------------------------------------------------------------------------------------------------
-  const { components, resizableColumns, tableWidth, resetColumns } =
-    useAntdResizableHeader({
-      columns: useMemo(() => columns, [columns]),
-      columnsState: {
-        persistenceKey: "localKeyMaterialInbound",
-        persistenceType: "localStorage",
-      },
-    });
+  const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
+    columns: useMemo(() => columns, [columns]),
+    columnsState: {
+      persistenceKey: 'localKeyMaterialInbound',
+      persistenceType: 'localStorage',
+    },
+  });
 
   // 可拖动的单个项目组件
   function SortableItem({ id, content, isDraggable }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({
-        id: id,
-        disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
-      });
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id: id,
+      disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
+    });
 
     const style = {
       transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
       transition,
       // 如果不可拖动，可以添加不同的样式或逻辑
       opacity: isDraggable ? 1 : 0.5,
-      cursor: isDraggable ? "grab" : "not-allowed",
+      cursor: isDraggable ? 'grab' : 'not-allowed',
     };
 
     return (
@@ -812,7 +778,7 @@ const App = () => {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: verticalListSortingStrategy,
-    })
+    }),
   );
 
   // 拖放逻辑处理函数
@@ -842,14 +808,11 @@ const App = () => {
   };
 
   const saveColumnsOrder = (columns) => {
-    localStorage.setItem(
-      "columnsMaterialOutbound",
-      JSON.stringify(columns.map((col) => col.key))
-    );
+    localStorage.setItem('columnsMaterialOutbound', JSON.stringify(columns.map((col) => col.key)));
   };
 
   useEffect(() => {
-    const savedOrder = localStorage.getItem("columnsMaterialOutbound");
+    const savedOrder = localStorage.getItem('columnsMaterialOutbound');
     if (savedOrder) {
       const order = JSON.parse(savedOrder);
       const orderedColumns = order
@@ -860,8 +823,8 @@ const App = () => {
     // 其他初始化逻辑...
   }, []);
   function refreshPage() {
-    localStorage.removeItem("columnsMaterialOutbound");
-    message.success("复原成功！");
+    localStorage.removeItem('columnsMaterialOutbound');
+    message.success('复原成功！');
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -874,7 +837,7 @@ const App = () => {
       <div className="content h-auto">
         <div className="tools">
           <Space size="middle">
-            <Tooltip title={isShowSearch ? "隐藏搜索" : "显示搜索"}>
+            <Tooltip title={isShowSearch ? '隐藏搜索' : '显示搜索'}>
               <Switch
                 onChange={onSearchChange}
                 checkedChildren={<SearchOutlined />}
@@ -901,10 +864,7 @@ const App = () => {
             </Tooltip>
           </Space>
         </div>
-        <div
-          className="search-wrapper"
-          style={{ display: isShowSearch ? "block" : "none" }}
-        >
+        <div className="search-wrapper" style={{ display: isShowSearch ? 'block' : 'none' }}>
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
               <Col span={8}>
@@ -963,19 +923,19 @@ const App = () => {
                     showSearch
                     options={[
                       {
-                        label: "产线领料",
+                        label: '产线领料',
                         value: 1,
                       },
                       {
-                        label: "维修领料",
+                        label: '维修领料',
                         value: 2,
                       },
                       {
-                        label: "退供应商",
+                        label: '退供应商',
                         value: 3,
                       },
                       {
-                        label: "产品制样",
+                        label: '产品制样',
                         value: 4,
                       },
                     ]}
@@ -984,22 +944,18 @@ const App = () => {
               </Col>
               <Col span={8}>
                 <Form.Item label="出库日期（开始）" name="startTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item label="出库日期（结束）" name="endTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
 
               <Col span={8}>
                 <Space size="small">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
-                  >
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     查询
                   </Button>
                   <Button onClick={resetFormSearch} htmlType="button">
@@ -1011,12 +967,12 @@ const App = () => {
           </Form>
         </div>
         <div className="table-wrapper  h-[40vh] overflow-auto">
-          <div style={{ marginBottom: 16, textAlign: "right" }}>
+          <div style={{ marginBottom: 16, textAlign: 'right' }}>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => {
-                showModal("create");
+                showModal('create');
               }}
             >
               新增出库单
@@ -1034,11 +990,14 @@ const App = () => {
             bordered
             expandable={{
               expandedRowRender,
-              defaultExpandedRowKeys: ["0"],
+              defaultExpandedRowKeys: ['0'],
               expandRowByClick: false,
             }}
           />
         </div>
+
+        {/* 汇总方式 */}
+        <WmsCount type={2} WmsCountData={WmsCountData} className=" h-[40vh]" />
         {/* 拖拽组件 */}
         <Modal
           title="调整列顺序（拖动排序）"
@@ -1052,21 +1011,13 @@ const App = () => {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext
-              items={columns
-                .filter((col) => !col.fixed)
-                .map((item) => item.key)}
-            >
+            <SortableContext items={columns.filter((col) => !col.fixed).map((item) => item.key)}>
               <Row gutter={16}>
                 {columns
                   .filter((col) => !col.fixed)
                   .map((item) => (
                     <Col key={item.key} span={8}>
-                      <SortableItem
-                        id={item.key}
-                        content={item.title}
-                        isDraggable={!item?.fixed}
-                      />
+                      <SortableItem id={item.key} content={item.title} isDraggable={!item?.fixed} />
                     </Col>
                   ))}
               </Row>
@@ -1087,7 +1038,7 @@ const App = () => {
           <Form
             labelCol={{ span: 6 }}
             form={formCreate}
-            style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+            style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
           >
             <Form.Item
               label="出库单"
@@ -1095,7 +1046,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1108,16 +1059,11 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
-              <Select
-                placeholder="请选择"
-                allowClear
-                showSearch
-                options={prodproductionorder}
-              />
+              <Select placeholder="请选择" allowClear showSearch options={prodproductionorder} />
             </Form.Item>
 
             <Form.Item
@@ -1126,7 +1072,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1139,7 +1085,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1179,7 +1125,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请选择",
+                  message: '请选择',
                 },
               ]}
             >
@@ -1190,19 +1136,19 @@ const App = () => {
                 showSearch
                 options={[
                   {
-                    label: "产线领料",
+                    label: '产线领料',
                     value: 1,
                   },
                   {
-                    label: "维修领料",
+                    label: '维修领料',
                     value: 2,
                   },
                   {
-                    label: "退供应商",
+                    label: '退供应商',
                     value: 3,
                   },
                   {
-                    label: "产品制样",
+                    label: '产品制样',
                     value: 4,
                   },
                 ]}
@@ -1214,7 +1160,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1240,8 +1186,6 @@ const App = () => {
           }}
         />
       </div>
-      {/* 汇总方式 */}
-      <WmsCount type={2} WmsCountData={WmsCountData} className=" h-[40vh]" />
     </div>
   );
 };
@@ -1261,7 +1205,7 @@ const UIDprint = (props) => {
       supplier: selectedDetailRow?.supplier,
       supplierItemCode: selectedDetailRow?.supplierItemCode,
       packageQty: selectedDetailRow?.outboundQty,
-      qty: "", // 截取数量
+      qty: '', // 截取数量
       msl: selectedDetailRow?.msl,
       shelfLife: selectedDetailRow?.shelfLife,
       productionDate: dayjs(selectedDetailRow?.productionDate),
@@ -1323,13 +1267,9 @@ const UIDprint = (props) => {
     formCreate1
       .validateFields()
       .then((values) => {
-        console.log("values", values);
-        values.productionDate = dayjs(values.productionDate).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-        values.expirationDate = dayjs(values.expirationDate).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
+        console.log('values', values);
+        values.productionDate = dayjs(values.productionDate).format('YYYY-MM-DD HH:mm:ss');
+        values.expirationDate = dayjs(values.expirationDate).format('YYYY-MM-DD HH:mm:ss');
         setLoadingOk1(true);
         const {
           itemCode,
@@ -1343,7 +1283,7 @@ const UIDprint = (props) => {
           msl,
           packageQty,
         } = values;
-        console.log("productionDate", productionDate);
+        console.log('productionDate', productionDate);
         let params = {
           packQty: packageQty,
           stockInId: activeId1,
@@ -1362,12 +1302,12 @@ const UIDprint = (props) => {
             `${config.API_PREFIX}outbound/order/cutOff` +
               `?${qs.stringify({
                 outboundOrderMaterialDetailsId: selectedDetailRow.id,
-                cutOffQty: formCreate1.getFieldValue("qty"),
+                cutOffQty: formCreate1.getFieldValue('qty'),
               })}`,
-            {}
+            {},
           )
           .then(async (res) => {
-            console.log("bizData", res?.bizData);
+            console.log('bizData', res?.bizData);
             // let bizData = res?.bizData.split("/");
             let bizData = [res?.bizData];
             if (bizData.length) {
@@ -1380,7 +1320,7 @@ const UIDprint = (props) => {
                   // @luck 我感觉还是调用两次比较好，中间间隔3s或者5s
                   await new Promise((resolve) => setTimeout(resolve, 5000));
                 } catch (err) {
-                  console.error(err, "生成打印数据或打印异常！");
+                  console.error(err, '生成打印数据或打印异常！');
                   // message.error("生成打印数据或打印异常！");
                 }
               }
@@ -1388,7 +1328,7 @@ const UIDprint = (props) => {
               formCreate1.setFieldsValue({ generateQty: 1 });
               formCreate1.setFieldsValue({ productionDate: dayjs() });
               setLoadingOk1(false);
-              message.success("操作成功！");
+              message.success('操作成功！');
               onChange();
               setTimeout(() => {
                 QTYRef.current.focus();
@@ -1401,7 +1341,7 @@ const UIDprint = (props) => {
           });
       })
       .catch((error) => {
-        console.log("Form validation error:", error);
+        console.log('Form validation error:', error);
       });
   };
   const handleCancel1 = () => {
@@ -1421,14 +1361,14 @@ const UIDprint = (props) => {
   // 格式化日期输出（可选）
   function formatDate(date) {
     let year = date.getFullYear();
-    let month = (1 + date.getMonth()).toString().padStart(2, "0"); // 月份从0开始，所以需要+1
-    let day = date.getDate().toString().padStart(2, "0");
+    let month = (1 + date.getMonth()).toString().padStart(2, '0'); // 月份从0开始，所以需要+1
+    let day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
   // 这里不用扫描了，直接调用拿打印模板id
   const fetchData2 = () => {
-    let itemCode = formCreate1.getFieldValue("itemCode");
-    let supplierItemCode = formCreate1.getFieldValue("supplierItemCode");
+    let itemCode = formCreate1.getFieldValue('itemCode');
+    let supplierItemCode = formCreate1.getFieldValue('supplierItemCode');
     http
       .get(config.API_PREFIX + api.basicItemBaseInfoPage, {
         pageSize: 1000,
@@ -1465,11 +1405,11 @@ const UIDprint = (props) => {
   };
   //选择供应商填充数据
   const fillInOtherFields = (record) => {
-    console.log("record", record);
+    console.log('record', record);
     supplierlList.forEach((item) => {
-      console.log("item.itemCode", item.itemCode);
+      console.log('item.itemCode', item.itemCode);
       if (item.supplier == record) {
-        console.log("item.itemCode", item.itemCode);
+        console.log('item.itemCode', item.itemCode);
         formCreate1.setFieldsValue({
           itemCode: item.itemCode,
           supplierItemCode: item.supplierItemCode,
@@ -1485,12 +1425,12 @@ const UIDprint = (props) => {
   const handleProductionDateChange = () => {
     // 处理生产日期的逻辑
     try {
-      let data1 = formCreate1.getFieldValue("productionDate");
-      data1 = new Date(data1.format("YYYY-MM-DD"));
-      let data2 = formCreate1.getFieldValue("shelfLife");
+      let data1 = formCreate1.getFieldValue('productionDate');
+      data1 = new Date(data1.format('YYYY-MM-DD'));
+      let data2 = formCreate1.getFieldValue('shelfLife');
       if (data1 && data2) {
         let endDate = addDaysToDate(data1, Number(data2));
-        formCreate1.setFieldValue("expirationDate", dayjs(endDate));
+        formCreate1.setFieldValue('expirationDate', dayjs(endDate));
         console.log(dayjs(endDate));
       }
     } catch (error) {}
@@ -1507,7 +1447,7 @@ const UIDprint = (props) => {
       <Form
         labelCol={{ span: 6 }}
         form={formCreate1}
-        style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+        style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
       >
         <Form.Item
           label="原材UID"
@@ -1515,16 +1455,11 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
-          <Input
-            allowClear
-            onPressEnter={fetchData2}
-            placeholder="请输入"
-            disabled
-          />
+          <Input allowClear onPressEnter={fetchData2} placeholder="请输入" disabled />
         </Form.Item>
         <Form.Item
           label="料号"
@@ -1532,16 +1467,11 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
-          <Input
-            allowClear
-            onPressEnter={fetchData2}
-            placeholder="请输入"
-            disabled
-          />
+          <Input allowClear onPressEnter={fetchData2} placeholder="请输入" disabled />
         </Form.Item>
 
         <Form.Item
@@ -1550,7 +1480,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1573,16 +1503,11 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
-          <Input
-            allowClear
-            onPressEnter={fetchData2}
-            placeholder="请输入"
-            disabled
-          />
+          <Input allowClear onPressEnter={fetchData2} placeholder="请输入" disabled />
         </Form.Item>
 
         <Form.Item
@@ -1591,7 +1516,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1604,13 +1529,13 @@ const UIDprint = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
           <InputNumber
             ref={QTYRef}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             allowClear
             placeholder="请输入"
             onPressEnter={handleOk1}
@@ -1623,7 +1548,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1636,16 +1561,11 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
-          <Input
-            allowClear
-            onBlur={handleProductionDateChange}
-            placeholder=""
-            disabled
-          />
+          <Input allowClear onBlur={handleProductionDateChange} placeholder="" disabled />
         </Form.Item>
 
         <Form.Item
@@ -1654,7 +1574,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1662,7 +1582,7 @@ const UIDprint = (props) => {
           <DatePicker
             format="YYYY-MM-DD"
             onChange={handleProductionDateChange}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             disabled
           />
         </Form.Item>
@@ -1673,12 +1593,12 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
           {/* <Input allowClear placeholder="请输入" /> */}
-          <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} disabled />
+          <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} disabled />
         </Form.Item>
 
         <Form.Item
@@ -1687,7 +1607,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1700,7 +1620,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1713,16 +1633,11 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
-          <InputNumber
-            style={{ width: "100%" }}
-            allowClear
-            placeholder="请输入"
-            disabled
-          />
+          <InputNumber style={{ width: '100%' }} allowClear placeholder="请输入" disabled />
         </Form.Item>
       </Form>
     </Modal>
@@ -1735,9 +1650,9 @@ const CommonModal = (props) => {
   const { isCommonModal, selectedAction, selectedRow, onClose } = props;
   const [form] = Form.useForm();
   const options = {
-    create: "录入",
-    reissue: "补发",
-    scan: "扫描",
+    create: '录入',
+    reissue: '补发',
+    scan: '扫描',
   };
   const onCancel = () => {
     onClose();
@@ -1747,16 +1662,16 @@ const CommonModal = (props) => {
       .validateFields()
       .then((values) => {
         console.log(values);
-        if (selectedAction === "create" || selectedAction === "scan") {
-          let url = "";
-          if (selectedAction === "create") {
+        if (selectedAction === 'create' || selectedAction === 'scan') {
+          let url = '';
+          if (selectedAction === 'create') {
             url = `outbound/order/write`;
             //确认状态的出库单可以执行“补发”。不允许录入
             if (selectedRow.outboundStatus === 1) {
-              message.warning("出库单已确认不允许录入");
+              message.warning('出库单已确认不允许录入');
               return;
             }
-          } else if (selectedAction === "scan") {
+          } else if (selectedAction === 'scan') {
             url = `outbound/order/scan`;
           }
 
@@ -1765,42 +1680,42 @@ const CommonModal = (props) => {
               config.API_PREFIX +
                 url +
                 `?${qs.stringify({
-                  uid: form.getFieldValue("materialsUID"),
+                  uid: form.getFieldValue('materialsUID'),
                   outboundOrderId: selectedRow.id,
                 })}`,
-              {}
+              {},
             )
             .then((res) => {
               form.resetFields();
-              message.success("操作成功");
+              message.success('操作成功');
               setTimeout(() => {
                 materialsUIDRef.current.focus();
               }, 1000);
             })
             .catch((err) => {});
         }
-        if (selectedAction === "reissue") {
+        if (selectedAction === 'reissue') {
           http
             .get(
               config.API_PREFIX +
                 `outbound/order/reissue` +
                 `?${qs.stringify({
                   uid: selectedRow.id,
-                  outboundOrderId: form.getFieldValue("materialsUID"),
-                  qty: form.getFieldValue("qty"),
-                  itemCode: form.getFieldValue("itemCode"),
+                  outboundOrderId: form.getFieldValue('materialsUID'),
+                  qty: form.getFieldValue('qty'),
+                  itemCode: form.getFieldValue('itemCode'),
                 })}`,
-              {}
+              {},
             )
             .then((res) => {
               form.resetFields();
-              message.success("操作成功");
+              message.success('操作成功');
             })
             .catch((err) => {});
         }
       })
       .catch((info) => {
-        console.log("Validate Failed:", info);
+        console.log('Validate Failed:', info);
       });
   };
   const materialsUIDRef = useRef(null);
@@ -1821,16 +1736,16 @@ const CommonModal = (props) => {
         form={form}
         layout="vertical"
         labelCol={{ span: 6 }}
-        style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+        style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
         autoComplete="off"
       >
-        {selectedAction == "reissue" && (
+        {selectedAction == 'reissue' && (
           <Tabs
             defaultActiveKey="1"
             items={[
               {
-                key: "1",
-                label: "原材UID",
+                key: '1',
+                label: '原材UID',
                 children: (
                   <Form.Item
                     label="原材UID"
@@ -1838,7 +1753,7 @@ const CommonModal = (props) => {
                     rules={[
                       {
                         required: true,
-                        message: "请输入",
+                        message: '请输入',
                       },
                     ]}
                   >
@@ -1847,8 +1762,8 @@ const CommonModal = (props) => {
                 ),
               },
               {
-                key: "2",
-                label: "原材料号",
+                key: '2',
+                label: '原材料号',
                 children: (
                   <>
                     <Form.Item
@@ -1857,7 +1772,7 @@ const CommonModal = (props) => {
                       rules={[
                         {
                           required: true,
-                          message: "请输入",
+                          message: '请输入',
                         },
                       ]}
                     >
@@ -1869,7 +1784,7 @@ const CommonModal = (props) => {
                       rules={[
                         {
                           required: true,
-                          message: "请输入",
+                          message: '请输入',
                         },
                       ]}
                     >
@@ -1881,16 +1796,16 @@ const CommonModal = (props) => {
             ]}
           />
         )}
-        {(selectedAction === "create" ||
-          selectedAction === "scan" ||
-          selectedAction === "confirm") && (
+        {(selectedAction === 'create' ||
+          selectedAction === 'scan' ||
+          selectedAction === 'confirm') && (
           <Form.Item
             label="原材UID"
             name="materialsUID"
             rules={[
               {
                 required: true,
-                message: "请输入",
+                message: '请输入',
               },
             ]}
           >

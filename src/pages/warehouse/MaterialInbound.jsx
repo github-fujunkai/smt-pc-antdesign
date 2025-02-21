@@ -1,88 +1,75 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import {
-  Badge,
-  Dropdown,
-  Drawer,
-  Tooltip,
-  Switch,
-  Typography,
-  DatePicker,
-  Image,
-  Tag,
-  Table,
-  Modal,
-  Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
-  Button,
-  message,
-} from "antd";
 import {
   ExclamationCircleFilled,
-  DownOutlined,
-  LoadingOutlined,
   PlusOutlined,
+  RollbackOutlined,
   SearchOutlined,
   SwapOutlined,
-  RollbackOutlined,
-} from "@ant-design/icons";
-import WmsCount from "./WmsCount";
-import http from "../../utils/http";
-import { config } from "../../utils/config";
-import api from "../../utils/api";
-import qs, { stringify } from "qs";
-import  dayjs from "dayjs";
-import { useAntdResizableHeader } from "@minko-fe/use-antd-resizable-header";
-import "@minko-fe/use-antd-resizable-header/index.css";
+} from '@ant-design/icons';
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useAntdResizableHeader } from '@minko-fe/use-antd-resizable-header';
+import '@minko-fe/use-antd-resizable-header/index.css';
 import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+  Typography,
+} from 'antd';
+import dayjs from 'dayjs';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import api from '../../utils/api';
+import { config } from '../../utils/config';
+import http from '../../utils/http';
+import WmsCount from './WmsCount';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
 let activeId = -1;
 let activeId1 = -1;
 let activeId2 = -1;
-let action2 = "";
+let action2 = '';
 
 // 工单状态
 const statusObj = {
-  0: "新建",
-  1: "下达",
-  2: "执行",
-  3: "挂起",
-  4: "结单",
-  5: "取消",
+  0: '新建',
+  1: '下达',
+  2: '执行',
+  3: '挂起',
+  4: '结单',
+  5: '取消',
 };
 
 // 工单类型
 const lotNoObj = {
-  0: "量产",
-  1: "试产",
-  2: "制样",
+  0: '量产',
+  1: '试产',
+  2: '制样',
 };
 
 // 制令单状态：0.新建，1.投产，2.挂起，3.结单
 const statusObj1 = {
-  0: "新建",
-  1: "投产",
-  2: "挂起",
-  3: "接单",
+  0: '新建',
+  1: '投产',
+  2: '挂起',
+  3: '接单',
 };
 
 const App = () => {
@@ -93,7 +80,7 @@ const App = () => {
   };
 
   const onFinish = (values) => {
-    console.log("search values", values);
+    console.log('search values', values);
     if (tableParams.pagination?.current !== 1) {
       setTableParams(paginationInit);
     } else {
@@ -115,34 +102,34 @@ const App = () => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([
     {
-      title: "入库单",
-      dataIndex: "inboundOrderNumber",
+      title: '入库单',
+      dataIndex: 'inboundOrderNumber',
       // sorter: true,
-      key: "inboundOrderNumber",
+      key: 'inboundOrderNumber',
       width: 100,
     },
     {
-      title: "采购单",
-      dataIndex: "purchaseOrderNumber",
-      key: "purchaseOrderNumber",
+      title: '采购单',
+      dataIndex: 'purchaseOrderNumber',
+      key: 'purchaseOrderNumber',
       width: 100,
     },
     {
-      title: "送货单",
-      dataIndex: "deliveryOrder",
-      key: "deliveryOrder",
+      title: '送货单',
+      dataIndex: 'deliveryOrder',
+      key: 'deliveryOrder',
       width: 100,
     },
     {
-      title: "供应商",
-      dataIndex: "supplier",
-      key: "supplier",
+      title: '供应商',
+      dataIndex: 'supplier',
+      key: 'supplier',
       width: 100,
     },
     {
-      title: "送货人",
-      dataIndex: "shipper",
-      key: "shipper",
+      title: '送货人',
+      dataIndex: 'shipper',
+      key: 'shipper',
       width: 100,
     },
     // {
@@ -151,69 +138,65 @@ const App = () => {
     //   key: "xxxxx",
     // },
     {
-      title: "仓库",
-      dataIndex: "storageLocation",
-      key: "storageLocation",
+      title: '仓库',
+      dataIndex: 'storageLocation',
+      key: 'storageLocation',
       width: 100,
     },
     {
-      title: "确认人",
-      dataIndex: "approver",
-      key: "approver",
+      title: '确认人',
+      dataIndex: 'approver',
+      key: 'approver',
       width: 100,
     },
     {
-      title: "入库人",
-      dataIndex: "receiver",
-      key: "receiver",
+      title: '入库人',
+      dataIndex: 'receiver',
+      key: 'receiver',
       width: 100,
     },
     {
-      title: "入库单状态",
-      dataIndex: "inboundStatus",
-      key: "inboundStatus",
+      title: '入库单状态',
+      dataIndex: 'inboundStatus',
+      key: 'inboundStatus',
       render: (_, record) => {
-        return record.inboundStatus === 0 ? "新增" : "确认";
+        return record.inboundStatus === 0 ? '新增' : '确认';
       },
       width: 100,
     },
     {
-      title: "入库类型",
-      dataIndex: "inboundType",
-      key: "inboundType",
+      title: '入库类型',
+      dataIndex: 'inboundType',
+      key: 'inboundType',
       render: (_, record) => {
         return record.inboundType === 1
-          ? "采购入库"
+          ? '采购入库'
           : record.inboundType === 2
-          ? "客户供料"
-          : "产线退库";
+          ? '客户供料'
+          : '产线退库';
       },
       width: 100,
     },
     {
-      title: "入库日期",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '入库日期',
+      dataIndex: 'createTime',
+      key: 'createTime',
       render: (_, record) => {
-        return dayjs(_).format("YYYY-MM-DD");
+        return dayjs(_).format('YYYY-MM-DD');
       },
       width: 100,
     },
     {
-      title: "操作",
-      dataIndex: "operation",
-      fixed: "right",
+      title: '操作',
+      dataIndex: 'operation',
+      fixed: 'right',
       render: (_, record) => {
         return (
           <Space>
-            <Typography.Link onClick={() => handlePrint("create", record)}>
-              录入
-            </Typography.Link>
-            <Typography.Link onClick={() => showModal("update", record)}>
-              修改
-            </Typography.Link>
+            <Typography.Link onClick={() => handlePrint('create', record)}>录入</Typography.Link>
+            <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
-            <Typography.Link onClick={() => showModal("update", record, true)}>
+            <Typography.Link onClick={() => showModal('update', record, true)}>
               确认
             </Typography.Link>
           </Space>
@@ -224,49 +207,46 @@ const App = () => {
 
   const del = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
-          .del(config.API_PREFIX + "inbound/order" + `/${record?.id}`, {})
+          .del(config.API_PREFIX + 'inbound/order' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
 
   const del2 = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
-          .del(
-            config.API_PREFIX + "inbound/order/detail" + `/${record?.id}`,
-            {}
-          )
+          .del(config.API_PREFIX + 'inbound/order/detail' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
@@ -275,15 +255,15 @@ const App = () => {
   // 生成单号
   const getAddOrder = () => {
     http
-      .get(config.API_PREFIX + "inbound/order/generateOrderNumber", {})
+      .get(config.API_PREFIX + 'inbound/order/generateOrderNumber', {})
       .then((res) => {
-        formCreate.setFieldValue("inboundOrderNumber", res.bizData || "");
+        formCreate.setFieldValue('inboundOrderNumber', res.bizData || '');
       })
       .catch((err) => {});
   };
   //新增入库单
   const showModal = (action, record, confirm) => {
-    if (action === "update" && record) {
+    if (action === 'update' && record) {
       const {
         id,
         inboundOrderNumber,
@@ -319,14 +299,14 @@ const App = () => {
   };
 
   const [isModalOpen1, setIsModalOpen1] = useState(false);
-  const [isAddOrPrint, setIsAddOrPrint] = useState("create");
+  const [isAddOrPrint, setIsAddOrPrint] = useState('create');
   const [isPrintData, setIsPrintData] = useState({});
   const handlePrint = (action, record) => {
     setIsAddOrPrint(action);
     setIsPrintData(record);
     activeId1 = record.id;
-    console.log("action", action, record);
-    if (action == "create") {
+    console.log('action', action, record);
+    if (action == 'create') {
       setIsModalOpen1(true);
     }
   };
@@ -336,7 +316,7 @@ const App = () => {
     formCreate
       .validateFields()
       .then((values) => {
-        console.log("values", values);
+        console.log('values', values);
         setLoadingOk(true);
         // wtf
         const {
@@ -362,8 +342,8 @@ const App = () => {
           supplier,
         };
         let action = null;
-        let msg = "";
-        let apiUrl = "";
+        let msg = '';
+        let apiUrl = '';
         if (activeId !== -1) {
           action = http.post;
           apiUrl = `${config.API_PREFIX}inbound/order`;
@@ -371,15 +351,15 @@ const App = () => {
           // 如果是确认增加确认人
           if (isConfirm) {
             params.inboundStatus = 1;
-            params.approver = localStorage.getItem("username");
+            params.approver = localStorage.getItem('username');
           }
-          msg = "修改成功！";
+          msg = '修改成功！';
         } else {
           action = http.post;
           apiUrl = `${config.API_PREFIX}inbound/order`;
-          msg = "新增成功！";
+          msg = '新增成功！';
         }
-        console.log("paramsparamsparamsparamsparamsparams", params, isConfirm);
+        console.log('paramsparamsparamsparamsparamsparams', params, isConfirm);
         action(apiUrl, params)
           .then((res) => {
             formCreate.resetFields();
@@ -394,7 +374,7 @@ const App = () => {
           });
       })
       .catch((error) => {
-        console.log("Form validation error:", error);
+        console.log('Form validation error:', error);
       });
   };
 
@@ -420,7 +400,7 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-    console.log("JSON.stringify(tableParams)]", JSON.stringify(tableParams));
+    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -438,7 +418,7 @@ const App = () => {
 
     // sequelize 举例
     // order: [[ 'created_at', 'desc' ], [ 'categoryId', 'desc' ]],
-    console.log("order, field", order, field);
+    console.log('order, field', order, field);
 
     // 多个传参举例-hzry
     // GET /api/resource?sort=created_at:desc,categoryId:asc
@@ -454,8 +434,8 @@ const App = () => {
       // 举例：lxy
       // orders[0].column: id
       // orders[0].asc: true
-      params["orders[0].column"] = field;
-      params["orders[0].asc"] = order === "ascend" ? true : false;
+      params['orders[0].column'] = field;
+      params['orders[0].asc'] = order === 'ascend' ? true : false;
     }
 
     const {
@@ -503,18 +483,18 @@ const App = () => {
       params.childMaterialUid = materialUid;
     }
     if (startTime) {
-      params.createTimeStart = startTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeStart = startTime.format('YYYY-MM-DD 00:00:00');
     }
     if (endTime) {
-      params.createTimeEnd = endTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeEnd = endTime.format('YYYY-MM-DD 00:00:00');
     }
-    console.log("inboundStatus", params);
+    console.log('inboundStatus', params);
     // 传到wms汇总
     setWmsCountData(params);
     http
-      .get(config.API_PREFIX + "inbound/order/page", params)
+      .get(config.API_PREFIX + 'inbound/order/page', params)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
 
         setData(data?.records || []);
@@ -534,13 +514,13 @@ const App = () => {
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange: ", pagination, filters, sorter);
+    console.log('handleTableChange: ', pagination, filters, sorter);
     setTableParams({
       pagination,
       filters,
       ...sorter,
     });
-    console.log("tableParams1", tableParams);
+    console.log('tableParams1', tableParams);
 
     // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
@@ -551,91 +531,87 @@ const App = () => {
   const [loadingUpload, setLoadingUpload] = useState(false);
 
   const expandedRowRender = (record) => {
-    console.log("record", record.details);
+    console.log('record', record.details);
     const columns1 = [
       {
-        title: "原材UID",
-        dataIndex: "materialUid",
-        key: "materialUid",
+        title: '原材UID',
+        dataIndex: 'materialUid',
+        key: 'materialUid',
       },
       {
-        title: "料号",
-        dataIndex: "itemCode",
-        key: "itemCode",
+        title: '料号',
+        dataIndex: 'itemCode',
+        key: 'itemCode',
       },
       {
-        title: "供应商料号",
-        dataIndex: "supplierItemCode",
-        key: "supplierItemCode",
+        title: '供应商料号',
+        dataIndex: 'supplierItemCode',
+        key: 'supplierItemCode',
       },
       {
-        title: "物料描述",
-        dataIndex: "materialDescription",
-        key: "materialDescription",
+        title: '物料描述',
+        dataIndex: 'materialDescription',
+        key: 'materialDescription',
       },
       {
-        title: "批次号",
-        dataIndex: "lotNo",
-        key: "lotNo",
+        title: '批次号',
+        dataIndex: 'lotNo',
+        key: 'lotNo',
       },
       {
-        title: "包装数量",
-        dataIndex: "packageQty",
-        key: "packageQty",
+        title: '包装数量',
+        dataIndex: 'packageQty',
+        key: 'packageQty',
       },
       {
-        title: "入库数量",
-        dataIndex: "inboundQty",
-        key: "inboundQty",
+        title: '入库数量',
+        dataIndex: 'inboundQty',
+        key: 'inboundQty',
       },
       {
-        title: "DateCode",
-        dataIndex: "dateCode",
-        key: "dateCode",
+        title: 'DateCode',
+        dataIndex: 'dateCode',
+        key: 'dateCode',
       },
       {
-        title: "物料类型",
-        dataIndex: "itemCategory",
-        key: "itemCategory",
+        title: '物料类型',
+        dataIndex: 'itemCategory',
+        key: 'itemCategory',
       },
       {
-        title: "MSL",
-        dataIndex: "msl",
-        key: "msl",
+        title: 'MSL',
+        dataIndex: 'msl',
+        key: 'msl',
       },
       {
-        title: "有效期",
-        dataIndex: "expirationDate",
-        key: "expirationDate",
+        title: '有效期',
+        dataIndex: 'expirationDate',
+        key: 'expirationDate',
       },
       {
-        title: "库位",
-        dataIndex: "storageLocation",
-        key: "storageLocation",
+        title: '库位',
+        dataIndex: 'storageLocation',
+        key: 'storageLocation',
       },
       {
-        title: "创建日期",
-        dataIndex: "createTime",
-        key: "createTime",
+        title: '创建日期',
+        dataIndex: 'createTime',
+        key: 'createTime',
       },
       {
-        title: "操作员",
-        dataIndex: "updateBy",
-        key: "updateBy",
+        title: '操作员',
+        dataIndex: 'updateBy',
+        key: 'updateBy',
       },
       {
-        title: "操作",
-        key: "operation",
-        fixed: "right",
+        title: '操作',
+        key: 'operation',
+        fixed: 'right',
         render: (_, record) => {
           return (
             <Space>
-              <Typography.Link onClick={() => handlePrint("update", record)}>
-                打印
-              </Typography.Link>
-              <Typography.Link onClick={() => del2(record)}>
-                删除
-              </Typography.Link>
+              <Typography.Link onClick={() => handlePrint('update', record)}>打印</Typography.Link>
+              <Typography.Link onClick={() => del2(record)}>删除</Typography.Link>
             </Space>
           );
         },
@@ -647,37 +623,35 @@ const App = () => {
         dataSource={record?.details || []}
         pagination={false}
         size="small"
-        scroll={{ x: "max-content" }}
+        scroll={{ x: 'max-content' }}
         bordered
-        style={{ margin: "10px 10px 10px 0" }}
+        style={{ margin: '10px 10px 10px 0' }}
         className="custom-table"
       />
     );
   };
   // --------------------------------------------------------------------------------------------------------------------
-  const { components, resizableColumns, tableWidth, resetColumns } =
-    useAntdResizableHeader({
-      columns: useMemo(() => columns, [columns]),
-      columnsState: {
-        persistenceKey: "localKeyMaterialInbound",
-        persistenceType: "localStorage",
-      },
-    });
+  const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
+    columns: useMemo(() => columns, [columns]),
+    columnsState: {
+      persistenceKey: 'localKeyMaterialInbound',
+      persistenceType: 'localStorage',
+    },
+  });
 
   // 可拖动的单个项目组件
   function SortableItem({ id, content, isDraggable }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({
-        id: id,
-        disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
-      });
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id: id,
+      disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
+    });
 
     const style = {
       transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
       transition,
       // 如果不可拖动，可以添加不同的样式或逻辑
       opacity: isDraggable ? 1 : 0.5,
-      cursor: isDraggable ? "grab" : "not-allowed",
+      cursor: isDraggable ? 'grab' : 'not-allowed',
     };
 
     return (
@@ -692,7 +666,7 @@ const App = () => {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: verticalListSortingStrategy,
-    })
+    }),
   );
 
   // 拖放逻辑处理函数
@@ -722,14 +696,11 @@ const App = () => {
   };
 
   const saveColumnsOrder = (columns) => {
-    localStorage.setItem(
-      "columnsMaterialInbound",
-      JSON.stringify(columns.map((col) => col.key))
-    );
+    localStorage.setItem('columnsMaterialInbound', JSON.stringify(columns.map((col) => col.key)));
   };
 
   useEffect(() => {
-    const savedOrder = localStorage.getItem("columnsMaterialInbound");
+    const savedOrder = localStorage.getItem('columnsMaterialInbound');
     if (savedOrder) {
       const order = JSON.parse(savedOrder);
       const orderedColumns = order
@@ -740,8 +711,8 @@ const App = () => {
     // 其他初始化逻辑...
   }, []);
   function refreshPage() {
-    localStorage.removeItem("columnsMaterialInbound");
-    message.success("复原成功！");
+    localStorage.removeItem('columnsMaterialInbound');
+    message.success('复原成功！');
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -754,7 +725,7 @@ const App = () => {
       <div className="content h-auto">
         <div className="tools">
           <Space size="middle">
-            <Tooltip title={isShowSearch ? "隐藏搜索" : "显示搜索"}>
+            <Tooltip title={isShowSearch ? '隐藏搜索' : '显示搜索'}>
               <Switch
                 onChange={onSearchChange}
                 checkedChildren={<SearchOutlined />}
@@ -781,10 +752,7 @@ const App = () => {
             </Tooltip>
           </Space>
         </div>
-        <div
-          className="search-wrapper"
-          style={{ display: isShowSearch ? "block" : "none" }}
-        >
+        <div className="search-wrapper" style={{ display: isShowSearch ? 'block' : 'none' }}>
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
               <Col span={8}>
@@ -825,15 +793,15 @@ const App = () => {
                     showSearch
                     options={[
                       {
-                        label: "采购入库",
+                        label: '采购入库',
                         value: 1,
                       },
                       {
-                        label: "客户供料",
+                        label: '客户供料',
                         value: 2,
                       },
                       {
-                        label: "产线退库",
+                        label: '产线退库',
                         value: 3,
                       },
                     ]}
@@ -848,11 +816,11 @@ const App = () => {
                     showSearch
                     options={[
                       {
-                        label: "新增",
+                        label: '新增',
                         value: 0,
                       },
                       {
-                        label: "确认",
+                        label: '确认',
                         value: 1,
                       },
                     ]}
@@ -866,22 +834,18 @@ const App = () => {
               </Col>
               <Col span={8}>
                 <Form.Item label="入库日期（开始）" name="startTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item label="入库日期（结束）" name="endTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
 
               <Col span={8}>
                 <Space size="small">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
-                  >
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     查询
                   </Button>
                   <Button onClick={resetFormSearch} htmlType="button">
@@ -893,12 +857,12 @@ const App = () => {
           </Form>
         </div>
         <div className="table-wrapper h-[40vh] overflow-auto">
-          <div style={{ marginBottom: 16, textAlign: "right" }}>
+          <div style={{ marginBottom: 16, textAlign: 'right' }}>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => {
-                showModal("create");
+                showModal('create');
               }}
             >
               新增入库单
@@ -919,11 +883,13 @@ const App = () => {
             bordered
             expandable={{
               expandedRowRender,
-              defaultExpandedRowKeys: ["0"],
+              defaultExpandedRowKeys: ['0'],
               expandRowByClick: false,
             }}
           />
         </div>
+        {/* 汇总方式 */}
+        <WmsCount type={1} WmsCountData={WmsCountData} className="h-[40vh]" />
         {/* 拖拽组件 */}
         <Modal
           title="调整列顺序（拖动排序）"
@@ -937,21 +903,13 @@ const App = () => {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext
-              items={columns
-                .filter((col) => !col.fixed)
-                .map((item) => item.key)}
-            >
+            <SortableContext items={columns.filter((col) => !col.fixed).map((item) => item.key)}>
               <Row gutter={16}>
                 {columns
                   .filter((col) => !col.fixed)
                   .map((item) => (
                     <Col key={item.key} span={8}>
-                      <SortableItem
-                        id={item.key}
-                        content={item.title}
-                        isDraggable={!item?.fixed}
-                      />
+                      <SortableItem id={item.key} content={item.title} isDraggable={!item?.fixed} />
                     </Col>
                   ))}
               </Row>
@@ -972,7 +930,7 @@ const App = () => {
           <Form
             labelCol={{ span: 8 }}
             form={formCreate}
-            style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+            style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
           >
             <Form.Item
               label="入库单"
@@ -980,7 +938,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -993,7 +951,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1006,7 +964,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1019,7 +977,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1032,7 +990,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1045,7 +1003,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1058,7 +1016,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1071,7 +1029,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1081,15 +1039,15 @@ const App = () => {
                 options={[
                   {
                     value: 1,
-                    label: "采购入库",
+                    label: '采购入库',
                   },
                   {
                     value: 2,
-                    label: "客户供料",
+                    label: '客户供料',
                   },
                   {
                     value: 3,
-                    label: "产线退库",
+                    label: '产线退库',
                   },
                 ]}
               />
@@ -1100,7 +1058,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1118,8 +1076,6 @@ const App = () => {
           }}
         />
       </div>
-      {/* 汇总方式 */}
-      <WmsCount type={1} WmsCountData={WmsCountData} className=" h-[40vh]" />
     </div>
   );
 };
@@ -1143,22 +1099,19 @@ const UIDprint = (props) => {
     //如果是自动打印就执行打印逻辑
     if (isModalOpen1) {
       http
-        .post(
-          `${config.API_PREFIX}param/config/get?areaId=&code=inboundMaterialUid`,
-          {}
-        )
+        .post(`${config.API_PREFIX}param/config/get?areaId=&code=inboundMaterialUid`, {})
         .then((res) => {
           setAutoPrint(res?.bizData?.configValue == 1 ? true : false);
         });
     }
   }, [isModalOpen1]);
   useEffect(() => {
-    if (isAddOrPrint == "update") {
+    if (isAddOrPrint == 'update') {
       fetchData2(1, isPrintData.itemCode);
     }
   }, [isPrintData]);
   useEffect(() => {
-    if (isAddOrPrint == "update") {
+    if (isAddOrPrint == 'update') {
       handleOk2();
     }
   }, [nowData]);
@@ -1235,11 +1188,11 @@ const UIDprint = (props) => {
           // @luck 我感觉还是调用两次比较好，中间间隔3s或者5s
           await new Promise((resolve) => setTimeout(resolve, 5000));
         } catch (err) {
-          console.error(err, "生成打印数据或打印异常！");
+          console.error(err, '生成打印数据或打印异常！');
           // message.error("生成打印数据或打印异常！");
         }
       }
-      message.success("操作成功！");
+      message.success('操作成功！');
     }
   };
   //录入--如果是自动打印就执行打印逻辑
@@ -1247,12 +1200,8 @@ const UIDprint = (props) => {
     formCreate1
       .validateFields()
       .then((values) => {
-        values.productionDate = dayjs(values.productionDate).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-        values.expirationDate = dayjs(values.expirationDate).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
+        values.productionDate = dayjs(values.productionDate).format('YYYY-MM-DD HH:mm:ss');
+        values.expirationDate = dayjs(values.expirationDate).format('YYYY-MM-DD HH:mm:ss');
         setLoadingOk1(true);
         const {
           itemCode,
@@ -1294,21 +1243,18 @@ const UIDprint = (props) => {
                 if (autoPrint) {
                   // 自动打印才进行打印
                   for (let i = 0; i < res?.bizData.length; i++) {
-                    const printData = await getPrintData(
-                      res?.bizData[i],
-                      params
-                    );
+                    const printData = await getPrintData(res?.bizData[i], params);
                     myDesign(printData.bizData);
                     // @luck 我感觉还是调用两次比较好，中间间隔3s或者5s
                     await new Promise((resolve) => setTimeout(resolve, 5000));
                   }
                 }
               } catch (err) {
-                console.error(err, "生成打印数据或打印异常！");
+                console.error(err, '生成打印数据或打印异常！');
               }
               formCreate1.resetFields();
               setLoadingOk1(false);
-              message.success("操作成功！");
+              message.success('操作成功！');
               setTimeout(() => {
                 itemCodeRef?.current?.focus();
               }, 500);
@@ -1320,7 +1266,7 @@ const UIDprint = (props) => {
           });
       })
       .catch((error) => {
-        console.log("Form validation error:", error);
+        console.log('Form validation error:', error);
       });
   };
   const handleCancel1 = () => {
@@ -1340,13 +1286,13 @@ const UIDprint = (props) => {
   // 格式化日期输出（可选）
   function formatDate(date) {
     let year = date.getFullYear();
-    let month = (1 + date.getMonth()).toString().padStart(2, "0"); // 月份从0开始，所以需要+1
-    let day = date.getDate().toString().padStart(2, "0");
+    let month = (1 + date.getMonth()).toString().padStart(2, '0'); // 月份从0开始，所以需要+1
+    let day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
   // 扫描录入料号或者供应商料号去之前维护的物料基础信息里面进行筛选
   const fetchData2 = (type, code) => {
-    let itemCode = type == 1 ? code : formCreate1.getFieldValue("itemCode");
+    let itemCode = type == 1 ? code : formCreate1.getFieldValue('itemCode');
     // let supplierItemCode = formCreate1.getFieldValue("supplierItemCode");
     http
       .get(config.API_PREFIX + api.basicItemBaseInfoPage, {
@@ -1381,7 +1327,7 @@ const UIDprint = (props) => {
           }
         } else {
           if (type == 2) formCreate1.resetFields();
-          message.warning("未获取到物料信息，请重新输入");
+          message.warning('未获取到物料信息，请重新输入');
         }
       })
       .catch((err) => {
@@ -1390,11 +1336,11 @@ const UIDprint = (props) => {
   };
   //选择供应商填充数据
   const fillInOtherFields = (record) => {
-    console.log("record", record);
+    console.log('record', record);
     supplierlList.forEach((item) => {
-      console.log("item.itemCode", item.itemCode);
+      console.log('item.itemCode', item.itemCode);
       if (item.supplier == record) {
-        console.log("item.itemCode", item.itemCode);
+        console.log('item.itemCode', item.itemCode);
         formCreate1.setFieldsValue({
           itemCode: item.itemCode,
           supplierItemCode: item.supplierItemCode,
@@ -1410,28 +1356,28 @@ const UIDprint = (props) => {
   const handleProductionDateChange = () => {
     // 处理生产日期的逻辑
     try {
-      let data1 = formCreate1.getFieldValue("productionDate");
-      data1 = new Date(data1.format("YYYY-MM-DD"));
-      let data2 = formCreate1.getFieldValue("shelfLife");
+      let data1 = formCreate1.getFieldValue('productionDate');
+      data1 = new Date(data1.format('YYYY-MM-DD'));
+      let data2 = formCreate1.getFieldValue('shelfLife');
       if (data1 && data2) {
         let endDate = addDaysToDate(data1, Number(data2));
-        formCreate1.setFieldValue("expirationDate", dayjs(endDate));
+        formCreate1.setFieldValue('expirationDate', dayjs(endDate));
         console.log(dayjs(endDate));
       }
       setTimeout(() => {
-        jumpTo("lotNoRef");
+        jumpTo('lotNoRef');
       }, 500);
     } catch (error) {}
   };
   const jumpTo = (type) => {
     setTimeout(() => {
-      if (type == "productionDateRef") {
+      if (type == 'productionDateRef') {
         productionDateRef?.current?.focus();
-      } else if (type == "lotNoRef") {
+      } else if (type == 'lotNoRef') {
         lotNoRef?.current?.focus();
-      } else if (type == "dateCodeRef") {
+      } else if (type == 'dateCodeRef') {
         dateCodeRef?.current?.focus();
-      } else if (type == "generateQtyRef") {
+      } else if (type == 'generateQtyRef') {
         generateQtyRef?.current?.focus();
       }
     }, 500);
@@ -1448,7 +1394,7 @@ const UIDprint = (props) => {
       <Form
         labelCol={{ span: 8 }}
         form={formCreate1}
-        style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+        style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
       >
         <Form.Item
           label="料号"
@@ -1456,7 +1402,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1476,7 +1422,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1488,7 +1434,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1510,7 +1456,7 @@ const UIDprint = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -1524,7 +1470,7 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1539,16 +1485,16 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
               <InputNumber
                 ref={QTYRef}
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 allowClear
                 placeholder="请输入"
-                onPressEnter={() => jumpTo("productionDateRef")}
+                onPressEnter={() => jumpTo('productionDateRef')}
               />
             </Form.Item>
           </Col>
@@ -1562,7 +1508,7 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1577,7 +1523,7 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1595,7 +1541,7 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1604,7 +1550,7 @@ const UIDprint = (props) => {
                 ref={productionDateRef}
                 format="YYYY-MM-DD"
                 onChange={handleProductionDateChange}
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
               />
             </Form.Item>
           </Col>
@@ -1616,12 +1562,12 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
               {/* <Input allowClear placeholder="请输入" /> */}
-              <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+              <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>
@@ -1634,7 +1580,7 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1642,7 +1588,7 @@ const UIDprint = (props) => {
                 ref={lotNoRef}
                 allowClear
                 placeholder="请输入"
-                onPressEnter={() => jumpTo("dateCodeRef")}
+                onPressEnter={() => jumpTo('dateCodeRef')}
               />
             </Form.Item>
           </Col>
@@ -1654,7 +1600,7 @@ const UIDprint = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1662,7 +1608,7 @@ const UIDprint = (props) => {
                 ref={dateCodeRef}
                 allowClear
                 placeholder="请输入"
-                onPressEnter={() => jumpTo("generateQtyRef")}
+                onPressEnter={() => jumpTo('generateQtyRef')}
               />
             </Form.Item>
           </Col>
@@ -1675,13 +1621,13 @@ const UIDprint = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
           <InputNumber
             ref={generateQtyRef}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             allowClear
             placeholder="请输入"
             onPressEnter={handleOk1}

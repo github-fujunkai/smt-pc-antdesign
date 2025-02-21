@@ -1,58 +1,43 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import {
-  Badge,
-  Dropdown,
-  Drawer,
-  Tooltip,
-  Switch,
-  Typography,
-  DatePicker,
-  Image,
-  Tag,
-  Table,
-  Modal,
-  Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
-  Button,
-  message,
-  Tabs,
-} from "antd";
 import {
   ExclamationCircleFilled,
-  DownOutlined,
-  LoadingOutlined,
   PlusOutlined,
+  RollbackOutlined,
   SearchOutlined,
   SwapOutlined,
-  RollbackOutlined,
-} from "@ant-design/icons";
-import WmsCount from "./WmsCount";
-import http from "../../utils/http";
-import { config } from "../../utils/config";
-import api from "../../utils/api";
-import qs, { stringify } from "qs";
-import  dayjs from "dayjs";
-import { useAntdResizableHeader } from "@minko-fe/use-antd-resizable-header";
-import "@minko-fe/use-antd-resizable-header/index.css";
+} from '@ant-design/icons';
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useAntdResizableHeader } from '@minko-fe/use-antd-resizable-header';
+import '@minko-fe/use-antd-resizable-header/index.css';
 import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+  Typography,
+} from 'antd';
+import dayjs from 'dayjs';
+import qs from 'qs';
+import { useEffect, useMemo, useState } from 'react';
+import { config } from '../../utils/config';
+import http from '../../utils/http';
+import WmsCount from './WmsCount';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
@@ -67,7 +52,7 @@ const App = () => {
   };
 
   const onFinish = (values) => {
-    console.log("search values", values);
+    console.log('search values', values);
     if (tableParams.pagination?.current !== 1) {
       setTableParams(paginationInit);
     } else {
@@ -89,79 +74,71 @@ const App = () => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([
     {
-      title: "盘点单",
-      dataIndex: "inventoryCode",
+      title: '盘点单',
+      dataIndex: 'inventoryCode',
       // sorter: true,
-      key: "inventoryCode",
-      width:180
+      key: 'inventoryCode',
+      width: 180,
     },
     {
-      title: "盘点类型",
-      dataIndex: "inventoryType",
-      key: "inventoryType",
-      width:130
+      title: '盘点类型',
+      dataIndex: 'inventoryType',
+      key: 'inventoryType',
+      width: 130,
     },
     {
-      title: "盘点内容",
-      dataIndex: "inventoryContent",
-      key: "inventoryContent",
-      width:130
+      title: '盘点内容',
+      dataIndex: 'inventoryContent',
+      key: 'inventoryContent',
+      width: 130,
     },
     {
-      title: "盘点人",
-      dataIndex: "approver",
-      key: "approver",
-      width:130
+      title: '盘点人',
+      dataIndex: 'approver',
+      key: 'approver',
+      width: 130,
     },
     {
-      title: "确认人",
-      dataIndex: "approver",
-      key: "approver1",
-      width:130
+      title: '确认人',
+      dataIndex: 'approver',
+      key: 'approver1',
+      width: 130,
     },
     {
-      title: "盘点状态",
-      dataIndex: "inventoryStatus",
-      key: "inventoryStatus",
+      title: '盘点状态',
+      dataIndex: 'inventoryStatus',
+      key: 'inventoryStatus',
       render: (_, record) => {
-        return <>{record.inventoryStatus == 0 ? "新增" : "确认"}</>;
+        return <>{record.inventoryStatus == 0 ? '新增' : '确认'}</>;
       },
-      width:130
+      width: 130,
     },
     {
-      title: "备注",
-      dataIndex: "remark",
-      key: "remark",
-      width:130
+      title: '备注',
+      dataIndex: 'remark',
+      key: 'remark',
+      width: 130,
     },
     {
-      title: "盘点日期",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '盘点日期',
+      dataIndex: 'createTime',
+      key: 'createTime',
       render: (_, record) => {
-        return dayjs(_).format("YYYY-MM-DD");
+        return dayjs(_).format('YYYY-MM-DD');
       },
-      width:130
+      width: 130,
     },
     {
-      title: "操作",
-      dataIndex: "operation",
-      fixed: "right",
+      title: '操作',
+      dataIndex: 'operation',
+      fixed: 'right',
       render: (_, record) => {
         return (
           <Space>
-            <Typography.Link onClick={() => showModal("update", record)}>
-              修改
-            </Typography.Link>
+            <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
-            <Typography.Link
-              onClick={() => InventoryOrder(record)}
-            >
-              盘点
-            </Typography.Link>
-            <Typography.Link onClick={() => confirmOrder(record)}>
-              确认
-            </Typography.Link>
+            <Typography.Link onClick={() => InventoryOrder(record)}>盘点</Typography.Link>
+            <Typography.Link onClick={() => confirmOrder(record)}>确认</Typography.Link>
           </Space>
         );
       },
@@ -169,77 +146,70 @@ const App = () => {
   ]);
   const confirmOrder = (record) => {
     confirm({
-      title: "确认",
+      title: '确认',
       icon: <ExclamationCircleFilled />,
-      content: "是否确认当前盘点单?",
+      content: '是否确认当前盘点单?',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
-          .del(
-            config.API_PREFIX +
-              "inventory/order/confirm?id=" +
-              `${record?.id}`,
-            {}
-          )
+          .del(config.API_PREFIX + 'inventory/order/confirm?id=' + `${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("确认成功！");
+            message.success('确认成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
   const InventoryOrder = (record) => {
     confirm({
-      title: "盘点",
+      title: '盘点',
       icon: <ExclamationCircleFilled />,
-      content: "是否进行盘点?",
+      content: '是否进行盘点?',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
           .del(
-            config.API_PREFIX +
-              "inventory/order/inventory?inventoryOrderId=" +
-              `${record?.id}`,
-            {}
+            config.API_PREFIX + 'inventory/order/inventory?inventoryOrderId=' + `${record?.id}`,
+            {},
           )
           .then((res) => {
             fetchData();
-            message.success("盘点成功！");
+            message.success('盘点成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
   const del = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
-          .del(config.API_PREFIX + "inventory/order" + `/${record?.id}`, {})
+          .del(config.API_PREFIX + 'inventory/order' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
@@ -247,23 +217,16 @@ const App = () => {
   // 生成单号
   const getAddOrder = () => {
     http
-      .get(config.API_PREFIX + "inventory/order/generateOrderNumber", {})
+      .get(config.API_PREFIX + 'inventory/order/generateOrderNumber', {})
       .then((res) => {
-        formCreate.setFieldValue("inventoryCode", res.bizData || "");
+        formCreate.setFieldValue('inventoryCode', res.bizData || '');
       })
       .catch((err) => {});
   };
   //新增盘点单
   const showModal = (action, record, confirm) => {
-    if (action === "update" && record) {
-      const {
-        id,
-        inventoryCode,
-        inventoryType,
-        inventoryContent,
-        approver,
-        remark,
-      } = record;
+    if (action === 'update' && record) {
+      const { id, inventoryCode, inventoryType, inventoryContent, approver, remark } = record;
       activeId = id;
       formCreate.setFieldsValue({
         inventoryCode,
@@ -286,15 +249,9 @@ const App = () => {
     formCreate
       .validateFields()
       .then((values) => {
-        console.log("values", values);
+        console.log('values', values);
         setLoadingOk(true);
-        const {
-          inventoryCode,
-          inventoryType,
-          inventoryContent,
-          approver,
-          remark,
-        } = values;
+        const { inventoryCode, inventoryType, inventoryContent, approver, remark } = values;
         let params = {
           inventoryCode,
           inventoryType,
@@ -303,18 +260,18 @@ const App = () => {
           remark,
         };
         let action = null;
-        let msg = "";
-        let apiUrl = "";
-        console.log("activeId", activeId);
+        let msg = '';
+        let apiUrl = '';
+        console.log('activeId', activeId);
         if (activeId !== -1) {
           action = http.post;
           apiUrl = `${config.API_PREFIX}inventory/order`;
           params.id = activeId;
-          msg = "修改成功！";
+          msg = '修改成功！';
         } else {
           action = http.post;
           apiUrl = `${config.API_PREFIX}inventory/order`;
-          msg = "新增成功！";
+          msg = '新增成功！';
         }
         action(apiUrl, params)
           .then((res) => {
@@ -330,7 +287,7 @@ const App = () => {
           });
       })
       .catch((error) => {
-        console.log("Form validation error:", error);
+        console.log('Form validation error:', error);
       });
   };
 
@@ -356,7 +313,7 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-    console.log("JSON.stringify(tableParams)]", JSON.stringify(tableParams));
+    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -374,7 +331,7 @@ const App = () => {
 
     // sequelize 举例
     // order: [[ 'created_at', 'desc' ], [ 'categoryId', 'desc' ]],
-    console.log("order, field", order, field);
+    console.log('order, field', order, field);
 
     // 多个传参举例-hzry
     // GET /api/resource?sort=created_at:desc,categoryId:asc
@@ -390,12 +347,20 @@ const App = () => {
       // 举例：lxy
       // orders[0].column: id
       // orders[0].asc: true
-      params["orders[0].column"] = field;
-      params["orders[0].asc"] = order === "ascend" ? true : false;
+      params['orders[0].column'] = field;
+      params['orders[0].asc'] = order === 'ascend' ? true : false;
     }
 
     const {
-      inventoryCode,inventoryType,inventoryContent,approver,lotNo,materialUid,storageLocation,startTime,endTime
+      inventoryCode,
+      inventoryType,
+      inventoryContent,
+      approver,
+      lotNo,
+      materialUid,
+      storageLocation,
+      startTime,
+      endTime,
     } = formSearch.getFieldsValue();
     if (inventoryCode) {
       params.inventoryCode = inventoryCode;
@@ -419,21 +384,21 @@ const App = () => {
       params.lotNo = lotNo;
     }
     if (startTime) {
-      params.createTimeStart = startTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeStart = startTime.format('YYYY-MM-DD 00:00:00');
     }
     if (endTime) {
-      params.createTimeEnd = endTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeEnd = endTime.format('YYYY-MM-DD 00:00:00');
     }
     setWmsCountData(params);
     http
-      .get(config.API_PREFIX + "inventory/order/page", params)
+      .get(config.API_PREFIX + 'inventory/order/page', params)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
 
         setData(data?.records || []);
         setLoading(false);
-        console.log("fetchData pagination", tableParams);
+        console.log('fetchData pagination', tableParams);
         setTableParams({
           ...tableParams,
           pagination: {
@@ -449,13 +414,13 @@ const App = () => {
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange: ", pagination, filters, sorter);
+    console.log('handleTableChange: ', pagination, filters, sorter);
     setTableParams({
       pagination,
       filters,
       ...sorter,
     });
-    console.log("tableParams1", tableParams);
+    console.log('tableParams1', tableParams);
 
     // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
@@ -466,63 +431,63 @@ const App = () => {
   const [loadingUpload, setLoadingUpload] = useState(false);
 
   const expandedRowRender = (record) => {
-    console.log("record", record.inventoryOrderMaterialDetails);
+    console.log('record', record.inventoryOrderMaterialDetails);
     const columns1 = [
       {
-        title: "料盘UID",
-        dataIndex: "materialUid",
-        key: "materialUid",
+        title: '料盘UID',
+        dataIndex: 'materialUid',
+        key: 'materialUid',
       },
       {
-        title: "料号",
-        dataIndex: "itemCode",
-        key: "itemCode",
+        title: '料号',
+        dataIndex: 'itemCode',
+        key: 'itemCode',
       },
       {
-        title: "供应商料号",
-        dataIndex: "supplierItemCode",
-        key: "supplierItemCode",
+        title: '供应商料号',
+        dataIndex: 'supplierItemCode',
+        key: 'supplierItemCode',
       },
       {
-        title: "物料描述",
-        dataIndex: "materialDescription",
-        key: "materialDescription",
+        title: '物料描述',
+        dataIndex: 'materialDescription',
+        key: 'materialDescription',
       },
       {
-        title: "数量",
-        dataIndex: "qty",
-        key: "qty",
+        title: '数量',
+        dataIndex: 'qty',
+        key: 'qty',
       },
       {
-        title: "盘点数量",
-        dataIndex: "inventoryQty",
-        key: "inventoryQty",
+        title: '盘点数量',
+        dataIndex: 'inventoryQty',
+        key: 'inventoryQty',
       },
       {
-        title: "差异数量",
-        dataIndex: "differenceQty",
-        key: "differenceQty",
+        title: '差异数量',
+        dataIndex: 'differenceQty',
+        key: 'differenceQty',
       },
       {
-        title: "库位",
-        dataIndex: "storageLocation",
-        key: "storageLocation",
+        title: '库位',
+        dataIndex: 'storageLocation',
+        key: 'storageLocation',
       },
       {
-        title: "已盘点",
-        dataIndex: "isInventory",
-        key: "isInventory",
+        title: '已盘点',
+        dataIndex: 'isInventory',
+        key: 'isInventory',
       },
     ];
     return (
       <Table
         columns={columns1}
-        dataSource={record?.inventoryOrderMaterialDetails|| []}
+        dataSource={record?.inventoryOrderMaterialDetails || []}
         pagination={false}
         size="small"
-        scroll={{ x: "max-content" }}
+        scroll={{ x: 'max-content' }}
         bordered
-        style={{ margin: "10px 10px 10px 0" }}
+        style={{ margin: '10px 10px 10px 0' }}
         className="custom-table"
       />
     );
@@ -530,7 +495,7 @@ const App = () => {
   // 弹窗组件
   const [isCommonModal, setIsCommonModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState([]);
-  const [selectedAction, setSelectedAction] = useState("");
+  const [selectedAction, setSelectedAction] = useState('');
   const showCommonModal = (action, record, confirm) => {
     console.log(action, action, confirm);
     setSelectedAction(action);
@@ -541,29 +506,27 @@ const App = () => {
     setIsCommonModal(false);
   };
   // --------------------------------------------------------------------------------------------------------------------
-  const { components, resizableColumns, tableWidth, resetColumns } =
-    useAntdResizableHeader({
-      columns: useMemo(() => columns, [columns]),
-      columnsState: {
-        persistenceKey: "localKeyMaterialInbound",
-        persistenceType: "localStorage",
-      },
-    });
+  const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
+    columns: useMemo(() => columns, [columns]),
+    columnsState: {
+      persistenceKey: 'localKeyMaterialInbound',
+      persistenceType: 'localStorage',
+    },
+  });
 
   // 可拖动的单个项目组件
   function SortableItem({ id, content, isDraggable }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({
-        id: id,
-        disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
-      });
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id: id,
+      disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
+    });
 
     const style = {
       transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
       transition,
       // 如果不可拖动，可以添加不同的样式或逻辑
       opacity: isDraggable ? 1 : 0.5,
-      cursor: isDraggable ? "grab" : "not-allowed",
+      cursor: isDraggable ? 'grab' : 'not-allowed',
     };
 
     return (
@@ -578,7 +541,7 @@ const App = () => {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: verticalListSortingStrategy,
-    })
+    }),
   );
 
   // 拖放逻辑处理函数
@@ -608,14 +571,11 @@ const App = () => {
   };
 
   const saveColumnsOrder = (columns) => {
-    localStorage.setItem(
-      "columnsInventoryCount",
-      JSON.stringify(columns.map((col) => col.key))
-    );
+    localStorage.setItem('columnsInventoryCount', JSON.stringify(columns.map((col) => col.key)));
   };
 
   useEffect(() => {
-    const savedOrder = localStorage.getItem("columnsInventoryCount");
+    const savedOrder = localStorage.getItem('columnsInventoryCount');
     if (savedOrder) {
       const order = JSON.parse(savedOrder);
       const orderedColumns = order
@@ -626,8 +586,8 @@ const App = () => {
     // 其他初始化逻辑...
   }, []);
   function refreshPage() {
-    localStorage.removeItem("columnsInventoryCount");
-    message.success("复原成功！");
+    localStorage.removeItem('columnsInventoryCount');
+    message.success('复原成功！');
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -640,7 +600,7 @@ const App = () => {
       <div className="content h-auto">
         <div className="tools">
           <Space size="middle">
-            <Tooltip title={isShowSearch ? "隐藏搜索" : "显示搜索"}>
+            <Tooltip title={isShowSearch ? '隐藏搜索' : '显示搜索'}>
               <Switch
                 onChange={onSearchChange}
                 checkedChildren={<SearchOutlined />}
@@ -667,10 +627,7 @@ const App = () => {
             </Tooltip>
           </Space>
         </div>
-        <div
-          className="search-wrapper"
-          style={{ display: isShowSearch ? "block" : "none" }}
-        >
+        <div className="search-wrapper" style={{ display: isShowSearch ? 'block' : 'none' }}>
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
               <Col span={8}>
@@ -686,12 +643,12 @@ const App = () => {
                     showSearch
                     options={[
                       {
-                        label: "库位",
-                        value: "库位",
+                        label: '库位',
+                        value: '库位',
                       },
                       {
-                        label: "料号",
-                        value: "料号",
+                        label: '料号',
+                        value: '料号',
                       },
                     ]}
                   />
@@ -724,22 +681,18 @@ const App = () => {
               </Col>
               <Col span={8}>
                 <Form.Item label="盘点日期（开始）" name="startTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item label="盘点日期（结束）" name="endTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
 
               <Col span={8}>
                 <Space size="small">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
-                  >
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     查询
                   </Button>
                   <Button onClick={resetFormSearch} htmlType="button">
@@ -751,12 +704,12 @@ const App = () => {
           </Form>
         </div>
         <div className="table-wrapper  h-[40vh] overflow-auto">
-          <div style={{ marginBottom: 16, textAlign: "right" }}>
+          <div style={{ marginBottom: 16, textAlign: 'right' }}>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => {
-                showModal("create");
+                showModal('create');
               }}
             >
               新增盘点单
@@ -774,11 +727,13 @@ const App = () => {
             bordered
             expandable={{
               expandedRowRender,
-              defaultExpandedRowKeys: ["0"],
+              defaultExpandedRowKeys: ['0'],
               expandRowByClick: false,
             }}
           />
         </div>
+        {/* 汇总方式 */}
+        <WmsCount type={4} WmsCountData={WmsCountData} className=" h-[40vh]" />
         {/* 拖拽组件 */}
         <Modal
           title="调整列顺序（拖动排序）"
@@ -792,21 +747,13 @@ const App = () => {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext
-              items={columns
-                .filter((col) => !col.fixed)
-                .map((item) => item.key)}
-            >
+            <SortableContext items={columns.filter((col) => !col.fixed).map((item) => item.key)}>
               <Row gutter={16}>
                 {columns
                   .filter((col) => !col.fixed)
                   .map((item) => (
                     <Col key={item.key} span={8}>
-                      <SortableItem
-                        id={item.key}
-                        content={item.title}
-                        isDraggable={!item?.fixed}
-                      />
+                      <SortableItem id={item.key} content={item.title} isDraggable={!item?.fixed} />
                     </Col>
                   ))}
               </Row>
@@ -827,7 +774,7 @@ const App = () => {
           <Form
             labelCol={{ span: 6 }}
             form={formCreate}
-            style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+            style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
           >
             <Form.Item
               label="盘点单"
@@ -835,7 +782,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -847,7 +794,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -856,12 +803,12 @@ const App = () => {
                 allowClear
                 options={[
                   {
-                    label: "库位",
-                    value: "库位",
+                    label: '库位',
+                    value: '库位',
                   },
                   {
-                    label: "料号",
-                    value: "料号",
+                    label: '料号',
+                    value: '料号',
                   },
                 ]}
               />
@@ -872,7 +819,7 @@ const App = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -885,7 +832,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -897,7 +844,7 @@ const App = () => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -915,8 +862,6 @@ const App = () => {
           }}
         />
       </div>
-      {/* 汇总方式 */}
-      <WmsCount type={4} WmsCountData={WmsCountData} className=" h-[40vh]" />
     </div>
   );
 };
@@ -927,8 +872,8 @@ const CommonModal = (props) => {
   const { isCommonModal, selectedAction, selectedRow, onClose } = props;
   const [form] = Form.useForm();
   const options = {
-    stocktaking: "盘点",
-    confirm: "确认",
+    stocktaking: '盘点',
+    confirm: '确认',
   };
   const onCancel = () => {
     onClose();
@@ -938,9 +883,9 @@ const CommonModal = (props) => {
       .validateFields()
       .then((values) => {
         console.log(values);
-        if (selectedAction === "stocktaking") {
-          let url = "";
-          if (selectedAction === "stocktaking") {
+        if (selectedAction === 'stocktaking') {
+          let url = '';
+          if (selectedAction === 'stocktaking') {
             url = `inventory/order/inventory`;
           }
           http
@@ -948,17 +893,17 @@ const CommonModal = (props) => {
               config.API_PREFIX +
                 url +
                 `?${qs.stringify({
-                  itemCode: form.getFieldValue("itemCode"),
+                  itemCode: form.getFieldValue('itemCode'),
                   inventoryOrderId: selectedRow.id,
                 })}`,
-              {}
+              {},
             )
             .then((res) => {})
             .catch((err) => {});
         }
       })
       .catch((info) => {
-        console.log("Validate Failed:", info);
+        console.log('Validate Failed:', info);
       });
   };
   return (
@@ -978,17 +923,17 @@ const CommonModal = (props) => {
         form={form}
         layout="vertical"
         labelCol={{ span: 6 }}
-        style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+        style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
         autoComplete="off"
       >
-        {selectedAction === "stocktaking" && (
+        {selectedAction === 'stocktaking' && (
           <Form.Item
             label="料号"
             name="itemCode"
             rules={[
               {
                 required: true,
-                message: "请输入",
+                message: '请输入',
               },
             ]}
           >

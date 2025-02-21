@@ -22,16 +22,16 @@ export default [
       },
     ],
   },
-  {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
-  },
+  // {
+  //   path: '/welcome',
+  //   name: 'welcome',
+  //   icon: 'smile',
+  //   component: './Welcome',
+  // },
   {
     path: '/app',
     name: '基础设置',
-    icon: 'crown',
+    icon: 'SettingOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -78,7 +78,7 @@ export default [
   {
     path: '/factory',
     name: '工厂建模',
-    icon: 'crown',
+    icon: 'InsertRowBelowOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -105,7 +105,7 @@ export default [
   {
     path: '/replace',
     name: '替代物料',
-    icon: 'crown',
+    icon: 'InboxOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -132,7 +132,7 @@ export default [
   {
     path: '/rule',
     name: '规则设定',
-    icon: 'crown',
+    icon: 'ProfileOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -159,7 +159,7 @@ export default [
   {
     path: '/warehouse',
     name: '仓库管理',
-    icon: 'crown',
+    icon: 'HomeOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -171,7 +171,7 @@ export default [
         component: './StoreMaterial',
       },
       {
-        path: '/warehouse/BarcodeDecoding',
+        path: '/warehouse/MaterialInbound',
         name: '原材入库',
         component: './warehouse/MaterialInbound',
       },
@@ -200,7 +200,7 @@ export default [
   {
     path: '/ierror',
     name: '防错追溯',
-    icon: 'crown',
+    icon: 'SafetyCertificateOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -221,7 +221,7 @@ export default [
   {
     path: '/search',
     name: '信息查询',
-    icon: 'crown',
+    icon: 'SearchOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -262,7 +262,7 @@ export default [
   {
     path: '/produce',
     name: '生产计划',
-    icon: 'crown',
+    icon: 'ProjectOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -282,8 +282,8 @@ export default [
   },
   {
     path: '/manufacture',
-    name: '生产计划',
-    icon: 'crown',
+    name: '生产管理',
+    icon: 'SolutionOutlined',
     access: 'canAdmin',
     routes: [
       {
@@ -311,23 +311,23 @@ export default [
       },
     ],
   },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    routes: [
-      {
-        path: '/admin',
-        redirect: '/admin/sub-page',
-      },
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        component: './Admin',
-      },
-    ],
-  },
+  // {
+  //   path: '/admin',
+  //   name: 'admin',
+  //   icon: 'crown',
+  //   access: 'canAdmin',
+  //   routes: [
+  //     {
+  //       path: '/admin',
+  //       redirect: '/admin/sub-page',
+  //     },
+  //     {
+  //       path: '/admin/sub-page',
+  //       name: 'sub-page',
+  //       component: './Admin',
+  //     },
+  //   ],
+  // },
   // {
   //   name: 'list.table-list',
   //   icon: 'table',
@@ -344,7 +344,7 @@ export default [
   // },
   {
     path: '/',
-    redirect: '/ierror/TraceSafe',
+    redirect: '/user/login',
   },
   {
     path: '*',
