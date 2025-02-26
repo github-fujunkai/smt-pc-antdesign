@@ -7,6 +7,7 @@ import '@minko-fe/use-antd-resizable-header/index.css'
 import http from '../utils/http'
 import {config} from '../utils/config'
 import api from '../utils/api'
+import { FormattedMessage, useIntl } from '@umijs/max';
 import qs from 'qs';
 
 const { confirm } = Modal;

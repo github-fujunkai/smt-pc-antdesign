@@ -43,6 +43,19 @@ export function downloadCSV(csvString, filename) {
 // const fileName = "example.csv";
 // downloadCSV(csvData, fileName);
 
+export function getDictionaryListByCode(name) {
+  let typeList =  JSON.parse(localStorage.getItem('dictionaryType') || '[]');
+  let code = typeList.find(item => item.label === name)?.value;
+  // console.log('codecodecodecodecodecodecodecodecodecode',code)
+  let list =  JSON.parse(localStorage.getItem('dictionaryList') || '[]');
+  return list.filter(item => item.dictType == code).map(item => {
+    return {
+      label: item.dictKey,
+      value: item.dictValue
+    }
+  });
+}
+
 
 
 

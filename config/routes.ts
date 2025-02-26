@@ -73,6 +73,11 @@ export default [
         name: '仓库设置',
         component: './WarehouseSetup',
       },
+      {
+        path: '/app/dictionary',
+        name: '数据字典',
+        component: './app/dictionary',
+      },
     ],
   },
   {
@@ -277,6 +282,11 @@ export default [
         path: '/produce/TechnologicalProcess',
         name: '工艺流程',
         component: './TechnologicalProcess',
+      },
+      {
+        path: '/produce/product',
+        name: '产品管理',
+        component: './produce/product',
       },
     ],
   },

@@ -1,24 +1,11 @@
-import React from "react";
-import {
-  Tabs,
-  Tree,
-  Col,
-  Row,
-  Button,
-  Checkbox,
-  Form,
-  Input,
-  Select,
-  Switch,
-  Radio,
-  message,
-} from "antd";
-import http from "../utils/http";
-import { config } from "../utils/config";
-import api from "../utils/api";
-import { useEffect, useState } from "react";
-import qs, { stringify } from "qs";
-import SwitchNumber from "../components/SwitchNumber";
+import { Button, Col, Form, Input, message, Row, Select, Switch, Tabs, Tree } from 'antd';
+import qs from 'qs';
+import React, { useEffect, useState } from 'react';
+import SwitchNumber from '../components/SwitchNumber';
+import api from '../utils/api';
+import { config } from '../utils/config';
+import http from '../utils/http';
+import { getDictionaryListByCode } from '../utils/util';
 const App = () => {
   const onChange = (key) => {
     console.log(key);
@@ -26,23 +13,23 @@ const App = () => {
 
   const items = [
     {
-      key: "StorageLocation",
-      label: "储存位置",
+      key: 'StorageLocation',
+      label: '储存位置',
       children: <StorageLocation />,
     },
     {
-      key: "PutIn",
-      label: "入库",
+      key: 'PutIn',
+      label: '入库',
       children: <PutIn />,
     },
     {
-      key: "PutOut",
-      label: "出库",
+      key: 'PutOut',
+      label: '出库',
       children: <PutOut />,
     },
     {
-      key: "IntelligentShelves",
-      label: "智能货架",
+      key: 'IntelligentShelves',
+      label: '智能货架',
       children: <IntelligentShelves />,
     },
   ];
@@ -60,7 +47,7 @@ const StorageLocation = () => {
   const [shelvesList, setShelvesList] = React.useState([]);
   const getTreeList = () => {
     http
-      .post(config.API_PREFIX + "storage/location/list/tree", {})
+      .post(config.API_PREFIX + 'storage/location/list/tree', {})
       .then((res) => {
         // let res1 = {
         //   bizData: {
@@ -113,16 +100,16 @@ const StorageLocation = () => {
   useEffect(() => {
     getTreeList();
     StorageLocationFrom.setFieldsValue({
-      code: "",
-      rackType: "普通货架",
-      locations: "",
-      storageType: "良品仓",
+      code: '',
+      rackType: '普通货架',
+      locations: '',
+      storageType: '良品仓',
       isValidated: false,
     });
 
     // 获取货架列表
     http
-      .post(config.API_PREFIX + "dict/intelligent/shelves", {})
+      .post(config.API_PREFIX + 'dict/intelligent/shelves', {})
       .then((res) => {
         setShelvesList(
           res?.bizData?.map((item) => {
@@ -130,7 +117,7 @@ const StorageLocation = () => {
               label: item.fieldName,
               value: item.fieldName,
             };
-          }) || []
+          }) || [],
         );
       })
       .catch((err) => {
@@ -139,26 +126,26 @@ const StorageLocation = () => {
   }, []);
   const [selectNode, setSelectNode] = useState(null);
   const onSelect = (selectedKeys, info) => {
-    console.log("selected", selectedKeys, info);
+    console.log('selected', selectedKeys, info);
 
     setSelectNode(info.node);
-    StorageLocationFrom.setFieldValue("rackType", info.node.rackType);
-    StorageLocationFrom.setFieldValue("code", info.node.code);
-    StorageLocationFrom.setFieldValue("locations", "");
+    StorageLocationFrom.setFieldValue('rackType', info.node.rackType);
+    StorageLocationFrom.setFieldValue('code', info.node.code);
+    StorageLocationFrom.setFieldValue('locations', '');
     if (info.node.isValidated == 0) {
-      StorageLocationFrom.setFieldValue("isValidated", false);
+      StorageLocationFrom.setFieldValue('isValidated', false);
     } else {
-      StorageLocationFrom.setFieldValue("isValidated", true);
+      StorageLocationFrom.setFieldValue('isValidated', true);
     }
   };
   const onCheck = (checkedKeys, info) => {
-    console.log("onCheck", checkedKeys, info);
+    console.log('onCheck', checkedKeys, info);
   };
   const onFinish = (values) => {
-    console.log("Success:", values);
+    console.log('Success:', values);
   };
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
   const addTree = (type) => {
     StorageLocationFrom.validateFields()
@@ -217,16 +204,16 @@ const StorageLocation = () => {
             localOrChild: 1,
           };
         }
-        console.log("params", params);
+        console.log('params', params);
         http
-          .post(config.API_PREFIX + "storage/location", params)
+          .post(config.API_PREFIX + 'storage/location', params)
           .then((res) => {
             getTreeList();
           })
           .catch((err) => {});
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log('err', err);
       });
   };
   const delTree = () => {
@@ -246,7 +233,7 @@ const StorageLocation = () => {
             id: selectNode?.id,
             upDown: type, //上移 1 下移 2
           })}`,
-        {}
+        {},
       )
       .then((res) => {
         getTreeList();
@@ -268,7 +255,7 @@ const StorageLocation = () => {
           onSelect={onSelect}
           onCheck={onCheck}
           treeData={treeList}
-          fieldNames={{ title: "name", key: "id", children: "children" }}
+          fieldNames={{ title: 'name', key: 'id', children: 'children' }}
         />
       </div>
       <div className="w-[68%]">
@@ -299,11 +286,23 @@ const StorageLocation = () => {
                 rules={[
                   {
                     required: false,
-                    message: "请选择仓库类型!",
+                    message: '请选择仓库类型!',
                   },
                 ]}
               >
                 <Select
+                  placeholder="请选择"
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? '')
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? '').toLowerCase())
+                  }
+                  options={getDictionaryListByCode('仓库类型')}
+                />
+                {/* <Select
                   options={[
                     {
                       value: "良品仓",
@@ -330,7 +329,7 @@ const StorageLocation = () => {
                       label: "线边仓",
                     },
                   ]}
-                />
+                /> */}
               </Form.Item>
               <Form.Item
                 label="库位前缀"
@@ -338,7 +337,7 @@ const StorageLocation = () => {
                 rules={[
                   {
                     required: false,
-                    message: "",
+                    message: '',
                   },
                 ]}
               >
@@ -352,7 +351,7 @@ const StorageLocation = () => {
                 rules={[
                   {
                     required: false,
-                    message: "请选择货架型号",
+                    message: '请选择货架型号',
                   },
                 ]}
               >
@@ -364,7 +363,7 @@ const StorageLocation = () => {
                 rules={[
                   {
                     required: false,
-                    message: "",
+                    message: '',
                   },
                 ]}
               >
@@ -383,7 +382,7 @@ const StorageLocation = () => {
                 rules={[
                   {
                     required: false,
-                    message: "请添加库位",
+                    message: '请添加库位',
                   },
                 ]}
               >
@@ -445,7 +444,7 @@ const PutIn = () => {
             workshopId: 1,
             areaId: 1,
           })}`,
-        {}
+        {},
       )
       .then((res) => {
         // console.log('paramConfigAll: ', res)
@@ -461,7 +460,7 @@ const PutIn = () => {
     // 获取原材UID规则
     http
       .get(config.API_PREFIX + api.barcodegenrulePage, {
-        ruleType: "wmsItemUniqueCode",
+        ruleType: 'wmsItemUniqueCode',
       })
       .then((res) => {
         const data = res?.bizData?.records.map((item) => {
@@ -474,23 +473,21 @@ const PutIn = () => {
       });
   }, []);
   const onFinish = (values) => {
-    console.log("Success:", values);
+    console.log('Success:', values);
   };
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
   const handelInbound = () => {
-    console.log("inbound", form.getFieldsValue());
+    console.log('inbound', form.getFieldsValue());
     let data = param;
-    data.warehouseConfig.inboundMaterialUid.configValue =
-      form.getFieldsValue().uid;
-    data.warehouseConfig.inboundRuleId.configValue =
-      form.getFieldsValue().ruleId;
+    data.warehouseConfig.inboundMaterialUid.configValue = form.getFieldsValue().uid;
+    data.warehouseConfig.inboundRuleId.configValue = form.getFieldsValue().ruleId;
     http
       .post(config.API_PREFIX + api.paramConfigSaveOrUpdate, data)
       .then((res) => {
         console.log(res);
-        message.success("保存成功！");
+        message.success('保存成功！');
       })
       .catch((err) => {
         console.error(err);
@@ -525,19 +522,19 @@ const PutIn = () => {
               rules={[
                 {
                   required: true,
-                  message: "请选择原材UID",
+                  message: '请选择原材UID',
                 },
               ]}
             >
               <Select
                 options={[
                   {
-                    value: "1",
-                    label: "自动打印",
+                    value: '1',
+                    label: '自动打印',
                   },
                   {
-                    value: "2",
-                    label: "第三方UID",
+                    value: '2',
+                    label: '第三方UID',
                   },
                 ]}
               />
@@ -550,7 +547,7 @@ const PutIn = () => {
               rules={[
                 {
                   required: true,
-                  message: "请选择原材UID规则",
+                  message: '请选择原材UID规则',
                 },
               ]}
             >
@@ -585,31 +582,19 @@ const PutOut = () => {
             workshopId: 1,
             areaId: 1,
           })}`,
-        {}
+        {},
       )
       .then((res) => {
         // console.log('paramConfigAll: ', res)
         setParam(res?.bizData);
         form.setFieldsValue({
-          switch1:
-            Number(res?.bizData?.warehouseConfig?.outboundFifo?.configValue) ||
-            0,
-          fifoRlue:
-            res?.bizData?.warehouseConfig?.outboundFifoRule?.configValue || "1",
+          switch1: Number(res?.bizData?.warehouseConfig?.outboundFifo?.configValue) || 0,
+          fifoRlue: res?.bizData?.warehouseConfig?.outboundFifoRule?.configValue || '1',
           switch2:
-            Number(
-              res?.bizData?.warehouseConfig?.outboundWorkOrderGeneration
-                ?.configValue
-            ) || 0,
+            Number(res?.bizData?.warehouseConfig?.outboundWorkOrderGeneration?.configValue) || 0,
           switch3:
-            Number(
-              res?.bizData?.warehouseConfig?.outboundHalfTrayPriority
-                ?.configValue
-            ) || 0,
-          switch4:
-            Number(
-              res?.bizData?.warehouseConfig?.outboundScanEnabled?.configValue
-            ) || 0,
+            Number(res?.bizData?.warehouseConfig?.outboundHalfTrayPriority?.configValue) || 0,
+          switch4: Number(res?.bizData?.warehouseConfig?.outboundScanEnabled?.configValue) || 0,
         });
       })
       .catch((err) => {
@@ -617,23 +602,18 @@ const PutOut = () => {
       });
   }, []);
   const handelOutbound = () => {
-    console.log("出库", form.getFieldsValue());
+    console.log('出库', form.getFieldsValue());
     let data = param;
-    data.warehouseConfig.outboundFifo.configValue =
-      form.getFieldsValue().switch1;
-    data.warehouseConfig.outboundFifoRule.configValue =
-      form.getFieldsValue().fifoRlue;
-    data.warehouseConfig.outboundWorkOrderGeneration.configValue =
-      form.getFieldsValue().switch2;
-    data.warehouseConfig.outboundHalfTrayPriority.configValue =
-      form.getFieldsValue().switch3;
-    data.warehouseConfig.outboundScanEnabled.configValue =
-      form.getFieldsValue().switch4;
+    data.warehouseConfig.outboundFifo.configValue = form.getFieldsValue().switch1;
+    data.warehouseConfig.outboundFifoRule.configValue = form.getFieldsValue().fifoRlue;
+    data.warehouseConfig.outboundWorkOrderGeneration.configValue = form.getFieldsValue().switch2;
+    data.warehouseConfig.outboundHalfTrayPriority.configValue = form.getFieldsValue().switch3;
+    data.warehouseConfig.outboundScanEnabled.configValue = form.getFieldsValue().switch4;
     http
       .post(config.API_PREFIX + api.paramConfigSaveOrUpdate, data)
       .then((res) => {
         console.log(res);
-        message.success("保存成功！");
+        message.success('保存成功！');
       })
       .catch((err) => {
         console.error(err);
@@ -666,20 +646,20 @@ const PutOut = () => {
                   defaultValue="入库日期"
                   options={[
                     {
-                      value: "1",
-                      label: "入库日期",
+                      value: '1',
+                      label: '入库日期',
                     },
                     {
-                      value: "2",
-                      label: "生产日期",
+                      value: '2',
+                      label: '生产日期',
                     },
                     {
-                      value: "3",
-                      label: "Datacode",
+                      value: '3',
+                      label: 'Datacode',
                     },
                     {
-                      value: "4",
-                      label: "时效时长",
+                      value: '4',
+                      label: '时效时长',
                     },
                   ]}
                 />
@@ -688,20 +668,12 @@ const PutOut = () => {
           )}
 
           <Col span={24}>
-            <Form.Item
-              label="自动生成出库明细"
-              name="switch2"
-              valuePropName="checked"
-            >
+            <Form.Item label="自动生成出库明细" name="switch2" valuePropName="checked">
               <SwitchNumber />
             </Form.Item>
           </Col>
           <Col span={24}>
-            <Form.Item
-              label="扫描后允许出库"
-              name="switch3"
-              valuePropName="checked"
-            >
+            <Form.Item label="扫描后允许出库" name="switch3" valuePropName="checked">
               <SwitchNumber />
             </Form.Item>
           </Col>
@@ -746,27 +718,24 @@ const IntelligentShelves = () => {
             workshopId: 1,
             areaId: 1,
           })}`,
-        {}
+        {},
       )
       .then((res) => {
         // console.log('paramConfigAll: ', res)
         setParam(res?.bizData);
-        form.setFieldsValue({rackType: res?.bizData?.warehouseConfig?.rackType?.configValue,
+        form.setFieldsValue({
+          rackType: res?.bizData?.warehouseConfig?.rackType?.configValue,
           address: res?.bizData?.warehouseConfig?.smartRackAddress?.configValue,
-          storageLocation:
-            res?.bizData?.warehouseConfig?.smartRackPosition?.configValue,
-          color:
-            res?.bizData?.warehouseConfig?.smartRackColor_value?.configValue ||
-            "0",
+          storageLocation: res?.bizData?.warehouseConfig?.smartRackPosition?.configValue,
+          color: res?.bizData?.warehouseConfig?.smartRackColor_value?.configValue || '0',
         });
-        
       })
       .catch((err) => {
         console.log(err);
       });
     // 获取货架列表
     http
-      .post(config.API_PREFIX + "dict/intelligent/shelves", {})
+      .post(config.API_PREFIX + 'dict/intelligent/shelves', {})
       .then((res) => {
         setShelvesData(res?.bizData || []);
         setShelvesList(
@@ -775,7 +744,7 @@ const IntelligentShelves = () => {
               label: item.fieldName,
               value: item.fieldName,
             };
-          }) || []
+          }) || [],
         );
       })
       .catch((err) => {
@@ -784,23 +753,19 @@ const IntelligentShelves = () => {
   }, []);
   useEffect(() => {
     handleShelvesChange(form.getFieldsValue().rackType);
-  },[param]);
+  }, [param]);
   const handelShelves = () => {
-    console.log("智能货架", form.getFieldsValue());
+    console.log('智能货架', form.getFieldsValue());
     let data = param;
-    data.warehouseConfig.rackType.configValue =
-      form.getFieldsValue().rackType;
-    data.warehouseConfig.smartRackAddress.configValue =
-      form.getFieldsValue().address;
-    data.warehouseConfig.smartRackPosition.configValue =
-      form.getFieldsValue().storageLocation;
-    data.warehouseConfig.smartRackColor_value.configValue =
-      form.getFieldsValue().color;
+    data.warehouseConfig.rackType.configValue = form.getFieldsValue().rackType;
+    data.warehouseConfig.smartRackAddress.configValue = form.getFieldsValue().address;
+    data.warehouseConfig.smartRackPosition.configValue = form.getFieldsValue().storageLocation;
+    data.warehouseConfig.smartRackColor_value.configValue = form.getFieldsValue().color;
     http
       .post(config.API_PREFIX + api.paramConfigSaveOrUpdate, data)
       .then((res) => {
         console.log(res);
-        message.success("保存成功！");
+        message.success('保存成功！');
       })
       .catch((err) => {
         console.error(err);
@@ -811,18 +776,18 @@ const IntelligentShelves = () => {
     http
       .post(
         config.API_PREFIX +
-          "iot/wms/light/Up" +
+          'iot/wms/light/Up' +
           `?${qs.stringify({
             type: 1,
-            storageLocation: form.getFieldValue("storageLocation"),
-            color: status == 2 ? 0 : form.getFieldValue("color"), // 0:灭灯 >0：亮灯
-            address: form.getFieldValue("address"),
+            storageLocation: form.getFieldValue('storageLocation'),
+            color: status == 2 ? 0 : form.getFieldValue('color'), // 0:灭灯 >0：亮灯
+            address: form.getFieldValue('address'),
           })}`,
-        {}
+        {},
       )
       .then((res) => {
         console.log(res);
-        message.success("操作成功！");
+        message.success('操作成功！');
       })
       .catch((err) => {
         console.error(err);
@@ -891,7 +856,7 @@ const IntelligentShelves = () => {
           Object.keys(item.colors).map((key) => ({
             label: item.colors[key],
             value: key,
-          }))
+          })),
         );
       }
     });
@@ -923,7 +888,7 @@ const IntelligentShelves = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入地址端口",
+                  message: '请输入地址端口',
                 },
               ]}
             >
@@ -937,7 +902,7 @@ const IntelligentShelves = () => {
               rules={[
                 {
                   required: true,
-                  message: "请输入货架/储位",
+                  message: '请输入货架/储位',
                 },
               ]}
             >
@@ -945,14 +910,14 @@ const IntelligentShelves = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            {" "}
+            {' '}
             <Form.Item
               label="货架型号"
               name="rackType"
               rules={[
                 {
                   required: false,
-                  message: "请选择货架型号",
+                  message: '请选择货架型号',
                 },
               ]}
             >
@@ -966,7 +931,7 @@ const IntelligentShelves = () => {
               rules={[
                 {
                   required: true,
-                  message: "请选择颜色",
+                  message: '请选择颜色',
                 },
               ]}
             >

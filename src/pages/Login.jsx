@@ -2,7 +2,8 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, Typography } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../utils/api';
+import api from '../utils/api'
+import { FormattedMessage, useIntl } from '@umijs/max';;
 import { config } from '../utils/config';
 import http from '../utils/http';
 const { Title, Link } = Typography;
@@ -70,10 +71,10 @@ const Login = () => {
         localStorage.setItem('username', data.username);
         setLoading(false);
         // navigate('/');
-        // navigate('/ierror/TraceSafe');
         await fetchUserInfo();
-        const urlParams = new URL(window.location.href).searchParams;
-        navigate(urlParams.get('redirect') || '/');
+        // const urlParams = new URL(window.location.href).searchParams;
+        // navigate(urlParams.get('redirect') || '/');
+        navigate('/ierror/TraceSafe');
       })
       .catch((err) => {
         setLoading(false);

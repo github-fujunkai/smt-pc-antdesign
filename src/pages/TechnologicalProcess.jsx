@@ -1,107 +1,100 @@
-import React, { useState, useMemo, useEffect } from "react";
 import {
   CopyOutlined,
-  DownOutlined,
   ExclamationCircleFilled,
   PlusOutlined,
   SearchOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
 import {
-  Dropdown,
-  Drawer,
-  Tooltip,
-  Switch,
-  Typography,
-  DatePicker,
-  Image,
-  Tag,
-  Table,
-  Modal,
   Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
   Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
   message,
-} from "antd";
-import http from "../utils/http";
-import { config } from "../utils/config";
-import dayjs, { Dayjs } from "dayjs";
+  Modal,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+  Typography,
+} from 'antd';
+import { useEffect, useState } from 'react';
+import { config } from '../utils/config';
+import http from '../utils/http';
 const TechnologicalProcess = () => {
   const { confirm } = Modal;
   const [dataSource, setDataSource] = useState([]);
   const columns = [
     {
-      title: "工艺编码",
-      dataIndex: "processCode",
-      key: "processCode",
+      title: '工艺编码',
+      dataIndex: 'processCode',
+      key: 'processCode',
       ellipsis: true,
     },
     {
-      title: "工艺名称",
-      dataIndex: "processName",
-      key: "processName",
+      title: '工艺名称',
+      dataIndex: 'processName',
+      key: 'processName',
       ellipsis: true,
     },
     {
-      title: "生产阶别",
-      dataIndex: "productionLevel",
-      key: "productionLevel",
+      title: '生产阶别',
+      dataIndex: 'productionLevel',
+      key: 'productionLevel',
       ellipsis: true,
     },
     {
-      title: "产品料号",
-      dataIndex: "productCode",
-      key: "productCode",
+      title: '产品料号',
+      dataIndex: 'productCode',
+      key: 'productCode',
       ellipsis: true,
     },
     {
-      title: "产品名称",
-      dataIndex: "productName",
-      key: "productName",
+      title: '产品名称',
+      dataIndex: 'productName',
+      key: 'productName',
       ellipsis: true,
     },
     {
-      title: "创建日期",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '创建日期',
+      dataIndex: 'createTime',
+      key: 'createTime',
       ellipsis: true,
     },
     {
-      title: "创建人",
-      dataIndex: "createBy",
-      key: "createBy",
+      title: '创建人',
+      dataIndex: 'createBy',
+      key: 'createBy',
       ellipsis: true,
     },
     {
-      title: "备注",
-      dataIndex: "remarks",
-      key: "remarks",
+      title: '备注',
+      dataIndex: 'remarks',
+      key: 'remarks',
       ellipsis: true,
     },
     {
-      title: "操作",
-      dataIndex: "",
-      key: "x",
-      fixed: "right",
-      width: "180",
+      title: '操作',
+      dataIndex: '',
+      key: 'x',
+      fixed: 'right',
+      width: '180',
       render: (text, record) => {
         return (
           <Space>
             <Typography.Link
               onClick={() => {
-                showProduction("add", record);
+                showProduction('add', record);
               }}
             >
               添加工序
             </Typography.Link>
             <Typography.Link
               onClick={() => {
-                showModal("update", record);
+                showModal('update', record);
               }}
             >
               修改
@@ -125,24 +118,23 @@ const TechnologicalProcess = () => {
   };
   const onFormFinish = (values) => {
     let params = {};
-    const { startTime, endTime, processCode, processName, productionLevel } =
-      values;
-    if (startTime && startTime != "") {
-      params.startTime = startTime.format("YYYY-MM-DD 00:00:00");
+    const { startTime, endTime, processCode, processName, productionLevel } = values;
+    if (startTime && startTime != '') {
+      params.startTime = startTime.format('YYYY-MM-DD 00:00:00');
     }
-    if (endTime && endTime != "") {
-      params.endTime = endTime.format("YYYY-MM-DD 00:00:00");
+    if (endTime && endTime != '') {
+      params.endTime = endTime.format('YYYY-MM-DD 00:00:00');
     }
-    if (processCode && processCode != "") {
+    if (processCode && processCode != '') {
       params.processCode = processCode;
     }
-    if (processName && processName != "") {
+    if (processName && processName != '') {
       params.processName = processName;
     }
-    if (productionLevel && productionLevel != "") {
+    if (productionLevel && productionLevel != '') {
       params.productionLevel = productionLevel;
     }
-    console.log("search values", params);
+    console.log('search values', params);
     fetchData(params);
   };
   const [formSearch] = Form.useForm();
@@ -156,12 +148,7 @@ const TechnologicalProcess = () => {
       return;
     }
     http
-      .get(
-        config.API_PREFIX +
-          "process/steps/list?" +
-          `processRecordId=${prodproductId}`,
-        {}
-      )
+      .get(config.API_PREFIX + 'process/steps/list?' + `processRecordId=${prodproductId}`, {})
       .then((res) => {
         setProdproductList(res?.bizData);
       })
@@ -176,16 +163,12 @@ const TechnologicalProcess = () => {
   }, [prodproductId]);
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
+      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
       let slectId = selectedRows?.[0].id;
       setProdproductId(slectId);
     },
     getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
+      disabled: record.name === 'Disabled User', // Column configuration not to be checked
       name: record.name,
     }),
   };
@@ -205,7 +188,7 @@ const TechnologicalProcess = () => {
   const [isEditData, setIsEditData] = useState(null);
   //添加修改工艺
   const showModal = (action, record) => {
-    if (action === "update" && record) {
+    if (action === 'update' && record) {
       setIsEditData(record);
     } else {
       setIsEditData(null);
@@ -215,22 +198,22 @@ const TechnologicalProcess = () => {
   //删除工艺
   const handelDelete = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
         http
-          .del(config.API_PREFIX + "process/records" + `/${record?.id}`, {})
+          .del(config.API_PREFIX + 'process/records' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
@@ -241,7 +224,7 @@ const TechnologicalProcess = () => {
   const showProduction = (action, record) => {
     console.log(action, record);
     let curId = null;
-    if (action === "update" && record) {
+    if (action === 'update' && record) {
       setProductionId(null);
       setSelectedRow(record); //子集修改用的数据
       curId = record.processRecordId;
@@ -252,10 +235,7 @@ const TechnologicalProcess = () => {
     }
     //获取校验前工序
     http
-      .get(
-        config.API_PREFIX + "process/steps/list?" + `processRecordId=${curId}`,
-        {}
-      )
+      .get(config.API_PREFIX + 'process/steps/list?' + `processRecordId=${curId}`, {})
       .then((res) => {
         let data = res?.bizData.map((item) => {
           return {
@@ -270,36 +250,33 @@ const TechnologicalProcess = () => {
   //删除工序
   const delProduction = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
         http
-          .del(config.API_PREFIX + "process/steps" + `/${record?.id}`, {})
+          .del(config.API_PREFIX + 'process/steps' + `/${record?.id}`, {})
           .then((res) => {
             if (prodproductId) {
               getProdproductList();
             }
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
   const onChangeCopy = () => {
     http
-      .post(
-        config.API_PREFIX + "process/records/copy" + `/${prodproductId}`,
-        {}
-      )
+      .post(config.API_PREFIX + 'process/records/copy' + `/${prodproductId}`, {})
       .then((res) => {
         fetchData();
-        message.success("复制成功！");
+        message.success('复制成功！');
       })
       .catch((err) => {
         console.log(err);
@@ -319,7 +296,7 @@ const TechnologicalProcess = () => {
   };
   const fetchData = (values) => {
     http
-      .get(config.API_PREFIX + "process/records/page", {
+      .get(config.API_PREFIX + 'process/records/page', {
         ...values,
         ...pageParams,
       })
@@ -342,17 +319,17 @@ const TechnologicalProcess = () => {
         className="breadcrumb"
         items={[
           {
-            title: "生产计划",
+            title: '生产计划',
           },
           {
-            title: "工艺流程",
+            title: '工艺流程',
           },
         ]}
       ></Breadcrumb>
       <div className="content">
         <div className="tools">
           <Space size="middle">
-            <Tooltip title={isShowSearch ? "隐藏搜索" : "显示搜索"}>
+            <Tooltip title={isShowSearch ? '隐藏搜索' : '显示搜索'}>
               <Switch
                 onChange={onSearchChange}
                 checkedChildren={<SearchOutlined />}
@@ -361,10 +338,7 @@ const TechnologicalProcess = () => {
             </Tooltip>
           </Space>
         </div>
-        <div
-          className="search-wrapper"
-          style={{ display: isShowSearch ? "block" : "none" }}
-        >
+        <div className="search-wrapper" style={{ display: isShowSearch ? 'block' : 'none' }}>
           <Form form={formSearch} onFinish={onFormFinish}>
             <Row gutter="24">
               <Col span={8}>
@@ -384,24 +358,24 @@ const TechnologicalProcess = () => {
                     allowClear
                     options={[
                       {
-                        value: "SMT",
-                        label: "SMT",
+                        value: 'SMT',
+                        label: 'SMT',
                       },
                       {
-                        value: "THT",
-                        label: "THT",
+                        value: 'THT',
+                        label: 'THT',
                       },
                       {
-                        value: "DIP",
-                        label: "DIP",
+                        value: 'DIP',
+                        label: 'DIP',
                       },
                       {
-                        value: "ASSY",
-                        label: "ASSY",
+                        value: 'ASSY',
+                        label: 'ASSY',
                       },
                       {
-                        value: "Packing",
-                        label: "Packing",
+                        value: 'Packing',
+                        label: 'Packing',
                       },
                     ]}
                   />
@@ -410,22 +384,18 @@ const TechnologicalProcess = () => {
               <Col span={8}>
                 <Form.Item label="开始时间" name="startTime">
                   {/* <Input allowClear placeholder="请输入" /> */}
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item label="结束时间" name="endTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
 
               <Col span={8}>
                 <Space size="small">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
-                  >
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     查询
                   </Button>
                   <Button onClick={resetFormSearch} htmlType="button">
@@ -436,20 +406,16 @@ const TechnologicalProcess = () => {
             </Row>
           </Form>
         </div>
-        <div style={{ marginBottom: 16, textAlign: "right", marginRight: 20 }}>
+        <div style={{ marginBottom: 16, textAlign: 'right', marginRight: 20 }}>
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => showModal("create")}
+            onClick={() => showModal('create')}
             style={{ marginRight: 20 }}
           >
             新增
           </Button>
-          <Button
-            type="primary"
-            icon={<CopyOutlined />}
-            onClick={() => onChangeCopy()}
-          >
+          <Button type="primary" icon={<CopyOutlined />} onClick={() => onChangeCopy()}>
             复制
           </Button>
         </div>
@@ -459,19 +425,19 @@ const TechnologicalProcess = () => {
               current: pageParams.current,
               pageSize: pageParams.size,
               total: total,
-              size: "small",
+              size: 'small',
               onChange: handleQuery,
               showTotal: (total) => `总数 ${total}`,
             }}
             dataSource={dataSource}
             columns={columns}
             rowSelection={{
-              type: "radio",
+              type: 'radio',
               ...rowSelection,
             }}
             rowKey={(dataSource) => dataSource.id}
             size="small"
-            scroll={{ x: "max-content" }}
+            scroll={{ x: 'max-content' }}
           />
         </div>
         <div>
@@ -515,17 +481,17 @@ const TechnologicalFrom = (props) => {
     console.log(formCreate.getFieldsValue());
     let modalData = formCreate.getFieldsValue();
     let action = null;
-    let msg = "";
+    let msg = '';
     if (isEditData) {
       action = http.put;
-      msg = "修改成功";
+      msg = '修改成功';
       modalData.id = isEditData?.id;
     } else {
       action = http.post;
       modalData.id = 0;
-      msg = "新增成功";
+      msg = '新增成功';
     }
-    action(config.API_PREFIX + "process/records", modalData)
+    action(config.API_PREFIX + 'process/records', modalData)
       .then((res1) => {
         formCreate.resetFields();
         onChange(false);
@@ -551,7 +517,7 @@ const TechnologicalFrom = (props) => {
       <Form
         labelCol={{ span: 6 }}
         form={formCreate}
-        style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+        style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
       >
         <Form.Item
           label="工艺编码"
@@ -559,7 +525,7 @@ const TechnologicalFrom = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -571,7 +537,7 @@ const TechnologicalFrom = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -595,7 +561,7 @@ const TechnologicalFrom = (props) => {
           rules={[
             {
               required: true,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -604,24 +570,24 @@ const TechnologicalFrom = (props) => {
             allowClear
             options={[
               {
-                value: "SMT",
-                label: "SMT",
+                value: 'SMT',
+                label: 'SMT',
               },
               {
-                value: "THT",
-                label: "THT",
+                value: 'THT',
+                label: 'THT',
               },
               {
-                value: "DIP",
-                label: "DIP",
+                value: 'DIP',
+                label: 'DIP',
               },
               {
-                value: "ASSY",
-                label: "ASSY",
+                value: 'ASSY',
+                label: 'ASSY',
               },
               {
-                value: "Packing",
-                label: "Packing",
+                value: 'Packing',
+                label: 'Packing',
               },
             ]}
           />
@@ -632,7 +598,7 @@ const TechnologicalFrom = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -644,7 +610,7 @@ const TechnologicalFrom = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -657,7 +623,7 @@ const TechnologicalFrom = (props) => {
           rules={[
             {
               required: false,
-              message: "请输入",
+              message: '请输入',
             },
           ]}
         >
@@ -677,79 +643,79 @@ const ProductionProcess = (props) => {
   }, [prodproductList]);
   const columns = [
     {
-      title: "序号",
-      dataIndex: "stepNumber",
-      key: "stepNumber",
+      title: '序号',
+      dataIndex: 'stepNumber',
+      key: 'stepNumber',
     },
     {
-      title: "工序编码",
-      dataIndex: "stepCode",
-      key: "stepCode",
+      title: '工序编码',
+      dataIndex: 'stepCode',
+      key: 'stepCode',
       ellipsis: true,
     },
     {
-      title: "工序名称",
-      dataIndex: "stepName",
-      key: "stepName",
+      title: '工序名称',
+      dataIndex: 'stepName',
+      key: 'stepName',
     },
     {
-      title: "阶别",
-      dataIndex: "level",
-      key: "level",
+      title: '阶别',
+      dataIndex: 'level',
+      key: 'level',
     },
     {
-      title: "工序面别",
-      dataIndex: "surface",
-      key: "surface",
+      title: '工序面别',
+      dataIndex: 'surface',
+      key: 'surface',
       ellipsis: true,
     },
     {
-      title: "工序必过",
-      dataIndex: "required",
-      key: "required",
+      title: '工序必过',
+      dataIndex: 'required',
+      key: 'required',
     },
     {
-      title: "工序类型",
-      dataIndex: "type",
-      key: "type",
+      title: '工序类型',
+      dataIndex: 'type',
+      key: 'type',
     },
     {
-      title: "校验前工序",
-      dataIndex: "validationStep",
-      key: "validationStep",
+      title: '校验前工序',
+      dataIndex: 'validationStep',
+      key: 'validationStep',
       ellipsis: true,
     },
     {
-      title: "时长(分钟)",
-      dataIndex: "duration",
-      key: "duration",
+      title: '时长(分钟)',
+      dataIndex: 'duration',
+      key: 'duration',
       ellipsis: true,
     },
     {
-      title: "工时(秒)",
-      dataIndex: "manHour",
-      key: "manHour",
+      title: '工时(秒)',
+      dataIndex: 'manHour',
+      key: 'manHour',
       ellipsis: true,
     },
     {
-      title: "备注",
-      dataIndex: "remarks",
-      key: "remarks",
+      title: '备注',
+      dataIndex: 'remarks',
+      key: 'remarks',
       ellipsis: true,
     },
     {
-      title: "操作",
-      dataIndex: "",
-      key: "x",
+      title: '操作',
+      dataIndex: '',
+      key: 'x',
       ellipsis: true,
-      fixed: "right",
-      width: "125px",
+      fixed: 'right',
+      width: '125px',
       render: (_, record) => {
         return (
           <Space>
             <Typography.Link
               onClick={() => {
-                update("update", record);
+                update('update', record);
               }}
             >
               修改
@@ -793,23 +759,38 @@ const ProductionFrom = (props) => {
   } = props;
   const [isAssemble, setIsAssemble] = useState(false);
 
-  console.log("validationStepList", validationStepList);
+  console.log('validationStepList', validationStepList);
   // 校验前工序选项下拉项时不包含当前工序
   const validationStepListMine = validationStepList.filter(
-    (item) => item.label != selectedRow.stepName
+    (item) => item.label !== selectedRow.stepName,
   );
+  const [uidList, setUidList] = useState([]);
   useEffect(() => {
-    console.log("selectedRow", selectedRow);
-    if (selectedRow.type && typeof selectedRow.type === "string") {
-      selectedRow.type = selectedRow?.type.split(",") || [];
-      console.log("selectedRow.type", selectedRow.type);
-      if (selectedRow.type.includes("组装")) {
+    console.log('selectedRow', selectedRow);
+    if (selectedRow.type && typeof selectedRow.type === 'string') {
+      selectedRow.type = selectedRow?.type.split(',') || [];
+      console.log('selectedRow.type', selectedRow.type);
+      if (selectedRow.type.includes('组装')) {
         setIsAssemble(true);
       }
     }
     formCreate.setFieldsValue({
       ...selectedRow,
     });
+    //获取UID规则
+  
+    http.post(config.API_PREFIX + 'barcodegenrule/rule/code/list', {})
+          .then((res) => {
+            setUidList(res.bizData.map((item) => {
+              return {
+                label: item,
+                value: item,
+              };
+            }));
+          })
+          .catch((err) => {
+            console.log(err);
+          });
   }, [selectedRow]);
   const [formCreate] = Form.useForm();
 
@@ -822,21 +803,21 @@ const ProductionFrom = (props) => {
       .then((values) => {
         let modalData = formCreate.getFieldsValue();
         let action = null;
-        let msg = "";
+        let msg = '';
         if (!productionId) {
           action = http.put;
-          msg = "修改成功";
+          msg = '修改成功';
           modalData.processRecordId = selectedRow.productionId;
           modalData.id = selectedRow.id;
         } else {
           action = http.post;
           modalData.processRecordId = productionId;
           modalData.id = 0;
-          msg = "新增成功";
+          msg = '新增成功';
         }
-        modalData.type = modalData.type.join(",");
+        modalData.type = modalData.type.join(',');
         modalData.validationStep = validationStepName;
-        action(config.API_PREFIX + "process/steps/v2", modalData)
+        action(config.API_PREFIX + 'process/steps/v2', modalData)
           .then((res1) => {
             formCreate.resetFields();
             message.success(msg);
@@ -847,7 +828,7 @@ const ProductionFrom = (props) => {
           });
       })
       .catch((error) => {
-        console.log("Form validation error:", error);
+        console.log('Form validation error:', error);
       });
   };
   const handleCancel = () => {
@@ -868,7 +849,7 @@ const ProductionFrom = (props) => {
       <Form
         labelCol={{ span: 6 }}
         form={formCreate}
-        style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+        style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
       >
         <Row>
           <Col span={12}>
@@ -878,7 +859,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -890,7 +871,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -902,7 +883,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -914,7 +895,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -926,7 +907,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -935,24 +916,24 @@ const ProductionFrom = (props) => {
                 allowClear
                 options={[
                   {
-                    value: "SMT",
-                    label: "SMT",
+                    value: 'SMT',
+                    label: 'SMT',
                   },
                   {
-                    value: "THT",
-                    label: "THT",
+                    value: 'THT',
+                    label: 'THT',
                   },
                   {
-                    value: "DIP",
-                    label: "DIP",
+                    value: 'DIP',
+                    label: 'DIP',
                   },
                   {
-                    value: "ASSY",
-                    label: "ASSY",
+                    value: 'ASSY',
+                    label: 'ASSY',
                   },
                   {
-                    value: "Packing",
-                    label: "Packing",
+                    value: 'Packing',
+                    label: 'Packing',
                   },
                 ]}
               />
@@ -963,7 +944,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -973,12 +954,12 @@ const ProductionFrom = (props) => {
                 showSearch
                 options={[
                   {
-                    label: "TOP",
-                    value: "TOP",
+                    label: 'TOP',
+                    value: 'TOP',
                   },
                   {
-                    label: "BOT",
-                    value: "BOT",
+                    label: 'BOT',
+                    value: 'BOT',
                   },
                 ]}
               />
@@ -991,7 +972,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1001,12 +982,12 @@ const ProductionFrom = (props) => {
                 showSearch
                 options={[
                   {
-                    label: "是",
-                    value: "是",
+                    label: '是',
+                    value: '是',
                   },
                   {
-                    label: "否",
-                    value: "否",
+                    label: '否',
+                    value: '否',
                   },
                 ]}
               />
@@ -1017,7 +998,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1028,42 +1009,40 @@ const ProductionFrom = (props) => {
                 showSearch
                 options={[
                   {
-                    label: "投入",
-                    value: "投入",
+                    label: '投入',
+                    value: '投入',
                   },
                   {
-                    label: "过站",
-                    value: "过站",
+                    label: '过站',
+                    value: '过站',
                   },
                   {
-                    label: "组装",
-                    value: "组装",
+                    label: '组装',
+                    value: '组装',
                   },
                   {
-                    label: "测试",
-                    value: "测试",
+                    label: '测试',
+                    value: '测试',
                   },
                   {
-                    label: "产出",
-                    value: "产出",
+                    label: '产出',
+                    value: '产出',
                   },
                   {
-                    label: "一级包装",
-                    value: "一级包装",
+                    label: '一级包装',
+                    value: '一级包装',
                   },
                   {
-                    label: "二级包装",
-                    value: "二级包装",
+                    label: '二级包装',
+                    value: '二级包装',
                   },
                   {
-                    label: "分板",
-                    value: "分板",
+                    label: '分板',
+                    value: '分板',
                   },
                 ]}
                 onChange={(value) => {
-                  value.indexOf("组装") > -1
-                    ? setIsAssemble(true)
-                    : setIsAssemble(false);
+                  value.indexOf('组装') > -1 ? setIsAssemble(true) : setIsAssemble(false);
                 }}
               />
             </Form.Item>
@@ -1073,7 +1052,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1081,9 +1060,7 @@ const ProductionFrom = (props) => {
                 placeholder="请选择"
                 onChange={(e) => {
                   // 通过值获取当前选择的名称
-                  let data = validationStepListMine.filter(
-                    (item) => item.value == e
-                  );
+                  let data = validationStepListMine.filter((item) => item.value == e);
                   setValidationStepName(data?.[0]?.label);
                 }}
                 allowClear
@@ -1097,7 +1074,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1109,7 +1086,7 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -1120,17 +1097,82 @@ const ProductionFrom = (props) => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="时间戳"
-              name="genTimeSpan"
-              valuePropName="checked"
+              label="UID规则"
+              name="ruleCode"
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
-              <Switch defaultChecked={false}  />
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                options={uidList}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            {/* <Form.Item
+              label="标签模板"
+              name="labelTemplateId"
+              rules={[
+                {
+                  required: false,
+                  message: '请输入',
+                },
+              ]}
+            >
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                options={[
+                  {
+                    value: 0,
+                    label: 'xxxx',
+                  },
+                ]}
+              />
+            </Form.Item> */}
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="生成时间戳"
+              name="genTimeSpan"
+              rules={[
+                {
+                  required: false,
+                  message: '请输入',
+                },
+              ]}
+            >
+              {/* <Switch defaultChecked={false}  /> */}
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                options={[
+                  {
+                    value: 0,
+                    label: '不生成',
+                  },
+                  {
+                    value: 1,
+                    label: '生成',
+                  },
+                  {
+                    value: 2,
+                    label: '释放 ',
+                  },
+                  {
+                    value: 3,
+                    label: '生成与PCB绑定 ',
+                  },
+                ]}
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -1141,11 +1183,11 @@ const ProductionFrom = (props) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
-              <Switch defaultChecked={false}  />
+              <Switch defaultChecked={false} />
             </Form.Item>
           </Col>
         </Row>
@@ -1155,13 +1197,13 @@ const ProductionFrom = (props) => {
               <table className="myTable">
                 <thead>
                   <tr>
-                    <th style={{ width: "10%" }}>序号</th>
-                    <th style={{ width: "15%" }}>组装件</th>
-                    <th style={{ width: "15%" }}>条码规则</th>
-                    <th style={{ width: "15%" }}>用量</th>
-                    <th style={{ width: "15%" }}>组装顺序</th>
-                    <th style={{ width: "15%" }}>组装类别</th>
-                    <th style={{ width: "10%", textAlign: "center" }}>操作</th>
+                    <th style={{ width: '10%' }}>序号</th>
+                    <th style={{ width: '15%' }}>组装件</th>
+                    <th style={{ width: '15%' }}>条码规则</th>
+                    <th style={{ width: '15%' }}>用量</th>
+                    <th style={{ width: '15%' }}>组装顺序</th>
+                    <th style={{ width: '15%' }}>组装类别</th>
+                    <th style={{ width: '10%', textAlign: 'center' }}>操作</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1169,8 +1211,8 @@ const ProductionFrom = (props) => {
                     <tr key={key}>
                       <td>
                         <Form.Item
-                          name={[name, "sequenceNumber"]}
-                          rules={[{ required: true, message: "请输入序号" }]}
+                          name={[name, 'sequenceNumber']}
+                          rules={[{ required: true, message: '请输入序号' }]}
                           initialValue={key + 1}
                         >
                           <Input disabled placeholder="" />
@@ -1178,18 +1220,16 @@ const ProductionFrom = (props) => {
                       </td>
                       <td>
                         <Form.Item
-                          name={[name, "assemblyPart"]}
-                          rules={[{ required: true, message: "请输入组装件" }]}
+                          name={[name, 'assemblyPart']}
+                          rules={[{ required: true, message: '请输入组装件' }]}
                         >
                           <Input placeholder="" />
                         </Form.Item>
                       </td>
                       <td>
                         <Form.Item
-                          name={[name, "barcodeRule"]}
-                          rules={[
-                            { required: true, message: "请输入条码规则" },
-                          ]}
+                          name={[name, 'barcodeRule']}
+                          rules={[{ required: true, message: '请输入条码规则' }]}
                         >
                           <Input placeholder="" />
                           {/* <Select
@@ -1205,54 +1245,50 @@ const ProductionFrom = (props) => {
                       </td>
                       <td>
                         <Form.Item
-                          name={[name, "quantity"]}
-                          rules={[{ required: true, message: "请输入用量" }]}
+                          name={[name, 'quantity']}
+                          rules={[{ required: true, message: '请输入用量' }]}
                         >
                           <Input placeholder="" />
                         </Form.Item>
                       </td>
                       <td>
                         <Form.Item
-                          name={[name, "assemblyOrder"]}
-                          rules={[
-                            { required: true, message: "请输入组装顺序" },
-                          ]}
+                          name={[name, 'assemblyOrder']}
+                          rules={[{ required: true, message: '请输入组装顺序' }]}
                         >
                           <Input placeholder="" />
                         </Form.Item>
                       </td>
                       <td>
                         <Form.Item
-                          name={[name, "assemblyType"]}
-                          rules={[
-                            { required: true, message: "请输入组装类别" },
-                          ]}
+                          name={[name, 'assemblyType']}
+                          rules={[{ required: true, message: '请输入组装类别' }]}
                         >
                           <Select
                             placeholder="请选择"
                             allowClear
                             options={[
                               {
-                                value: "单体",
-                                label: "单体",
+                                value: '单体',
+                                label: '单体',
                               },
                               {
-                                value: "批次",
-                                label: "批次",
+                                value: '批次',
+                                label: '批次',
                               },
                             ]}
                           />
                         </Form.Item>
                       </td>
-                      <td style={{ textAlign: "center" }}>
+                      <td style={{ textAlign: 'center' }}>
                         <Space>
                           <Typography.Link
                             onClick={() => {
                               remove(name);
                             }}
                             style={{
-                              wordBreak: "break-word",
-                              whiteSpace: "nowrap",
+                              wordBreak: 'break-word',
+                              whiteSpace: 'nowrap',
                             }}
                           >
                             删除
@@ -1264,7 +1300,7 @@ const ProductionFrom = (props) => {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan={6} style={{ textAlign: "center" }}>
+                    <td colSpan={6} style={{ textAlign: 'center' }}>
                       <Button
                         onClick={() => {
                           add();

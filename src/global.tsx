@@ -1,10 +1,27 @@
 import { useIntl } from '@umijs/max';
 import { Button, message, notification } from 'antd';
 import defaultSettings from '../config/defaultSettings';
-
+import http from './utils/http';
+import { config } from './utils/config';
 const { pwa } = defaultSettings;
 const isHttps = document.location.protocol === 'https:';
 
+const getDictionary = async () => {
+  // 获取字典类型
+  http.get(`${config.API_PREFIX}sys/params/type/list`, {}).then((res) => {
+    localStorage.setItem('dictionaryType', JSON.stringify(res.bizData))
+  });
+  // 获取字典数据
+  const dictionary = await http.get(config.API_PREFIX + 'sys/params/page?current=1&size=1000', {})
+  .then((res) => {
+    localStorage.setItem('dictionaryList', JSON.stringify(res.bizData.records))
+  })
+  .catch((err) => {
+    console.log(err);
+  });;
+  return dictionary;
+}
+getDictionary();
 const clearCache = () => {
   // remove all caches
   if (window.caches) {

@@ -8,6 +8,7 @@ import '@minko-fe/use-antd-resizable-header/index.css'
 import http from '../utils/http'
 import {config} from '../utils/config'
 import api from '../utils/api'
+import { FormattedMessage, useIntl } from '@umijs/max';
 import qs from 'qs';
 import { downloadCSV } from '../utils/util';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -28,6 +29,7 @@ const feederStatusObj = {
 }
 
 const App = () => {
+
   const [loading, setLoading] = useState(false);
   const [loadingExport, setLoadingExport] = useState(false);
   const [formSearch] = Form.useForm();
@@ -177,10 +179,15 @@ const App = () => {
       console.log(err)
     })
   };
-
+  const intl = useIntl();
   const [columns, setColumns] = useState([
     {
-      title: '产线',
+      title: (
+              <FormattedMessage
+                id="pages.searchTable.areaNameProcess"
+                defaultMessage="产线"
+              />
+            ),
       dataIndex: 'areaNameProcess',
       key: 'areaNameProcess',
       width: 100,
@@ -579,7 +586,10 @@ const [items, setItems] = useState([
               </Col>
 
               <Col span={8}>
-                <Form.Item label="产线" name="areaId">
+                <Form.Item label={intl.formatMessage({
+                    id: 'pages.searchTable.areaNameProcess',
+                    defaultMessage: '产线',
+                  })} name="areaId">
                   <Select
                     placeholder="请选择"
                     allowClear

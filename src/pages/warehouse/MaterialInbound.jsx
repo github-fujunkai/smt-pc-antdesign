@@ -36,6 +36,7 @@ import {
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import api from '../../utils/api';
+import { getDictionaryListByCode } from '../../utils/util';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
 import WmsCount from './WmsCount';
@@ -400,7 +401,8 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
+    // console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
+    // console.log('getDictionaryListByCode', getDictionaryListByCode('送货人'));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -955,7 +957,16 @@ const App = () => {
                 },
               ]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                }
+                options={getDictionaryListByCode('供应商名称')}
+              />
             </Form.Item>
 
             <Form.Item
@@ -1007,7 +1018,16 @@ const App = () => {
                 },
               ]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                }
+                options={getDictionaryListByCode('送货人')}
+              />
             </Form.Item>
 
             <Form.Item
@@ -1020,7 +1040,16 @@ const App = () => {
                 },
               ]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                }
+                options={getDictionaryListByCode('入库人')}
+              />
             </Form.Item>
 
             <Form.Item

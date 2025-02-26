@@ -5,6 +5,7 @@ import { ExclamationCircleFilled, LoadingOutlined, PlusOutlined, SearchOutlined 
 import http from '../utils/http'
 import {config} from '../utils/config'
 import api from '../utils/api'
+import { FormattedMessage, useIntl } from '@umijs/max';
 import  dayjs from 'dayjs'
 const { TextArea } = Input;
 

@@ -5,6 +5,7 @@ import { ExclamationCircleFilled, DownOutlined, LoadingOutlined, PlusOutlined, S
 import http from '../utils/http'
 import {config} from '../utils/config'
 import api from '../utils/api'
+import { FormattedMessage, useIntl } from '@umijs/max';
 import  dayjs from 'dayjs'
 const { TextArea } = Input;
 
@@ -274,7 +275,8 @@ const App = () => {
       }
       setIsModalOpen(true);
   };
-  const showModal2 = (action, record) => {
+  const [onlyShow, setOnlyShow] = useState(true);
+  const showModal2 = (action, record, show) => {
     console.log(record)
     activeId2 = record.id
     action2 = action
@@ -284,6 +286,7 @@ const App = () => {
         formCreate2.setFieldsValue({
           prodProductionOrderQty,orderNumber, plannedQty, completedQty, productionAreaId: productionAreaId.toString(), lane, cycleTime, boardSide, productionStage, status, plannedProductionDate: dayjs(plannedProductionDate), plannedCompletionDate: dayjs(plannedCompletionDate)
         })
+        setOnlyShow(show?true:false)
       } else {
         formCreate2.resetFields();
         formCreate2.setFieldValue('orderNumber',record.orderNumber+'-'+record.productionOrders?.length);
@@ -724,6 +727,7 @@ const App = () => {
         render: (_, record) => {
           return (
             <Space>
+              <Typography.Link onClick={() => showModal2('update', record,'onlyShow')}>状态</Typography.Link>
               <Typography.Link onClick={() => showModal2('update', record)}>修改</Typography.Link>
               <Typography.Link onClick={() => del2(record)}>删除</Typography.Link>
             </Space>
@@ -1118,6 +1122,8 @@ const App = () => {
             form={formCreate2}
             style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
           >
+            <div
+            className={`${onlyShow ? 'hidden' : ''}`}>
             <Form.Item
               label="制令单号"
               name="orderNumber"
@@ -1300,6 +1306,34 @@ const App = () => {
               />
             </Form.Item>
 
+
+            <Form.Item
+              label="计划投产时间"
+              name="plannedProductionDate"
+              rules={[
+                {
+                  required: true,
+                  message: '请输入',
+                },
+              ]}
+            >
+              <DatePicker format="YYYY-MM-DD" style={{width: '100%'}} />
+            </Form.Item>
+
+            <Form.Item
+              label="计划完工日期"
+              name="plannedCompletionDate"
+              rules={[
+                {
+                  required: true,
+                  message: '请输入',
+                },
+              ]}
+            >
+              <DatePicker format="YYYY-MM-DD" style={{width: '100%'}} />
+            </Form.Item>
+            </div>
+            
             <Form.Item
               label="制令单状态"
               name="status"
@@ -1329,32 +1363,6 @@ const App = () => {
                   },
                 ]}
               />
-            </Form.Item>
-
-            <Form.Item
-              label="计划投产时间"
-              name="plannedProductionDate"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入',
-                },
-              ]}
-            >
-              <DatePicker format="YYYY-MM-DD" style={{width: '100%'}} />
-            </Form.Item>
-
-            <Form.Item
-              label="计划完工日期"
-              name="plannedCompletionDate"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入',
-                },
-              ]}
-            >
-              <DatePicker format="YYYY-MM-DD" style={{width: '100%'}} />
             </Form.Item>
           </Form>
         </Modal>

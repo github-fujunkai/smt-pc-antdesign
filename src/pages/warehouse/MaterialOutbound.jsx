@@ -43,7 +43,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import api from '../../utils/api';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
-import { downloadCSV } from '../../utils/util';
+import { downloadCSV, getDictionaryListByCode } from '../../utils/util';
 import WmsCount from './WmsCount';
 const { TextArea } = Input;
 
@@ -1076,7 +1076,18 @@ const App = () => {
                 },
               ]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? '')
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? '').toLowerCase())
+                }
+                options={getDictionaryListByCode('发料人')}
+              />
             </Form.Item>
 
             <Form.Item
@@ -1089,7 +1100,18 @@ const App = () => {
                 },
               ]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select
+                placeholder="请选择"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? '')
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? '').toLowerCase())
+                }
+                options={getDictionaryListByCode('领料人')}
+              />
             </Form.Item>
 
             <Form.Item label="上料表" name="quantity">

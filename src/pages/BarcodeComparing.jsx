@@ -4,6 +4,7 @@ import { PlusOutlined, CloseOutlined, CloseCircleOutlined } from '@ant-design/ic
 import http from '../utils/http'
 import {config} from '../utils/config'
 import api from '../utils/api'
+import { FormattedMessage, useIntl } from '@umijs/max';
 const { Title } = Typography;
 
 let separator = null

@@ -799,9 +799,9 @@ const App = () => {
                           />
                         </Form.Item>
                       </Col>
-                      {!deviceTypeList.includes(
+                      {/* {!deviceTypeList.includes(
                         formCreate.getFieldValue(["items", index, "deviceType"])
-                      ) && (
+                      ) && ( */}
                         <Col span={12}>
                           <Form.Item
                             label="路径"
@@ -815,7 +815,7 @@ const App = () => {
                             <Input placeholder="请输入" />
                           </Form.Item>
                         </Col>
-                      )}
+                      {/* )} */}
 
                       <Col span={12}>
                         <Form.Item
