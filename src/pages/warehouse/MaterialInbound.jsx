@@ -105,7 +105,6 @@ const App = () => {
     {
       title: '入库单',
       dataIndex: 'inboundOrderNumber',
-      // sorter: true,
       key: 'inboundOrderNumber',
       width: 100,
     },

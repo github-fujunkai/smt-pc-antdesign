@@ -217,3 +217,14 @@
   padding-block: 0px!important;
     padding-inline: 0px!important;
 }
+
+.ant-tabs-tab {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+.ant-tabs-tab-active {
+  background: rgba(0, 0, 0, 0) !important;
+}
+// 悬浮设置按钮
+.ant-pro-setting-drawer-handle {
+  display: none!important;
+}

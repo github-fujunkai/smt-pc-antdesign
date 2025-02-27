@@ -129,18 +129,25 @@ const App = () => {
         const { productName, productCode, productVersion, remarks } = values;
         console.log('valuesvaluesvaluesvalues', values);
         console.log('processList', processList);
+        let  Obj = undefined;
+        if (values.processUrl && values.processCode) {
+          Obj = [
+            {
+              uri: values.processUrl,
+              code: values.processCode,
+              pp: processList,
+            },
+          ];
+          
+        }else if (processList.length > 0) {
+          Obj = undefined
+        }
         let params = {
           productName,
           productCode,
           productVersion,
           remarks,
-          processProgramObj: [
-            {
-              uri: values.processUrl,
-              code: values.productCode,
-              pp: processList,
-            },
-          ],
+          processProgramObj: Obj,
         };
         let action = null;
         let msg = '';
@@ -220,13 +227,13 @@ const App = () => {
       productCode: productCode ? productCode : undefined,
       productVersion,
       remarks,
-      processProgramObj: [
-        {
-          uri: processUrl,
-          code: processCode,
-          pp: processList,
-        },
-      ],
+      // processProgramObj: [
+      //   {
+      //     uri: processUrl,
+      //     code: processCode,
+      //     pp: processList,
+      //   },
+      // ],
     };
     http
       .get(config.API_PREFIX + 'product/info/page', params)

@@ -390,7 +390,7 @@ const App = ({ isModalOpen, onClose }) => {
             >
               <Input allowClear disabled={isEdit} />
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               label="包装日期格式"
               name="packageDateTimeFormatter"
               rules={[
@@ -401,7 +401,7 @@ const App = ({ isModalOpen, onClose }) => {
               ]}
             >
               <Input allowClear disabled={isEdit} />
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item
               label="产品条码"
               name="panelCode"

@@ -740,13 +740,13 @@ const App = () => {
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="包装日期（开始）" name="createTimeStart">
+                <Form.Item label="起止时间（开始）" name="createTimeStart">
                   {/* <Input allowClear placeholder="请输入" /> */}
                   <DatePicker format="YYYY-MM-DD" style={{width: '100%'}} />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="包装日期（结束）" name="createTimeEnd">
+                <Form.Item label="起止时间（结束）" name="createTimeEnd">
                   {/* <Input allowClear placeholder="请输入" /> */}
                   <DatePicker format="YYYY-MM-DD" style={{width: '100%'}} />
                 </Form.Item>
