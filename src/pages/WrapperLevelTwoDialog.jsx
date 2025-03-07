@@ -90,10 +90,10 @@ const App = ({ isModalOpen, onClose }) => {
   //条码打印
   const printTemplateData = () => {
     // console.log("打印currentCodeMsg", currentCodeMsg);
-    if (currentCodeMsg == null) {
-      message.warning("获取不到包装信息！");
-      return;
-    }
+    // if (currentCodeMsg == null) {
+    //   message.warning("获取不到包装信息！");
+    //   return;
+    // }
     //根据 包装层级 +产品料号，到机型维护里获取 标签模板ID
     http
       .post(
@@ -158,7 +158,44 @@ const App = ({ isModalOpen, onClose }) => {
         console.log(err);
       });
   };
-
+//产品条码回车--内部逻辑拆分
+  const handlePanelCodechild = (orderNumber, productCode, currentValue) => {
+    http
+      .post(config.API_PREFIX + 'pack/product/packaging/productPackaging', {
+        packagingLevel: 2,
+        workOrderNumber: orderNumber,
+        productCode: productCode,
+        workStation: form.getFieldValue('workStation'),
+        uniqueCode: currentValue,
+      })
+      .then((res1) => {
+        const data = res1?.bizData;
+        // 储存当前扫的条码---获取的包装信息
+        setCurrentCodeMsg(res1?.bizData);
+        //录入条码，调用接口成功后，判断下是否已关箱，如果已关箱，前端自动打印条码
+        if (data.packageClosure == 'Y') {
+          if (codeList.length < data.maxPackageQty) {
+            const newCodeList = [...codeList, currentValue];
+            setCodeList(newCodeList);
+          }
+          message.success('该产品已关箱,执行打印中...');
+          // 打印条码
+          setTimeout(() => {
+            printTemplateData();
+          }, 1500);
+        } else {
+          form.setFieldValue('panelCode', '');
+          // 如果没关箱继续录入条码到产品列表，不打印
+          const newCodeList = [...codeList, currentValue];
+          setCodeList(newCodeList);
+          setIsEdit(true);
+        }
+      })
+      .catch((err) => {
+        form.setFieldValue('panelCode', '');
+        console.log(err);
+      });
+  };
   //产品条码回车
   const handlePanelCodeChange = (e) => {
     e.preventDefault();
@@ -168,140 +205,68 @@ const App = ({ isModalOpen, onClose }) => {
     }
     const currentValue = e.target.value;
     // 设置新的防抖计时器
-    debounceTimeout = setTimeout(() => {
-      // 判断当前值与上一次的值是否不同
-      // if (currentValue && currentValue !== previousPanelCodeValue) {
-      http
-        .get(config.API_PREFIX + api.wmsPanelUniqueCodePage, {
-          panelCode: currentValue,
-        })
-        .then((res) => {
-          // console.log("res", res);
-          const records = res?.bizData?.records;
-          if (records.length) {
-            const { orderNumber, productCode, boardCode, packagingId } =
-              records[0];
-            if (orderNumber != form.getFieldValue("orderNumber")) {
-              message.warning("工单号不一致");
-              return;
-            }
-            if (productCode != form.getFieldValue("productCode")) {
-              message.warning("产品料号不一致");
-              return;
-            }
-            if (
-              !form.getFieldValue("orderNumber") ||
-              form.getFieldValue("orderNumber") == ""
-            ) {
-              form.setFieldValue("orderNumber", orderNumber);
-              localStorage.setItem("orderNumber3", orderNumber);
-            }
-            if (
-              !form.getFieldValue("productCode") ||
-              form.getFieldValue("productCode") == ""
-            ) {
-              form.setFieldValue("productCode", productCode);
-              localStorage.setItem("productCode3", productCode);
-            }
-            // 包装新增两个接口：
-            // 16.3.10的产品包装，是录入条码时用的。pack/product/packaging/productPackaging
-            // 16.3.8 的关箱，是手动打印前关箱用的。pack/product/packaging/packageClosureByRule
-
-            http
-              .post(
-                config.API_PREFIX + "pack/product/packaging/productPackaging",
-                {
-                  packagingLevel: 2,
-                  workOrderNumber: orderNumber,
-                  productCode: productCode,
-                  workStation: form.getFieldValue("workStation"),
-                  uniqueCode: currentValue,
-                }
-              )
-              .then((res1) => {
-                const data = res1?.bizData;
-                // 储存当前扫的条码---获取的包装信息
-                setCurrentCodeMsg(res1?.bizData);
-                //录入条码，调用接口成功后，判断下是否已关箱，如果已关箱，前端自动打印条码
-                if (data.packageClosure == "Y") {
-                  if (codeList.length < data.maxPackageQty) {
-                    const newCodeList = [...codeList, currentValue];
-                    setCodeList(newCodeList);
-                  }
-                  message.success("该产品已关箱,执行打印中...");
-                  // 打印条码
-                  setTimeout(() => {
-                    printTemplateData();
-                  }, 1500);
+        debounceTimeout = setTimeout(() => {
+          http
+            .post(
+              `${config.API_PREFIX}${
+                api.packProductConfigPage
+              }?current=1&size=10&packagingLevel=2&productCode=${form.getFieldValue('productCode')}`,
+            )
+            .then((res) => {
+              //取records数据的第1条。校验verifyProjectProductCode=0时 不去查这里wmsPanelUniqueCodePage
+              const records = res?.bizData?.records;
+              if (records.length) {
+                const { labelTemplateId, verifyProjectProductCode } = records[0];
+                //不进行校验，不调用wmsPanelUniqueCodePage
+                if (verifyProjectProductCode == 0) {
+                  handlePanelCodechild(
+                    form.getFieldValue('orderNumber'),
+                    form.getFieldValue('productCode'),
+                    currentValue,
+                  );
                 } else {
-                  form.setFieldValue("panelCode", "");
-                  // 如果没关箱继续录入条码进去
-                  const newCodeList = [...codeList, currentValue];
-                  setCodeList(newCodeList);
-                  setIsEdit(true);
+                  http
+                    .get(config.API_PREFIX + api.wmsPanelUniqueCodePage, {
+                      panelCode: currentValue,
+                    })
+                    .then((res) => {
+                      // console.log("res", res);
+                      const records = res?.bizData?.records;
+                      if (records.length) {
+                        const { orderNumber, productCode, boardCode, packagingId } = records[0];
+                        if (
+                          !form.getFieldValue('orderNumber') ||
+                          form.getFieldValue('orderNumber') == ''
+                        ) {
+                          form.setFieldValue('orderNumber', orderNumber);
+                          localStorage.setItem('orderNumber3', orderNumber);
+                        }
+                        if (
+                          !form.getFieldValue('productCode') ||
+                          form.getFieldValue('productCode') == ''
+                        ) {
+                          form.setFieldValue('productCode', productCode);
+                          localStorage.setItem('productCode3', productCode);
+                        }
+                        // 包装新增两个接口：
+                        // 16.3.10的产品包装，是录入条码时用的。pack/product/packaging/productPackaging
+                        // 16.3.8 的关箱，是手动打印前关箱用的。pack/product/packaging/packageClosureByRule
+                        handlePanelCodechild(orderNumber, productCode, currentValue);
+                      } else {
+                        form.setFieldValue('panelCode', '');
+                        // message.error("未获取到数据");
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
                 }
-              })
-              .catch((err) => {
-                form.setFieldValue("panelCode", "");
-                console.log(err);
-              });
-            // 下面注释开发模拟使用
-            // let res = {
-            //   bizData: {
-            //     id: 1,
-            //     orderNumber: "4",
-            //     packagingLevel: 111,
-            //     workOrderNumber: "2",
-            //     productName: "3",
-            //     productCode: "22",
-            //     customerOrderNumber: null,
-            //     maxPackageQty: 1,
-            //     actualPackageQty: 0,
-            //     packageClosure: "N",
-            //     unpacking: "N",
-            //     workStation: "1",
-            //     packagingId: null,
-            //     stockOutId: null,
-            //     factoryId: null,
-            //     workshopId: null,
-            //     areaId: null,
-            //     createBy: "admin",
-            //     createTime: "2024-06-07 18:31:01",
-            //     updateBy: null,
-            //     updateTime: null,
-            //   },
-            //   respCode: "200",
-            //   respMsg: "成功",
-            // };
-            // const data = res?.bizData;
-            // //录入条码，调用接口成功后，判断下是否已关箱，如果已关箱，前端自动打印条码
-            // if (data.packageClosure == "Y") {
-            //   message.success("该产品已关箱,条码打印中...");
-            //   // 打印条码
-            //   alert("条码打印");
-            //   setTimeout(() => {
-            //     // 清除产品列表就好了，光标定位到产品输入框,工位，料号，工单保留进入下个循环
-            //     setCodeList([]);
-            //     form.setFieldValue("panelCode", "");
-            //   }, 1000);
-            // } else {
-            //   // 如果没关箱继续录入条码进去
-            //   const newCodeList = [...codeList, productCode];
-            //   setCodeList(newCodeList);
-            // }
-          } else {
-            form.setFieldValue("panelCode", "");
-            message.error("未获取到数据");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      // }
-
-      // 更新上一次的值
-      // setPreviousPanelCodeValue(currentValue);
-    }, 300);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }, 300);
   };
   const handleSubmit = (e) => {
     // e.preventDefault();

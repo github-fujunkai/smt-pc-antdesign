@@ -238,6 +238,11 @@ export default [
         component: './InfoScanning',
       },
       {
+        path: '/search/CrossStation',
+        name: '过站查询',
+        component: './search/CrossStation',
+      },
+      {
         path: '/search/InfoTransit',
         name: '过站记录',
         component: './InfoTransit',

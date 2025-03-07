@@ -82,6 +82,7 @@ export default {
   'menu.防错追溯.参数设置': 'Parameter Settings',
   'menu.信息查询': 'Information Query',
   'menu.信息查询.扫描记录': 'Scan Records',
+  'menu.信息查询.过站查询': 'Cross Station Records',
   'menu.信息查询.过站记录': 'Station Pass Records',
   'menu.信息查询.追溯信息': 'Traceability Info',
   'menu.信息查询.停机信息': 'Downtime Info',

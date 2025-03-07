@@ -43,21 +43,21 @@ const App = () => {
     setTimeout(() => {
       repairActionsRef.current.focus();
     }, 500);
-    // 根据产品条码查工单号
-    http
-      .get(
-        config.API_PREFIX +
-          api.productNoGetWorkOrderNumber +
-          '?panelCode=' +
-          formCreate.getFieldValue('panelCode'),
-        {},
-      )
-      .then((res) => {
-        formCreate.setFieldValue('workOrderNumber', res?.bizData);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // 根据产品条码查工单号---隐藏了现在
+    // http
+    //   .get(
+    //     config.API_PREFIX +
+    //       api.productNoGetWorkOrderNumber +
+    //       '?panelCode=' +
+    //       formCreate.getFieldValue('panelCode'),
+    //     {},
+    //   )
+    //   .then((res) => {
+    //     formCreate.setFieldValue('workOrderNumber', res?.bizData);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
     // setSelectedRowKeys([]);
 
     // 不良信息列表 新增的时候扫描了才显示
@@ -80,10 +80,16 @@ const App = () => {
       .catch((err) => {
         console.log(err);
       });
-      // 根据产品条码查工序
-      http.post(config.API_PREFIX +`process/steps/code/list?productCode=${formCreate.getFieldValue('panelCode')}`, {}).then((res) => {
-        setProcessesList(res?.bizData)
-      })
+    // 根据产品条码查工序
+    http
+      .post(
+        config.API_PREFIX +
+          `process/steps/code/list?productCode=${formCreate.getFieldValue('panelCode')}`,
+        {},
+      )
+      .then((res) => {
+        setProcessesList(res?.bizData);
+      });
   };
   const saveWorkStationStorage = (e) => {
     // 保存工位信息
@@ -292,14 +298,15 @@ const App = () => {
     setIsModalOpen(true);
 
     if (action === 'update' && record) {
-      const { id, workStation, workOrderNumber, panelCode, repairActions,refluxOperation } = record;
+      const { id, workStation, workOrderNumber, panelCode, repairActions, refluxOperation } =
+        record;
       activeId = id;
       formCreate.setFieldsValue({
         workStation,
         workOrderNumber,
         panelCode,
         repairActions,
-        refluxOperation
+        refluxOperation,
       });
       // 不良信息列表，放到编辑中增加了产品条码查询条件
       http
@@ -317,6 +324,16 @@ const App = () => {
         })
         .catch((err) => {
           console.log(err);
+        });
+      // 根据产品条码查工序
+      http
+        .post(
+          config.API_PREFIX +
+            `process/steps/code/list?productCode=${formCreate.getFieldValue('panelCode')}`,
+          {},
+        )
+        .then((res) => {
+          setProcessesList(res?.bizData);
         });
     } else {
       activeId = -1;
@@ -352,7 +369,7 @@ const App = () => {
           workOrderNumber,
           panelCode,
           repairActions,
-          refluxOperation
+          refluxOperation,
         } = values;
 
         let params = {
@@ -472,8 +489,6 @@ const App = () => {
       .catch((err) => {
         console.log(err);
       });
-
-     
   }, []);
 
   const fetchData = () => {
@@ -788,7 +803,7 @@ const App = () => {
             />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             label="工单号"
             name="workOrderNumber"
             rules={[
@@ -798,16 +813,11 @@ const App = () => {
               },
             ]}
           >
-            <Select
-              placeholder="请选择"
+            <Input
               allowClear
-              showSearch
-              options={dictBaseFwa?.area?.map((item) => ({
-                value: item.dictKey,
-                label: item.dictValue,
-              }))}
+              placeholder="请输入"
             />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             label="产品条码"
@@ -850,12 +860,7 @@ const App = () => {
               },
             ]}
           >
-            <Select
-              placeholder="请选择"
-              allowClear
-              showSearch
-              options={processesList}
-            />
+            <Select placeholder="请选择" allowClear showSearch options={processesList} />
           </Form.Item>
           <Form.Item
             label="不良原因"

@@ -3,8 +3,16 @@ import {
   PlusOutlined,
   RollbackOutlined,
   SearchOutlined,
-  SwapOutlined
+  SwapOutlined,
 } from '@ant-design/icons';
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useAntdResizableHeader } from '@minko-fe/use-antd-resizable-header';
 import '@minko-fe/use-antd-resizable-header/index.css';
@@ -26,15 +34,7 @@ import {
   Typography,
 } from 'antd';
 import dayjs from 'dayjs';
-import {
-  closestCenter,
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import api from '../utils/api';
 import { config } from '../utils/config';
 import http from '../utils/http';
@@ -145,7 +145,7 @@ const App = () => {
       title: '工位',
       dataIndex: 'workStation',
       key: 'workStation',
-      width: 200,
+      width: 120,
     },
     {
       title: '包装条码',
@@ -157,19 +157,19 @@ const App = () => {
       title: '工单号',
       dataIndex: 'workOrderNumber',
       key: 'workOrderNumber',
-      width: 200,
+      width: 120,
     },
     {
       title: '产品料号',
       dataIndex: 'productCode',
       key: 'productCode',
-      width: 200,
+      width: 120,
     },
     {
       title: '包装级别',
       dataIndex: 'packagingLevel',
       key: 'packagingLevel',
-      width: 150,
+      width: 80,
     },
     // {
     //   title: '容器编码',
@@ -181,13 +181,13 @@ const App = () => {
       title: '产品条码',
       dataIndex: 'panelCode',
       key: 'panelCode',
-      width: 200,
+      width: 120,
     },
     {
       title: '包装人',
       dataIndex: 'createBy',
       key: 'createBy',
-      width: 200,
+      width: 120,
     },
     {
       title: '包装时间',
@@ -196,36 +196,37 @@ const App = () => {
       render: (_, record) => {
         return dayjs(_).format('YYYY-MM-DD HH:mm:ss');
       },
+      width: 120,
     },
-    // {
-    //   title: '操作',
-    //   dataIndex: 'operation',
-    //   fixed: 'right',
-    //   render: (_, record) => {
-    //     return (
-    //       <Space>
-    //         {/* <Typography.Link onClick={() => showDrawer(record)}>拆单</Typography.Link> */}
-    //         <Typography.Link onClick={() => showModal2('create', record)}>新增产品包装-条码</Typography.Link>
-    //         <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
-    //         <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
-    //       </Space>
-    //     )
-    //   },
-    // },
+    {
+      title: '操作',
+      dataIndex: 'operation',
+      fixed: 'right',
+      render: (_, record) => {
+        return (
+          <Space>
+            <Typography.Link onClick={() => unboxing(record)}>解箱</Typography.Link>
+            <Typography.Link onClick={() => unProduct(record)}>解产品</Typography.Link>
+            <Typography.Link onClick={() => printTemplateData(record)}>打印</Typography.Link>
+          </Space>
+        );
+      }
+    },
+    
   ]);
 
-  const del = (record) => {
+  const unboxing = (record) => {
     confirm({
-      title: '删除确认',
+      title: '解箱',
       icon: <ExclamationCircleFilled />,
-      content: '删除后无法恢复，请确认是否删除！',
+      content: '是否执行解箱操作？',
       onOk() {
         console.log('OK');
         http
-          .del(config.API_PREFIX + api.prodworkorder + `/${record?.id}`, {})
+          .put(config.API_PREFIX + 'pack/product/packaging/unpackingById' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success('删除成功！');
+            message.success('解箱成功！');
           })
           .catch((err) => {
             console.log(err);
@@ -236,19 +237,23 @@ const App = () => {
       },
     });
   };
-
-  const del2 = (record) => {
+  const unProduct = (record) => {
     confirm({
-      title: '删除确认',
+      title: '解产品',
       icon: <ExclamationCircleFilled />,
-      content: '删除后无法恢复，请确认是否删除！',
+      content: '是否执行解产品操作？',
       onOk() {
-        console.log('OK');
         http
-          .del(config.API_PREFIX + api.prodproductionorder + `/${record?.id}`, {})
+          .post(config.API_PREFIX + 'pack/product/packaging/unpackSingleProduct', {
+            packagingLevel: record.packagingLevel,
+            workOrderNumber: record.workOrderNumber,
+            productCode: record.productCode,
+            workStation: record.workStation,
+            uniqueCode: record.orderNumber,
+          })
           .then((res) => {
             fetchData();
-            message.success('删除成功！');
+            message.success('解产品成功！');
           })
           .catch((err) => {
             console.log(err);
@@ -259,7 +264,48 @@ const App = () => {
       },
     });
   };
-
+  //条码打印
+  const printTemplateData = (record) => {
+    //根据 包装层级 +产品料号，到机型维护里获取 标签模板ID
+    http
+      .post(
+        `${config.API_PREFIX}${api.packProductConfigPage}?current=1&size=10&packagingLevel=1&productCode=${record.productCode}`,
+      )
+      .then((res) => {
+        const records = res?.bizData?.records;
+        if (records.length) {
+          const { labelTemplateId } = records[0];
+          http
+            .post(`${config.API_PREFIX}${api.printTemplatePrintData}`, {
+              templateId: labelTemplateId, //打印模板ID
+              qty: 1, //有几个条码就是几个
+              // orderNumber: "", //产品条码 条码是个列表怎么传？
+              packagingLevel: 1, //包装级别
+              workOrderNumber: record.workOrderNumber, //工单号
+              productCode: record.productCode, //产品料号
+              workStation: record.workStation, //工位
+              // packageDateTimeFormatter: form.getFieldValue('packageDateTimeFormatter'),
+              productName: record.productName,
+              orderNumber: record.orderNumber, //产品条码  ---- 这是算是箱号
+              actualPackageQty: record.actualPackageQty, //包装数量
+            })
+            .then((res1) => {
+              // 打印
+              if (res1.respCode == '200') {
+                message.success('操作成功！');
+                myDesign(res1?.bizData);
+              } else {
+                message.warning(res1.respMsg);
+                return;
+              }
+            });
+        }
+      })
+      .catch((err) => {
+        // setLoadingOk1(false);
+        console.log(err);
+      });
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpen2, setIsModalOpen2] = useState(false);
 
@@ -490,7 +536,6 @@ const App = () => {
 
   const [tableParams, setTableParams] = useState({ ...paginationInit });
 
- 
   useEffect(() => {
     fetchData();
     console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
@@ -639,22 +684,20 @@ const App = () => {
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [imageUrl, setImageUrl] = useState();
 
-  const myDesign = () => {
+  const myDesign = (tplContent) => {
     let LODOP = window.getLodop();
+    /*
     if (LODOP.CVERSION) {
       window.CLODOP.On_Return = function (TaskID, Value) {
         // document.getElementById('S1').value = Value;
-        console.log('Value', Value);
-        formCreate.setFieldValue('content', Value);
+        console.log("Value", Value);
       };
     }
-    // document.getElementById('S1').value = LODOP.PRINT_DESIGN();
-    let tplContent = formCreate.getFieldValue('content');
+    */
     if (tplContent) {
       eval(tplContent);
     }
-    const value = LODOP.PRINT_DESIGN();
-    console.log('value', value);
+    LODOP.PRINT();
   };
 
   const handleDeleteItem = (index, remove) => {
@@ -670,96 +713,96 @@ const App = () => {
   const handleWarpperLevel2 = (value) => {
     setWarpperLevel2(value);
   };
-    // --------------------------------------------------------------------------------------------------------------------
-    const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
-      columns: useMemo(() => columns, [columns]),
-      columnsState: {
-        persistenceKey: 'localKeyPackagingInquiry',
-        persistenceType: 'localStorage',
-      },
+  // --------------------------------------------------------------------------------------------------------------------
+  const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
+    columns: useMemo(() => columns, [columns]),
+    columnsState: {
+      persistenceKey: 'localKeyPackagingInquiry',
+      persistenceType: 'localStorage',
+    },
+  });
+
+  // 可拖动的单个项目组件
+  function SortableItem({ id, content, isDraggable }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id: id,
+      disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
     });
-  
-    // 可拖动的单个项目组件
-    function SortableItem({ id, content, isDraggable }) {
-      const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-        id: id,
-        disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
-      });
-  
-      const style = {
-        transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
-        transition,
-        // 如果不可拖动，可以添加不同的样式或逻辑
-        opacity: isDraggable ? 1 : 0.5,
-        cursor: isDraggable ? 'grab' : 'not-allowed',
-      };
-  
-      return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-          {content}
-        </div>
-      );
-    }
-  
-    // 定义传感器
-    const sensors = useSensors(
-      useSensor(PointerSensor),
-      useSensor(KeyboardSensor, {
-        coordinateGetter: verticalListSortingStrategy,
-      }),
+
+    const style = {
+      transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
+      transition,
+      // 如果不可拖动，可以添加不同的样式或逻辑
+      opacity: isDraggable ? 1 : 0.5,
+      cursor: isDraggable ? 'grab' : 'not-allowed',
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+        {content}
+      </div>
     );
-  
-    // 拖放逻辑处理函数
-    const handleDragEnd = (event) => {
-      const { active, over } = event;
-  
-      if (over && active.id !== over.id) {
-        const oldIndex = columns.findIndex((col) => col.key === active.id);
-        const newIndex = columns.findIndex((col) => col.key === over.id);
-  
-        if (oldIndex !== newIndex) {
-          setColumns((prevColumns) => {
-            const updatedColumns = Array.from(prevColumns);
-            const [movedColumn] = updatedColumns.splice(oldIndex, 1);
-            updatedColumns.splice(newIndex, 0, movedColumn);
-  
-            // 保存新的列顺序
-            saveColumnsOrder(updatedColumns);
-  
-            return updatedColumns;
-          });
-        }
-      } else {
-        // 如果没有有效的放置目标，强制更新状态以触发重渲染
-        setColumns((prevItems) => [...prevItems]);
+  }
+
+  // 定义传感器
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: verticalListSortingStrategy,
+    }),
+  );
+
+  // 拖放逻辑处理函数
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.key === active.id);
+      const newIndex = columns.findIndex((col) => col.key === over.id);
+
+      if (oldIndex !== newIndex) {
+        setColumns((prevColumns) => {
+          const updatedColumns = Array.from(prevColumns);
+          const [movedColumn] = updatedColumns.splice(oldIndex, 1);
+          updatedColumns.splice(newIndex, 0, movedColumn);
+
+          // 保存新的列顺序
+          saveColumnsOrder(updatedColumns);
+
+          return updatedColumns;
+        });
       }
-    };
-  
-    const saveColumnsOrder = (columns) => {
-      localStorage.setItem('columnsPackagingInquiry', JSON.stringify(columns.map((col) => col.key)));
-    };
-  
-    useEffect(() => {
-      const savedOrder = localStorage.getItem('columnsPackagingInquiry');
-      if (savedOrder) {
-        const order = JSON.parse(savedOrder);
-        const orderedColumns = order
-          .map((key) => columns.find((col) => col.key === key))
-          .filter(Boolean);
-        setColumns(orderedColumns);
-      }
-      // 其他初始化逻辑...
-    }, []);
-    function refreshPage() {
-      localStorage.removeItem('columnsPackagingInquiry');
-      message.success('复原成功！');
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+    } else {
+      // 如果没有有效的放置目标，强制更新状态以触发重渲染
+      setColumns((prevItems) => [...prevItems]);
     }
-  
-    const [isSortableOpen, setIsSortableOpen] = useState(false);
-    // --------------------------------------------------------------------------------------------------------------------
+  };
+
+  const saveColumnsOrder = (columns) => {
+    localStorage.setItem('columnsPackagingInquiry', JSON.stringify(columns.map((col) => col.key)));
+  };
+
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('columnsPackagingInquiry');
+    if (savedOrder) {
+      const order = JSON.parse(savedOrder);
+      const orderedColumns = order
+        .map((key) => columns.find((col) => col.key === key))
+        .filter(Boolean);
+      setColumns(orderedColumns);
+    }
+    // 其他初始化逻辑...
+  }, []);
+  function refreshPage() {
+    localStorage.removeItem('columnsPackagingInquiry');
+    message.success('复原成功！');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
+
+  const [isSortableOpen, setIsSortableOpen] = useState(false);
+  // --------------------------------------------------------------------------------------------------------------------
   return (
     <div className="content-wrapper">
       <div className="content">

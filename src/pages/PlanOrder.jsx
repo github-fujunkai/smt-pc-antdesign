@@ -291,6 +291,7 @@ const App = () => {
         formCreate2.resetFields();
         formCreate2.setFieldValue('orderNumber',record.orderNumber+'-'+record.productionOrders?.length);
         formCreate2.setFieldValue('plannedQty',record.plannedQty);
+        setOnlyShow(false)
       }
       setIsModalOpen2(true);
   };
