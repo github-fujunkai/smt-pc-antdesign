@@ -49,21 +49,36 @@ const App = ({ isModalOpen, onClose }) => {
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-  useEffect(() => {
-    form.setFieldsValue({
-      workStation: localStorage.getItem("workStation3") || "",
-      orderNumber: localStorage.getItem("orderNumber3") || "",
-      productCode: localStorage.getItem("productCode3") || "",
-      packageDateTimeFormatter: "yyyy/MM",
-    });
-  }, []);
-
   const [codeList, setCodeList] = useState([]);
   const myCodeListRef = useRef(codeList);
 
   useEffect(() => {
     myCodeListRef.current = codeList;
   }, [codeList]);
+  useEffect(() => {
+    if (isModalOpen) {
+      form.setFieldsValue({
+        workStation: localStorage.getItem('workStation3') || '',
+        orderNumber: localStorage.getItem('orderNumber3') || '',
+        productCode: localStorage.getItem('productCode3') || '',
+        packageDateTimeFormatter: 'yyyy/MM',
+      });
+      // 获取产品条码列表
+      http
+        .post(`${config.API_PREFIX}pack/product/packaging/uniqueCode/list`, {
+          packagingLevel: 1,
+          workOrderNumber: form.getFieldValue('orderNumber'),
+          productCode: form.getFieldValue('productCode'),
+          workStation: form.getFieldValue('workStation'),
+        })
+        .then((res) => {
+          if (JSON.stringify(res.bizData) !== '{}') {
+            // console.log('res', res.bizData);
+            setCodeList(res.bizData.uniqueCodeList || []);
+          }
+        });
+    }
+  }, [isModalOpen]);
   const myDesign = (tplContent) => {
     let LODOP = window.getLodop();
     /*

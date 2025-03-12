@@ -280,7 +280,7 @@ const StorageLocation = () => {
         >
           <Row>
             <Col span={12}>
-              <Form.Item
+              {/* <Form.Item
                 label="仓库类型"
                 name="storageType"
                 rules={[
@@ -302,35 +302,7 @@ const StorageLocation = () => {
                   }
                   options={getDictionaryListByCode('仓库类型')}
                 />
-                {/* <Select
-                  options={[
-                    {
-                      value: "良品仓",
-                      label: "良品仓",
-                    },
-                    {
-                      value: "不良仓",
-                      label: "不良仓",
-                    },
-                    {
-                      value: "报废仓",
-                      label: "报废仓",
-                    },
-                    {
-                      value: "成品仓",
-                      label: "成品仓",
-                    },
-                    {
-                      value: "治具仓",
-                      label: "治具仓",
-                    },
-                    {
-                      value: "线边仓",
-                      label: "线边仓",
-                    },
-                  ]}
-                /> */}
-              </Form.Item>
+              </Form.Item> */}
               <Form.Item
                 label="库位前缀"
                 name="code"

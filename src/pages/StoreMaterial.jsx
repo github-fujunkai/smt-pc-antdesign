@@ -1,42 +1,35 @@
-import React, { useState, useMemo, useEffect } from "react";
 import {
-  Typography,
-  Upload,
-  Image,
-  Tag,
-  Butotn,
-  Table,
-  Modal,
-  Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
-  Button,
-  message,
-  Option,
-} from "antd";
-import {
+  DownloadOutlined,
   ExclamationCircleFilled,
-  LoadingOutlined,
+  FileExcelOutlined,
   PlusOutlined,
   SearchOutlined,
-} from "@ant-design/icons";
-import {
   UploadOutlined,
-  DownloadOutlined,
-  FileExcelOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
+import {
+  Breadcrumb,
+  Button,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Table,
+  Typography,
+  Upload,
+} from 'antd';
+import { useEffect, useState } from 'react';
 
-import http from "../utils/http";
-import { config } from "../utils/config";
-import api from "../utils/api";
-import  dayjs from "dayjs";
-import qs from "qs";
-import { downloadCSV } from "../utils/util";
+import dayjs from 'dayjs';
+import qs from 'qs';
+import api from '../utils/api';
+import { config } from '../utils/config';
+import http from '../utils/http';
+import { downloadCSV } from '../utils/util';
 
 const { TextArea } = Input;
 
@@ -66,21 +59,21 @@ const App = () => {
   ]);
   */
   const mslList = [
-    { value: 1, label: "1" },
-    { value: 2, label: "2" },
-    { value: "2a", label: "2a" },
-    { value: 3, label: "3" },
-    { value: 4, label: "4" },
-    { value: 5, label: "5" },
-    { value: "5a", label: "5a" },
-    { value: 6, label: "6" },
+    { value: 1, label: '1' },
+    { value: 2, label: '2' },
+    { value: '2a', label: '2a' },
+    { value: 3, label: '3' },
+    { value: 4, label: '4' },
+    { value: 5, label: '5' },
+    { value: '5a', label: '5a' },
+    { value: 6, label: '6' },
   ];
   const [barCodeList, setBarCodeList] = useState([]);
   const getBarCode = () => {
     http
       .get(config.API_PREFIX + api.barcodegenrulePage, {})
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
         setBarCodeList(data?.records || []);
       })
@@ -97,15 +90,15 @@ const App = () => {
     // return
     setLoadingDownload(true);
     http
-      .post(config.API_PREFIX + "basic/item/baseInfo/downloadTemplate", {})
+      .post(config.API_PREFIX + 'basic/item/baseInfo/downloadTemplate', {})
       .then((res) => {
-        downloadCSV(res, "物料信息导入模板-CSV文件");
-        message.success("下载成功！");
+        downloadCSV(res, '物料信息导入模板-CSV文件');
+        message.success('下载成功！');
         setLoadingDownload(false);
       })
       .catch((err) => {
         console.log(err);
-        message.error("下载失败！");
+        message.error('下载失败！');
         setLoadingDownload(false);
       });
   };
@@ -114,19 +107,19 @@ const App = () => {
     setLoadingUpload(true);
     // 创建一个 FormData 对象，用于构建包含文件的请求
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
     // formData.append("importType", 0); //导入新增一个数据？
     http
-      .post(config.API_PREFIX + "basic/item/baseInfo/importData", formData)
+      .post(config.API_PREFIX + 'basic/item/baseInfo/importData', formData)
       .then((res) => {
-        message.success("导入成功！");
+        message.success('导入成功！');
         onSuccess(); // 通知 Ant Design Upload 组件上传成功
         setLoadingUpload(false);
         fetchData();
       })
       .catch((err) => {
         console.log(err);
-        message.error("导入失败！");
+        message.error('导入失败！');
         onError();
         setLoadingUpload(false);
       });
@@ -142,21 +135,21 @@ const App = () => {
       size: queryTotal,
     });
     http
-      .post(config.API_PREFIX + "basic/item/baseInfo/exportData" + `?${query}`)
+      .post(config.API_PREFIX + 'basic/item/baseInfo/exportData' + `?${query}`)
       .then((res) => {
-        message.success("导出成功！");
-        downloadCSV(res, "物料信息导出-CSV文件");
+        message.success('导出成功！');
+        downloadCSV(res, '物料信息导出-CSV文件');
         setLoadingExport(false);
       })
       .catch((err) => {
         console.log(err);
-        message.error("导出失败！");
+        message.error('导出失败！');
         setLoadingExport(false);
       });
   };
 
   const onFinish = (values) => {
-    console.log("search values", values);
+    console.log('search values', values);
     if (tableParams.pagination?.current !== 1) {
       setTableParams(paginationInit);
     } else {
@@ -179,99 +172,97 @@ const App = () => {
 
   const columns = [
     {
-      title: "物料ID",
-      dataIndex: "id",
+      title: '物料ID',
+      dataIndex: 'id',
       // sorter: true,
-      key: "id",
+      key: 'id',
     },
     {
-      title: "料号",
-      dataIndex: "itemCode",
+      title: '料号',
+      dataIndex: 'itemCode',
       // sorter: true,
-      key: "itemCode",
+      key: 'itemCode',
     },
     {
-      title: "供应商料号",
-      dataIndex: "supplierItemCode",
-      key: "supplierItemCode",
+      title: '供应商料号',
+      dataIndex: 'supplierItemCode',
+      key: 'supplierItemCode',
     },
     {
-      title: "物料描述",
-      dataIndex: "itemSpec",
-      key: "itemSpec",
+      title: '物料描述',
+      dataIndex: 'itemSpec',
+      key: 'itemSpec',
     },
     {
-      title: "供应商",
-      dataIndex: "supplier",
-      key: "supplier",
+      title: '供应商',
+      dataIndex: 'supplier',
+      key: 'supplier',
     },
     {
-      title: "包装数量",
-      dataIndex: "packageQty",
-      key: "packageQty",
+      title: '包装数量',
+      dataIndex: 'packageQty',
+      key: 'packageQty',
     },
     {
-      title: "物料类型",
-      dataIndex: "itemCategory",
-      key: "itemCategory",
+      title: '物料类型',
+      dataIndex: 'itemCategory',
+      key: 'itemCategory',
     },
     {
-      title: "MSL",
-      dataIndex: "msl",
-      key: "msl",
+      title: 'MSL',
+      dataIndex: 'msl',
+      key: 'msl',
     },
     {
-      title: "有效期",
-      dataIndex: "shelfLife",
-      key: "shelfLife",
+      title: '有效期',
+      dataIndex: 'shelfLife',
+      key: 'shelfLife',
     },
     {
-      title: "创建时间",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '创建时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
       // sorter: true,
       render: (_, record) => {
-        return dayjs(_).format("YYYY-MM-DD HH:mm:ss");
+        return dayjs(_).format('YYYY-MM-DD HH:mm:ss');
       },
     },
     {
-      title: "修改时间",
-      dataIndex: "updateTime",
-      key: "updateTime",
+      title: '修改时间',
+      dataIndex: 'updateTime',
+      key: 'updateTime',
       // sorter: true,
       render: (_, record) => {
-        return _ ? dayjs(_).format("YYYY-MM-DD HH:mm:ss") : "";
+        return _ ? dayjs(_).format('YYYY-MM-DD HH:mm:ss') : '';
       },
     },
     {
-      title: "修改人",
-      dataIndex: "updateBy",
-      key: "updateBy",
+      title: '修改人',
+      dataIndex: 'updateBy',
+      key: 'updateBy',
     },
     {
-      title: "标签模板",
-      dataIndex: "labelTemplateId",
-      key: "labelTemplateId",
+      title: '标签模板',
+      dataIndex: 'labelTemplateId',
+      key: 'labelTemplateId',
     },
     {
-      title: "库位",
-      dataIndex: "storageLocation",
-      key: "storageLocation",
+      title: '库位',
+      dataIndex: 'storageLocation',
+      key: 'storageLocation',
     },
     {
-      title: "备注",
-      dataIndex: "remark",
-      key: "remark",
+      title: '备注',
+      dataIndex: 'remark',
+      key: 'remark',
     },
     {
-      title: "操作",
-      dataIndex: "operation",
+      title: '操作',
+      dataIndex: 'operation',
       render: (_, record) => {
         return (
           <Space>
-            <Typography.Link onClick={() => showModal("update", record)}>
-              修改
-            </Typography.Link>
+            <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
           </Space>
         );
@@ -281,23 +272,23 @@ const App = () => {
 
   const del = (record) => {
     confirm({
-      title: "删除确认",
+      title: '删除确认',
       icon: <ExclamationCircleFilled />,
-      content: "删除后无法恢复，请确认是否删除！",
+      content: '删除后无法恢复，请确认是否删除！',
       onOk() {
-        console.log("OK");
+        console.log('OK');
         http
           .del(config.API_PREFIX + api.basicItemBaseInfo + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
-            message.success("删除成功！");
+            message.success('删除成功！');
           })
           .catch((err) => {
             console.log(err);
           });
       },
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   };
@@ -305,7 +296,7 @@ const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = (action, record) => {
-    if (action === "update" && record) {
+    if (action === 'update' && record) {
       const {
         id,
         itemCode,
@@ -348,7 +339,7 @@ const App = () => {
     formCreate
       .validateFields()
       .then((values) => {
-        console.log("values", values);
+        console.log('values', values);
 
         setLoadingOk(true);
         // wtf
@@ -381,19 +372,19 @@ const App = () => {
           remark,
         };
         let action = null;
-        let msg = "";
-        let apiUrl = "";
-        console.log("activeId", activeId);
+        let msg = '';
+        let apiUrl = '';
+        console.log('activeId', activeId);
         if (activeId !== -1) {
           action = http.put;
           // apiUrl = `${config.API_PREFIX}${api.printTemplate}/${activeId}`
           apiUrl = `${config.API_PREFIX}${api.basicItemBaseInfo}`;
           params.id = activeId;
-          msg = "修改成功！";
+          msg = '修改成功！';
         } else {
           action = http.post;
           apiUrl = `${config.API_PREFIX}${api.basicItemBaseInfo}`;
-          msg = "新增成功！";
+          msg = '新增成功！';
         }
         action(apiUrl, params)
           .then((res) => {
@@ -409,7 +400,7 @@ const App = () => {
           });
       })
       .catch((error) => {
-        console.log("Form validation error:", error);
+        console.log('Form validation error:', error);
       });
   };
 
@@ -445,7 +436,7 @@ const App = () => {
   */
   useEffect(() => {
     fetchData();
-    console.log("JSON.stringify(tableParams)]", JSON.stringify(tableParams));
+    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -459,9 +450,9 @@ const App = () => {
     http
       .get(config.API_PREFIX + api.printTemplateVariable, {})
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
-        console.log("printTemplateVariable", data);
+        console.log('printTemplateVariable', data);
         setTplVariable(data);
       })
       .catch((err) => {
@@ -474,7 +465,7 @@ const App = () => {
         size: 1000,
       })
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         setTpls(res?.bizData?.records || []);
       })
       .catch((err) => {
@@ -492,7 +483,7 @@ const App = () => {
 
     // sequelize 举例
     // order: [[ 'created_at', 'desc' ], [ 'categoryId', 'desc' ]],
-    console.log("order, field", order, field);
+    console.log('order, field', order, field);
 
     // 多个传参举例-hzry
     // GET /api/resource?sort=created_at:desc,categoryId:asc
@@ -508,8 +499,8 @@ const App = () => {
       // 举例：lxy
       // orders[0].column: id
       // orders[0].asc: true
-      params["orders[0].column"] = field;
-      params["orders[0].asc"] = order === "ascend" ? true : false;
+      params['orders[0].column'] = field;
+      params['orders[0].asc'] = order === 'ascend' ? true : false;
     }
 
     const {
@@ -550,12 +541,12 @@ const App = () => {
     http
       .get(config.API_PREFIX + api.basicItemBaseInfoPage, params)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
         setQueryTotal(data?.total);
         setData(data?.records || []);
         setLoading(false);
-        console.log("fetchData pagination", tableParams);
+        console.log('fetchData pagination', tableParams);
         setTableParams({
           ...tableParams,
           pagination: {
@@ -571,13 +562,13 @@ const App = () => {
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange: ", pagination, filters, sorter);
+    console.log('handleTableChange: ', pagination, filters, sorter);
     setTableParams({
       pagination,
       filters,
       ...sorter,
     });
-    console.log("tableParams1", tableParams);
+    console.log('tableParams1', tableParams);
 
     // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
@@ -591,17 +582,17 @@ const App = () => {
     if (LODOP.CVERSION) {
       window.CLODOP.On_Return = function (TaskID, Value) {
         // document.getElementById('S1').value = Value;
-        console.log("Value", Value);
-        formCreate.setFieldValue("content", Value);
+        console.log('Value', Value);
+        formCreate.setFieldValue('content', Value);
       };
     }
     // document.getElementById('S1').value = LODOP.PRINT_DESIGN();
-    let tplContent = formCreate.getFieldValue("content");
+    let tplContent = formCreate.getFieldValue('content');
     if (tplContent) {
       eval(tplContent);
     }
     const value = LODOP.PRINT_DESIGN();
-    console.log("value", value);
+    console.log('value', value);
   };
 
   return (
@@ -610,10 +601,10 @@ const App = () => {
         className="breadcrumb"
         items={[
           {
-            title: "仓库信息",
+            title: '仓库信息',
           },
           {
-            title: "物料信息",
+            title: '物料信息',
           },
         ]}
       ></Breadcrumb>
@@ -649,24 +640,24 @@ const App = () => {
                     allowClear
                     options={[
                       {
-                        value: "电子料",
-                        label: "电子料",
+                        value: '电子料',
+                        label: '电子料',
                       },
                       {
-                        value: "锡膏",
-                        label: "锡膏",
+                        value: '锡膏',
+                        label: '锡膏',
                       },
                       {
-                        value: "钢网",
-                        label: "钢网",
+                        value: '钢网',
+                        label: '钢网',
                       },
                       {
-                        value: "治具",
-                        label: "治具",
+                        value: '治具',
+                        label: '治具',
                       },
                       {
-                        value: "红胶",
-                        label: "红胶",
+                        value: '红胶',
+                        label: '红胶',
                       },
                     ]}
                   />
@@ -690,11 +681,7 @@ const App = () => {
 
               <Col span={8}>
                 <Space size="small">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
-                  >
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     查询
                   </Button>
                   <Button onClick={resetFormSearch} htmlType="button">
@@ -712,9 +699,9 @@ const App = () => {
           <div
             style={{
               marginBottom: 16,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
             <Space size="small">
@@ -755,7 +742,7 @@ const App = () => {
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => {
-                showModal("create");
+                showModal('create');
               }}
             >
               新增物料信息
@@ -780,228 +767,258 @@ const App = () => {
           okButtonProps={{
             disabled: loadingUpload,
           }}
+          width={700}
         >
           <Form
-            labelCol={{ span: 6 }}
+            labelCol={{ span: 68 }}
             form={formCreate}
-            style={{ padding: 16, maxHeight: "60vh", overflow: "scroll" }}
+            style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
           >
-            <Form.Item
-              label="料号"
-              name="itemCode"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <Input
-                style={{ width: "100%" }}
-                allowClear
-                placeholder="请输入"
-              />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label="料号"
+                  name="itemCode"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input style={{ width: '100%' }} allowClear placeholder="请输入" />
+                </Form.Item>
 
-            <Form.Item
-              label="物料描述"
-              name="itemSpec"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <Input allowClear placeholder="请输入" />
-            </Form.Item>
+                <Form.Item
+                  label="供应商"
+                  name="supplier"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item>
+                <Form.Item
+                  label="包装数量"
+                  name="packageQty"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <InputNumber style={{ width: '100%' }} allowClear placeholder="请输入" />
+                </Form.Item>
+                <Form.Item
+                  label="MSL"
+                  name="msl"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  {/* <Input allowClear placeholder="请输入" /> */}
+                  <Select
+                    placeholder="请选择"
+                    allowClear
+                    options={mslList?.map((item) => ({
+                      value: item.value,
+                      label: item.label,
+                    }))}
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="库位"
+                  name="storageLocation"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item>
+                {/* <Form.Item
+                  label="库存阈值"
+                  name="xxxxx"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item>
+                <Form.Item
+                  label="入库方式"
+                  name="xxxxx"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item> */}
+                <Form.Item
+                  label="备注"
+                  name="remark"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="物料描述"
+                  name="itemSpec"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item>
 
-            <Form.Item
-              label="供应商"
-              name="supplier"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <Input allowClear placeholder="请输入" />
-            </Form.Item>
+                <Form.Item
+                  label="供应商料号"
+                  name="supplierItemCode"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item>
 
-            <Form.Item
-              label="供应商料号"
-              name="supplierItemCode"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <Input allowClear placeholder="请输入" />
-            </Form.Item>
+                <Form.Item
+                  label="物料类型"
+                  name="itemCategory"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  {/* <Input allowClear placeholder="请输入" /> */}
+                  <Select
+                    placeholder="请选择"
+                    allowClear
+                    options={[
+                      {
+                        value: '电子料',
+                        label: '电子料',
+                      },
+                      {
+                        value: '锡膏',
+                        label: '锡膏',
+                      },
+                      {
+                        value: '钢网',
+                        label: '钢网',
+                      },
+                      {
+                        value: '治具',
+                        label: '治具',
+                      },
+                      {
+                        value: '红胶',
+                        label: '红胶',
+                      },
+                    ]}
+                  />
+                </Form.Item>
 
-            <Form.Item
-              label="包装数量"
-              name="packageQty"
-              rules={[
-                {
-                  required: true,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <InputNumber
-                style={{ width: "100%" }}
-                allowClear
-                placeholder="请输入"
-              />
-            </Form.Item>
+                <Form.Item
+                  label="有效期(天)"
+                  name="shelfLife"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item>
 
-            <Form.Item
-              label="物料类型"
-              name="itemCategory"
-              rules={[
-                {
-                  required: false,
-                  message: "请输入",
-                },
-              ]}
-            >
-              {/* <Input allowClear placeholder="请输入" /> */}
-              <Select
-                placeholder="请选择"
-                allowClear
-                options={[
-                  {
-                    value: "电子料",
-                    label: "电子料",
-                  },
-                  {
-                    value: "锡膏",
-                    label: "锡膏",
-                  },
-                  {
-                    value: "钢网",
-                    label: "钢网",
-                  },
-                  {
-                    value: "治具",
-                    label: "治具",
-                  },
-                  {
-                    value: "红胶",
-                    label: "红胶",
-                  },
-                ]}
-              />
-            </Form.Item>
+                <Form.Item
+                  label="唯一码规则"
+                  name="uniqueCodeRuleId"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  {/* <Input allowClear placeholder="请输入" /> */}
+                  <Select
+                    placeholder="请选择"
+                    allowClear
+                    options={barCodeList?.map((item) => ({
+                      value: item.ruleCode,
+                      label: item.ruleCode,
+                    }))}
+                  />
+                </Form.Item>
 
-            <Form.Item
-              label="MSL"
-              name="msl"
-              rules={[
-                {
-                  required: false,
-                  message: "请输入",
-                },
-              ]}
-            >
-              {/* <Input allowClear placeholder="请输入" /> */}
-              <Select
-                placeholder="请选择"
-                allowClear
-                options={mslList?.map((item) => ({
-                  value: item.value,
-                  label: item.label,
-                }))}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="有效期(天)"
-              name="shelfLife"
-              rules={[
-                {
-                  required: false,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <Input allowClear placeholder="请输入" />
-            </Form.Item>
-
-            <Form.Item
-              label="库位"
-              name="storageLocation"
-              rules={[
-                {
-                  required: false,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <Input allowClear placeholder="请输入" />
-            </Form.Item>
-
-            <Form.Item
-              label="唯一码规则"
-              name="uniqueCodeRuleId"
-              rules={[
-                {
-                  required: false,
-                  message: "请输入",
-                },
-              ]}
-            >
-              {/* <Input allowClear placeholder="请输入" /> */}
-              <Select
-                placeholder="请选择"
-                allowClear
-                options={barCodeList?.map((item) => ({
-                  value: item.ruleCode,
-                  label: item.ruleCode,
-                }))}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="标签模板"
-              name="labelTemplateId"
-              rules={[
-                {
-                  required: false,
-                  message: "请选择",
-                },
-              ]}
-            >
-              <Select
-                placeholder="请选择"
-                allowClear
-                // fieldNames={{
-                //   label: 'name',
-                //   value: 'id'
-                // }}
-                options={tpls.map((item) => ({
-                  label: `${item.name}（${item.type}）`,
-                  value: item.id,
-                }))}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="备注"
-              name="remark"
-              rules={[
-                {
-                  required: false,
-                  message: "请输入",
-                },
-              ]}
-            >
-              <Input allowClear placeholder="请输入" />
-            </Form.Item>
+                <Form.Item
+                  label="标签模板"
+                  name="labelTemplateId"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请选择',
+                    },
+                  ]}
+                >
+                  <Select
+                    placeholder="请选择"
+                    allowClear
+                    // fieldNames={{
+                    //   label: 'name',
+                    //   value: 'id'
+                    // }}
+                    options={tpls.map((item) => ({
+                      label: `${item.name}（${item.type}）`,
+                      value: item.id,
+                    }))}
+                  />
+                </Form.Item>
+                {/* <Form.Item
+                  label="检验标准"
+                  name="xxxxx"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
+                </Form.Item> */}
+              </Col>
+            </Row>
           </Form>
         </Modal>
       </div>
