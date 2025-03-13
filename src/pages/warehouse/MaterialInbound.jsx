@@ -669,7 +669,7 @@ const App = () => {
       coordinateGetter: verticalListSortingStrategy,
     }),
   );
-
+  
   // 拖放逻辑处理函数
   const handleDragEnd = (event) => {
     const { active, over } = event;
