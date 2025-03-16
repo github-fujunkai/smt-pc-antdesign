@@ -77,7 +77,7 @@ export default [
         path: '/app/dictionary',
         name: '数据字典',
         component: './app/dictionary',
-      },
+      }
     ],
   },
   {
@@ -266,6 +266,11 @@ export default [
         path: '/search/InfoMaterial',
         name: '物料记录',
         component: './InfoMaterial',
+      },
+      {
+        path: '/search/ViewQuery',
+        name: '视图查询',
+        component: './search/ViewQuery',
       },
     ],
   },

@@ -56,6 +56,23 @@ export function getDictionaryListByCode(name) {
   });
 }
 
+// 查询时空数据转undefined
+export function convertEmptyValuesToUndefined(obj) {
+  const newObj = { ...obj }; // 创建副本以避免修改原对象
+  for (const key in newObj) {
+    if (newObj.hasOwnProperty(key)) {
+      const value = newObj[key];
+      // 处理空字符串、纯空格字符串和null
+      if (value === null || (typeof value === 'string' && value.trim() === '')) {
+        newObj[key] = undefined;
+      }
+    }
+  }
+  return newObj;
+}
+
+
+
 
 
 

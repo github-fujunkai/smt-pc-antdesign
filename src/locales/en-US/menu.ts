@@ -88,6 +88,7 @@ export default {
   'menu.信息查询.停机信息': 'Downtime Info',
   'menu.信息查询.工单物料': 'Work Order Materials',
   'menu.信息查询.物料记录': 'Material Records',
+  'menu.信息查询.视图查询': 'View Records',
   'menu.生产计划': 'Production Planning',
   'menu.生产计划.工单信息': 'Work Order Info',
   'menu.生产计划.工艺流程': 'Process Flow',

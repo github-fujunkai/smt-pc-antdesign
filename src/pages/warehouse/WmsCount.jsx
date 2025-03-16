@@ -84,7 +84,7 @@ const App = (props) => {
         label: "批次号",
         value: "LOT_NO",
         key: "LOT_NO",
-      },
+      }
     ],
     4: [
       {
@@ -223,6 +223,16 @@ const App = (props) => {
         key: "qty",
       },
       {
+        title: "阈值",
+        dataIndex: "threshold",
+        key: "threshold",
+      },
+      {
+        title: "库存状态",
+        dataIndex: "status",
+        key: "status",
+      },
+      {
         title: "库位",
         dataIndex: "STORAGE_LOCATION",
         key: "STORAGE_LOCATION",
@@ -236,7 +246,7 @@ const App = (props) => {
         title: "批次号",
         dataIndex: "LOT_NO",
         key: "LOT_NO",
-      },
+      }
     ],
     4: [
       {
@@ -316,6 +326,8 @@ const App = (props) => {
             item.dataIndex === "item_code" ||
             item.dataIndex === "material_description" ||
             item.dataIndex === "package_qty" ||
+            item.dataIndex === "threshold" ||
+            item.dataIndex === "status" ||
             item.dataIndex === "qty"
           );
         })}

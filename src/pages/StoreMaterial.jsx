@@ -311,6 +311,7 @@ const App = () => {
         uniqueCodeRuleId,
         labelTemplateId,
         remark,
+        stockThreshold,storageType,inspectionStandard
       } = record;
       activeId = id;
       formCreate.setFieldsValue({
@@ -326,6 +327,7 @@ const App = () => {
         uniqueCodeRuleId,
         labelTemplateId,
         remark,
+        stockThreshold,storageType,inspectionStandard
       });
     } else {
       activeId = -1;
@@ -356,6 +358,7 @@ const App = () => {
           uniqueCodeRuleId,
           labelTemplateId,
           remark,
+          stockThreshold,storageType,inspectionStandard
         } = values;
         let params = {
           itemCode,
@@ -370,6 +373,7 @@ const App = () => {
           uniqueCodeRuleId,
           labelTemplateId,
           remark,
+          stockThreshold,storageType,inspectionStandard
         };
         let action = null;
         let msg = '';
@@ -845,9 +849,9 @@ const App = () => {
                 >
                   <Input allowClear placeholder="请输入" />
                 </Form.Item>
-                {/* <Form.Item
+                <Form.Item
                   label="库存阈值"
-                  name="xxxxx"
+                  name="stockThreshold"
                   rules={[
                     {
                       required: false,
@@ -859,7 +863,7 @@ const App = () => {
                 </Form.Item>
                 <Form.Item
                   label="入库方式"
-                  name="xxxxx"
+                  name="storageType"
                   rules={[
                     {
                       required: false,
@@ -867,8 +871,20 @@ const App = () => {
                     },
                   ]}
                 >
-                  <Input allowClear placeholder="请输入" />
-                </Form.Item> */}
+                   <Select
+                    placeholder="请选择"
+                    allowClear
+                    options={[ 
+                      { label: 'S-1', value: 'S-1' },
+                      { label: 'S-2', value: 'S-2' },
+                      { label: 'S-3', value: 'S-3' },
+                      { label: 'S-4', value: 'S-4' },
+                      { label: 'I', value: 'I' },
+                      { label: 'II', value: 'II' },
+                      { label: 'III', value: 'III' },
+                    ]}
+                  />
+                </Form.Item>
                 <Form.Item
                   label="备注"
                   name="remark"
@@ -1005,9 +1021,9 @@ const App = () => {
                     }))}
                   />
                 </Form.Item>
-                {/* <Form.Item
+                <Form.Item
                   label="检验标准"
-                  name="xxxxx"
+                  name="inspectionStandard"
                   rules={[
                     {
                       required: false,
@@ -1016,7 +1032,7 @@ const App = () => {
                   ]}
                 >
                   <Input allowClear placeholder="请输入" />
-                </Form.Item> */}
+                </Form.Item>
               </Col>
             </Row>
           </Form>
