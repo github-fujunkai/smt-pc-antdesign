@@ -1,39 +1,9 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import {
-  List,
-  Badge,
-  Dropdown,
-  Drawer,
-  Typography,
-  DatePicker,
-  Image,
-  Tag,
-  Butotn,
-  Table,
-  Modal,
-  Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
-  Button,
-  message,
-} from "antd";
-import {
-  ExclamationCircleFilled,
-  DownOutlined,
-  LoadingOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { Button, Form, Input, List, message, Modal, notification } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 
-import http from "../utils/http";
-import { config } from "../utils/config";
-import api from "../utils/api";
-import  dayjs from "dayjs";
+import api from '../utils/api';
+import { config } from '../utils/config';
+import http from '../utils/http';
 const { TextArea } = Input;
 
 let debounceTimeout = null;
@@ -47,7 +17,7 @@ const App = ({ isModalOpen, onClose }) => {
 
   const onFinish = (values) => {};
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    console.log('Failed:', errorInfo);
   };
   const [codeList, setCodeList] = useState([]);
   const myCodeListRef = useRef(codeList);
@@ -114,9 +84,7 @@ const App = ({ isModalOpen, onClose }) => {
       .post(
         `${config.API_PREFIX}${
           api.packProductConfigPage
-        }?current=1&size=10&packagingLevel=2&productCode=${form.getFieldValue(
-          "productCode"
-        )}`
+        }?current=1&size=10&packagingLevel=2&productCode=${form.getFieldValue('productCode')}`,
       )
       .then((res) => {
         const records = res?.bizData?.records;
@@ -137,27 +105,25 @@ const App = ({ isModalOpen, onClose }) => {
               qty: myCodeListRef.current.length || 0, //有几个条码就是几个
               // orderNumber: "", //产品条码 条码是个列表怎么传？
               packagingLevel: 2, //包装级别
-              workOrderNumber: form.getFieldValue("orderNumber"), //工单号
-              productCode: form.getFieldValue("productCode"), //产品料号
-              workStation: form.getFieldValue("workStation"), //工位
-              packageDateTimeFormatter: form.getFieldValue(
-                "packageDateTimeFormatter"
-              ),
+              workOrderNumber: form.getFieldValue('orderNumber'), //工单号
+              productCode: form.getFieldValue('productCode'), //产品料号
+              workStation: form.getFieldValue('workStation'), //工位
+              packageDateTimeFormatter: form.getFieldValue('packageDateTimeFormatter'),
               productName: myCurrentCodeMsgRef.current?.productName,
               orderNumber: myCurrentCodeMsgRef.current?.orderNumber, //产品条码  ---- 这是算是箱号
               actualPackageQty: myCurrentCodeMsgRef.current?.actualPackageQty, //包装数量
             })
             .then((res1) => {
               // 打印
-              if (res1.respCode == "200") {
+              if (res1.respCode == '200') {
                 setIsEdit(false);
-                message.success("操作成功！");
+                message.success('操作成功！');
                 myDesign(res1?.bizData);
                 // 打印之后 清除产品列表就好了，光标定位到产品条码输入框,工位，料号，工单保留进入下个循环
                 setTimeout(() => {
                   setCurrentCodeMsg(null);
                   setCodeList([]);
-                  form.setFieldValue("panelCode", "");
+                  form.setFieldValue('panelCode', '');
                   // 使用setTimeout确保在Modal渲染后执行
                   panelCodeRef.current.focus();
                 }, 1000);
@@ -173,7 +139,8 @@ const App = ({ isModalOpen, onClose }) => {
         console.log(err);
       });
   };
-//产品条码回车--内部逻辑拆分
+
+  //产品条码回车--内部逻辑拆分
   const handlePanelCodechild = (orderNumber, productCode, currentValue) => {
     http
       .post(config.API_PREFIX + 'pack/product/packaging/productPackaging', {
@@ -209,6 +176,13 @@ const App = ({ isModalOpen, onClose }) => {
       .catch((err) => {
         form.setFieldValue('panelCode', '');
         console.log(err);
+        notification.error({
+          description: err?.respMsg || '',
+          placement: 'top',
+          onClick: () => {
+            console.log('Notification Clicked!');
+          },
+        });
       });
   };
   //产品条码回车
@@ -220,68 +194,68 @@ const App = ({ isModalOpen, onClose }) => {
     }
     const currentValue = e.target.value;
     // 设置新的防抖计时器
-        debounceTimeout = setTimeout(() => {
-          http
-            .post(
-              `${config.API_PREFIX}${
-                api.packProductConfigPage
-              }?current=1&size=10&packagingLevel=2&productCode=${form.getFieldValue('productCode')}`,
-            )
-            .then((res) => {
-              //取records数据的第1条。校验verifyProjectProductCode=0时 不去查这里wmsPanelUniqueCodePage
-              const records = res?.bizData?.records;
-              if (records.length) {
-                const { labelTemplateId, verifyProjectProductCode } = records[0];
-                //不进行校验，不调用wmsPanelUniqueCodePage
-                if (verifyProjectProductCode == 0) {
-                  handlePanelCodechild(
-                    form.getFieldValue('orderNumber'),
-                    form.getFieldValue('productCode'),
-                    currentValue,
-                  );
-                } else {
-                  http
-                    .get(config.API_PREFIX + api.wmsPanelUniqueCodePage, {
-                      panelCode: currentValue,
-                    })
-                    .then((res) => {
-                      // console.log("res", res);
-                      const records = res?.bizData?.records;
-                      if (records.length) {
-                        const { orderNumber, productCode, boardCode, packagingId } = records[0];
-                        if (
-                          !form.getFieldValue('orderNumber') ||
-                          form.getFieldValue('orderNumber') == ''
-                        ) {
-                          form.setFieldValue('orderNumber', orderNumber);
-                          localStorage.setItem('orderNumber3', orderNumber);
-                        }
-                        if (
-                          !form.getFieldValue('productCode') ||
-                          form.getFieldValue('productCode') == ''
-                        ) {
-                          form.setFieldValue('productCode', productCode);
-                          localStorage.setItem('productCode3', productCode);
-                        }
-                        // 包装新增两个接口：
-                        // 16.3.10的产品包装，是录入条码时用的。pack/product/packaging/productPackaging
-                        // 16.3.8 的关箱，是手动打印前关箱用的。pack/product/packaging/packageClosureByRule
-                        handlePanelCodechild(orderNumber, productCode, currentValue);
-                      } else {
-                        form.setFieldValue('panelCode', '');
-                        // message.error("未获取到数据");
-                      }
-                    })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-                }
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }, 300);
+    debounceTimeout = setTimeout(() => {
+      http
+        .post(
+          `${config.API_PREFIX}${
+            api.packProductConfigPage
+          }?current=1&size=10&packagingLevel=2&productCode=${form.getFieldValue('productCode')}`,
+        )
+        .then((res) => {
+          //取records数据的第1条。校验verifyProjectProductCode=0时 不去查这里wmsPanelUniqueCodePage
+          const records = res?.bizData?.records;
+          if (records.length) {
+            const { labelTemplateId, verifyProjectProductCode } = records[0];
+            //不进行校验，不调用wmsPanelUniqueCodePage
+            if (verifyProjectProductCode == 0) {
+              handlePanelCodechild(
+                form.getFieldValue('orderNumber'),
+                form.getFieldValue('productCode'),
+                currentValue,
+              );
+            } else {
+              http
+                .get(config.API_PREFIX + api.wmsPanelUniqueCodePage, {
+                  panelCode: currentValue,
+                })
+                .then((res) => {
+                  // console.log("res", res);
+                  const records = res?.bizData?.records;
+                  if (records.length) {
+                    const { orderNumber, productCode, boardCode, packagingId } = records[0];
+                    if (
+                      !form.getFieldValue('orderNumber') ||
+                      form.getFieldValue('orderNumber') == ''
+                    ) {
+                      form.setFieldValue('orderNumber', orderNumber);
+                      localStorage.setItem('orderNumber3', orderNumber);
+                    }
+                    if (
+                      !form.getFieldValue('productCode') ||
+                      form.getFieldValue('productCode') == ''
+                    ) {
+                      form.setFieldValue('productCode', productCode);
+                      localStorage.setItem('productCode3', productCode);
+                    }
+                    // 包装新增两个接口：
+                    // 16.3.10的产品包装，是录入条码时用的。pack/product/packaging/productPackaging
+                    // 16.3.8 的关箱，是手动打印前关箱用的。pack/product/packaging/packageClosureByRule
+                    handlePanelCodechild(orderNumber, productCode, currentValue);
+                  } else {
+                    form.setFieldValue('panelCode', '');
+                    // message.error("未获取到数据");
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 300);
   };
   const handleSubmit = (e) => {
     // e.preventDefault();
@@ -305,6 +279,7 @@ const App = ({ isModalOpen, onClose }) => {
       onOk={handleOk}
       onCancel={handleCancel}
       footer={null}
+      width={800}
     >
       <div className="content-wrapper">
         <div className="">
@@ -317,9 +292,6 @@ const App = ({ isModalOpen, onClose }) => {
             wrapperCol={{
               span: 18,
             }}
-            style={{
-              maxWidth: 600,
-            }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"
@@ -328,54 +300,51 @@ const App = ({ isModalOpen, onClose }) => {
               label="工位"
               name="workStation"
               onBlur={(e) => {
-                if (e?.target?.value)
-                  localStorage.setItem("workStation2", e.target.value);
+                if (e?.target?.value) localStorage.setItem('workStation2', e.target.value);
               }}
               // extra="工位是手动输入的；下次访问浏览器缓存带出"
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
-              <Input allowClear disabled={isEdit}/>
+              <Input allowClear disabled={isEdit} />
             </Form.Item>
 
             <Form.Item
               label="工单号"
               name="orderNumber"
               onBlur={(e) => {
-                if (e?.target?.value)
-                  localStorage.setItem("orderNumber2", e.target.value);
+                if (e?.target?.value) localStorage.setItem('orderNumber2', e.target.value);
               }}
               // extra="根据扫描的第一片板子自动带出；为空自动带出，不为空根据返回的进行核对；允许手动删除，修改；下次访问浏览器缓存带出"
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
-              <Input allowClear disabled={isEdit}/>
+              <Input allowClear disabled={isEdit} />
             </Form.Item>
 
             <Form.Item
               label="产品料号"
               onBlur={(e) => {
-                if (e?.target?.value)
-                  localStorage.setItem("productCode2", e.target.value);
+                if (e?.target?.value) localStorage.setItem('productCode2', e.target.value);
               }}
               // extra="根据扫描的第一片板子自动带出；为空自动带出，不为空根据返回的进行核对；允许手动删除，修改；下次访问浏览器缓存带出"
               name="productCode"
               rules={[
                 {
                   required: true,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
-              <Input allowClear disabled={isEdit}/>
+              <Input allowClear disabled={isEdit} />
             </Form.Item>
             {/* <Form.Item
               label="包装日期格式"
@@ -396,16 +365,11 @@ const App = ({ isModalOpen, onClose }) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
-              <Input
-                allowClear
-                autoFocus
-                ref={panelCodeRef}
-                onPressEnter={handlePanelCodeChange}
-              />
+              <Input allowClear autoFocus ref={panelCodeRef} onPressEnter={handlePanelCodeChange} />
             </Form.Item>
 
             <Form.Item
@@ -413,7 +377,7 @@ const App = ({ isModalOpen, onClose }) => {
               rules={[
                 {
                   required: false,
-                  message: "请输入",
+                  message: '请输入',
                 },
               ]}
             >
@@ -439,7 +403,7 @@ const App = ({ isModalOpen, onClose }) => {
                 )}
               />
             </Form.Item>
-
+            <Form.Item label="已包装：">{codeList.length || 0}</Form.Item>
             <Form.Item
               wrapperCol={{
                 offset: 8,

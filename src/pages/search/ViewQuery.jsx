@@ -1,24 +1,10 @@
-import { ExclamationCircleFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  message,
-  Modal,
-  Row,
-  Select,
-  Space,
-  Table,
-  Typography,
-  DatePicker
-} from 'antd';
+import { ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
+import { Button, Col, Form, Input, message, Modal, Row, Select, Space, Table } from 'antd';
 import { useEffect, useState } from 'react';
 
-import dayjs from 'dayjs';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
-import {convertEmptyValuesToUndefined} from '../../utils/util'
+import { convertEmptyValuesToUndefined } from '../../utils/util';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
@@ -58,10 +44,7 @@ const App = () => {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
-  const [columns, setColumns] = useState([
- 
-  ]);
+  const [columns, setColumns] = useState([]);
   const del = (record) => {
     confirm({
       title: '删除确认',
@@ -157,23 +140,24 @@ const App = () => {
   const [typeList, setTypeList] = useState([]);
   useEffect(() => {
     // 获取视图类型
-    http
-    .get(config.API_PREFIX + 'dict/view/list', {})
-    .then((res) => {
-      setTypeList(res?.bizData.map(item => ({
-        label: item.dictValue,
-        value: item.dictKey
-      })) || []);
+    http.get(config.API_PREFIX + 'dict/view/list', {}).then((res) => {
+      setTypeList(
+        res?.bizData.map((item) => ({
+          label: item.dictValue,
+          value: item.dictKey,
+        })) || [],
+      );
       formSearch.setFieldsValue({ dictType: res?.bizData[0]?.dictKey });
       fetchData();
-    })
+    });
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams?.columnKey,
     tableParams?.order,
   ]);
-
+  const [datetimeFields, setDatetimeFields] = useState([]);
+  const [timestampFields, setTimestampFields] = useState([]);
   const fetchData = () => {
     setLoading(true);
     const {
@@ -181,34 +165,53 @@ const App = () => {
       field,
       pagination: { current, pageSize },
     } = tableParams;
-   
-    const {dictType} = formSearch.getFieldsValue();
- 
-    http.post(config.API_PREFIX + `view/show?current=${current}&size=${pageSize}&viewName=${dictType}`, {
-      ...convertEmptyValuesToUndefined(formSearch.getFieldsValue()),dictType:undefined
-          })
-          .then((res) => {
-            const data = res?.bizData;
-            setColumns(data?.viewColumns.map(item => ({
-              title: item,
-              dataIndex: item,
-              key: item,
-            })
-            ) || []);
-            setData(data?.viewData?.records || []);
-            setLoading(false);
-            setTableParams({
-              ...tableParams,
-              pagination: {
-                ...tableParams.pagination,
-                total: data?.viewData?.total,
-                showTotal,
-              },
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+
+    const { dictType } = formSearch.getFieldsValue();
+
+    http
+      .post(
+        config.API_PREFIX + `view/show?current=${current}&size=${pageSize}&viewName=${dictType}`,
+        {
+          ...convertEmptyValuesToUndefined(formSearch.getFieldsValue()),
+          dictType: undefined,
+        },
+      )
+      .then((res) => {
+        const data = res?.bizData;
+        setColumns(
+          data?.viewColumns.map((item) => ({
+            title: item,
+            dataIndex: item,
+            key: item,
+          })) || [],
+        );
+        setData(data?.viewData?.records || []);
+
+        // 提取datetime类型字段
+        const datetimeFields = Object.entries(data?.columnTypes)
+          .filter(([key, value]) => value === 'datetime')
+          .map(([key]) => key);
+        const timestampFields = Object.entries(data?.columnTypes)
+          .filter(([key, value]) => value === 'timestamp')
+          .map(([key]) => key);
+        console.log('datetimeFields', datetimeFields);
+        console.log('timestampFields', timestampFields);
+        setDatetimeFields(datetimeFields);
+        setTimestampFields(timestampFields);
+
+        setLoading(false);
+        setTableParams({
+          ...tableParams,
+          pagination: {
+            ...tableParams.pagination,
+            total: data?.viewData?.total,
+            showTotal,
+          },
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
@@ -237,24 +240,36 @@ const App = () => {
                   <Select placeholder="请选择" allowClear showSearch options={typeList} />
                 </Form.Item>
               </Col>
-              {
-                columns&&columns.map((item, index) => {
+              {columns &&
+                columns.map((item, index) => {
                   return (
                     <>
-                    <Col span={8} key={index}>
-                      <Form.Item label={item.title} name={item.dataIndex}>
-                        <Input placeholder="请输入" allowClear/>
-                      </Form.Item>
-                    </Col>
-                    {/* <Col span={8}>
+                      <Col span={8} key={index}>
+                        <Form.Item label={item.title} name={item.dataIndex}>
+                          <Input placeholder="请输入" allowClear />
+                          {/* {datetimeFields.includes(item.dataIndex) && (
+                            <DatePicker
+                              // showTime={{ format: 'YYYY-MM-DD' }}
+                              format="YYYY-MM-DD"
+                            />
+                          )}
+                          {timestampFields.includes(item.dataIndex) && (
+                            <RangePicker />
+                          )}
+                          {!datetimeFields.includes(item.dataIndex) &&
+                            !timestampFields.includes(item.dataIndex) && (
+                              <Input placeholder="请输入" allowClear />
+                            )} */}
+                        </Form.Item>
+                      </Col>
+                      {/* <Col span={8}>
                       <Form.Item label="开始时间" name="startTime">
                         <DatePicker showTime={{format: 'HH:mm'}} format="YYYY-MM-DD HH:mm" style={{width: '100%'}} />
                       </Form.Item>
                     </Col> */}
                     </>
-                  )
-                })
-              }
+                  );
+                })}
               <Col span={8}>
                 <Space size="small">
                   <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>

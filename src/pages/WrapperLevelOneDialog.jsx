@@ -1,4 +1,4 @@
-import { Button, Form, Input, List, message, Modal } from 'antd';
+import { Button, Form, Input, List, message, Modal, notification } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
 import api from '../utils/api';
@@ -135,6 +135,7 @@ const App = ({ isModalOpen, onClose }) => {
         console.log(err);
       });
   };
+
   //产品条码回车--内部逻辑拆分
   const handlePanelCodechild = (orderNumber, productCode, currentValue) => {
     http
@@ -171,6 +172,13 @@ const App = ({ isModalOpen, onClose }) => {
       .catch((err) => {
         form.setFieldValue('panelCode', '');
         console.log(err);
+        notification.error({
+          description: err?.respMsg || '',
+          placement: 'top',
+          onClick: () => {
+            console.log('Notification Clicked!');
+          },
+        });
       });
   };
   //产品条码回车
@@ -298,6 +306,7 @@ const App = ({ isModalOpen, onClose }) => {
       onOk={handleOk}
       onCancel={handleCancel}
       footer={null}
+      width={800}
     >
       <div className="content-wrapper">
         <div className="">
@@ -309,9 +318,6 @@ const App = ({ isModalOpen, onClose }) => {
             }}
             wrapperCol={{
               span: 18,
-            }}
-            style={{
-              maxWidth: 600,
             }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
@@ -421,7 +427,7 @@ const App = ({ isModalOpen, onClose }) => {
                 )}
               />
             </Form.Item>
-
+            <Form.Item label="已包装：">{codeList.length || 0}</Form.Item>
             <Form.Item
               wrapperCol={{
                 offset: 8,
