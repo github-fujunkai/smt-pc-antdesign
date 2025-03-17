@@ -135,7 +135,7 @@ const App = ({ isModalOpen, onClose }) => {
         console.log(err);
       });
   };
-
+  const { confirm } = Modal;
   //产品条码回车--内部逻辑拆分
   const handlePanelCodechild = (orderNumber, productCode, currentValue) => {
     http
@@ -172,12 +172,20 @@ const App = ({ isModalOpen, onClose }) => {
       .catch((err) => {
         form.setFieldValue('panelCode', '');
         console.log(err);
-        notification.error({
-          description: err?.respMsg || '',
-          placement: 'top',
-          duration: 1000,
-          onClick: () => {
-            console.log('Notification Clicked!');
+        // notification.error({
+        //   description: err?.respMsg || '',
+        //   placement: 'top',
+        //   duration: 1000,
+        //   onClick: () => {
+        //     console.log('Notification Clicked!');
+        //   },
+        // });
+        confirm({
+          title: '提示',
+          content: err?.respMsg || '',
+          onOk() {
+          },
+          onCancel() {
           },
         });
       });
