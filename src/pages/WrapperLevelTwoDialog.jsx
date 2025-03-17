@@ -157,7 +157,7 @@ const App = ({ isModalOpen, onClose }) => {
         //录入条码，调用接口成功后，判断下是否已关箱，如果已关箱，前端自动打印条码
         if (data.packageClosure == 'Y') {
           if (codeList.length < data.maxPackageQty) {
-            const newCodeList = [...codeList, currentValue];
+            const newCodeList = [currentValue,...codeList];
             setCodeList(newCodeList);
           }
           message.success('该产品已关箱,执行打印中...');
@@ -179,6 +179,7 @@ const App = ({ isModalOpen, onClose }) => {
         notification.error({
           description: err?.respMsg || '',
           placement: 'top',
+          duration: 1000,
           onClick: () => {
             console.log('Notification Clicked!');
           },
@@ -381,9 +382,7 @@ const App = ({ isModalOpen, onClose }) => {
                 },
               ]}
             >
-              {/* <Tag closeIcon onClose={console.log}>
-              
-            </Tag> */}
+              <div className='h-60 overflow-y-auto'>
               <List
                 bordered
                 dataSource={codeList}
@@ -402,6 +401,8 @@ const App = ({ isModalOpen, onClose }) => {
                   </List.Item>
                 )}
               />
+              
+            </div>
             </Form.Item>
             <Form.Item label="已包装：">{codeList.length || 0}</Form.Item>
             <Form.Item

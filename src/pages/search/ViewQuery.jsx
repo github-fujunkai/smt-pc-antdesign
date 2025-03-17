@@ -1,5 +1,18 @@
 import { ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
-import { Button, Col, Form, Input, message, Modal, Row, Select, Space, Table } from 'antd';
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Modal,
+  RangePicker,
+  Row,
+  Select,
+  Space,
+  Table,
+} from 'antd';
 import { useEffect, useState } from 'react';
 
 import { config } from '../../utils/config';
@@ -156,6 +169,7 @@ const App = () => {
     tableParams?.columnKey,
     tableParams?.order,
   ]);
+  const [dateFields, setDateFields] = useState([]);
   const [datetimeFields, setDatetimeFields] = useState([]);
   const [timestampFields, setTimestampFields] = useState([]);
   const fetchData = () => {
@@ -168,6 +182,7 @@ const App = () => {
 
     const { dictType } = formSearch.getFieldsValue();
 
+    // {"过站时间":"2025-02-27T16:00:00.000Z"} => {"过站时间":"2025-02-27 16:00:00"}
     http
       .post(
         config.API_PREFIX + `view/show?current=${current}&size=${pageSize}&viewName=${dictType}`,
@@ -194,10 +209,17 @@ const App = () => {
         const timestampFields = Object.entries(data?.columnTypes)
           .filter(([key, value]) => value === 'timestamp')
           .map(([key]) => key);
+        const dateFields = Object.entries(data?.columnTypes)
+          .filter(([key, value]) => value === 'date')
+          .map(([key]) => key);
+        console.log('dateFields', dateFields);
         console.log('datetimeFields', datetimeFields);
         console.log('timestampFields', timestampFields);
-        setDatetimeFields(datetimeFields);
-        setTimestampFields(timestampFields);
+        // if (timestampFields) timestampFields.push('工序');
+        // if (dateFields) dateFields.push('工位');
+        setDatetimeFields(datetimeFields); //[...datetimeFields, '工序']
+        setTimestampFields(timestampFields);  //[...timestampFields, '工位']
+        setDateFields(dateFields);
 
         setLoading(false);
         setTableParams({
@@ -247,26 +269,26 @@ const App = () => {
                       <Col span={8} key={index}>
                         <Form.Item label={item.title} name={item.dataIndex}>
                           <Input placeholder="请输入" allowClear />
-                          {/* {datetimeFields.includes(item.dataIndex) && (
+                          {/* {dateFields.includes(item.dataIndex) && (
                             <DatePicker
-                              // showTime={{ format: 'YYYY-MM-DD' }}
-                              format="YYYY-MM-DD"
+                              showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                              format="YYYY-MM-DD HH:mm:ss"
                             />
                           )}
-                          {timestampFields.includes(item.dataIndex) && (
-                            <RangePicker />
+                          {datetimeFields.includes(item.dataIndex) && (
+                            <DatePicker
+                              showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                              format="YYYY-MM-DD HH:mm:ss"
+                            />
                           )}
+                          {timestampFields.includes(item.dataIndex) && <RangePicker />}
                           {!datetimeFields.includes(item.dataIndex) &&
-                            !timestampFields.includes(item.dataIndex) && (
+                            !timestampFields.includes(item.dataIndex) &&
+                            !dateFields.includes(item.dataIndex) && (
                               <Input placeholder="请输入" allowClear />
                             )} */}
                         </Form.Item>
                       </Col>
-                      {/* <Col span={8}>
-                      <Form.Item label="开始时间" name="startTime">
-                        <DatePicker showTime={{format: 'HH:mm'}} format="YYYY-MM-DD HH:mm" style={{width: '100%'}} />
-                      </Form.Item>
-                    </Col> */}
                     </>
                   );
                 })}

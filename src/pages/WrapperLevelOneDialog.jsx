@@ -164,7 +164,7 @@ const App = ({ isModalOpen, onClose }) => {
         } else {
           form.setFieldValue('panelCode', '');
           // 如果没关箱继续录入条码到产品列表，不打印
-          const newCodeList = [...codeList, currentValue];
+          const newCodeList = [currentValue,...codeList];
           setCodeList(newCodeList);
           setIsEdit(true);
         }
@@ -175,6 +175,7 @@ const App = ({ isModalOpen, onClose }) => {
         notification.error({
           description: err?.respMsg || '',
           placement: 'top',
+          duration: 1000,
           onClick: () => {
             console.log('Notification Clicked!');
           },
@@ -408,9 +409,8 @@ const App = ({ isModalOpen, onClose }) => {
                 },
               ]}
             >
-              {/* <Tag closeIcon onClose={console.log}>
-              
-            </Tag> */}
+              <div className='h-60 overflow-y-auto'>
+
               <List
                 bordered
                 dataSource={codeList}
@@ -426,6 +426,8 @@ const App = ({ isModalOpen, onClose }) => {
                   </List.Item>
                 )}
               />
+              
+            </div>
             </Form.Item>
             <Form.Item label="已包装：">{codeList.length || 0}</Form.Item>
             <Form.Item
