@@ -5,7 +5,6 @@ import SwitchNumber from '../components/SwitchNumber';
 import api from '../utils/api';
 import { config } from '../utils/config';
 import http from '../utils/http';
-import { getDictionaryListByCode } from '../utils/util';
 const App = () => {
   const onChange = (key) => {
     console.log(key);
@@ -19,12 +18,12 @@ const App = () => {
     },
     {
       key: 'PutIn',
-      label: '入库',
+      label: '入库设置',
       children: <PutIn />,
     },
     {
       key: 'PutOut',
-      label: '出库',
+      label: '出库设置',
       children: <PutOut />,
     },
     {
@@ -318,6 +317,22 @@ const StorageLocation = () => {
             </Col>
             <Col span={12}>
               <Form.Item
+                label="库位代码"
+                name="locations"
+                rules={[
+                  {
+                    required: false,
+                    message: '请添加库位',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+              <Form.Item
                 label="货架型号"
                 name="rackType"
                 rules={[
@@ -329,9 +344,14 @@ const StorageLocation = () => {
               >
                 <Select options={shelvesList} />
               </Form.Item>
+            </Col>
+            <Col span={6}>
               <Form.Item
                 label="检验占用"
                 name="isValidated"
+                labelCol={{
+                  span: 12,
+                }}
                 rules={[
                   {
                     required: false,
@@ -342,25 +362,7 @@ const StorageLocation = () => {
                 <Switch checked={checked} onChange={onCheckedChange} />
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Col span={12} className="mr-2">
-              <Form.Item
-                label=""
-                name="locations"
-                labelCol={{
-                  span: 0,
-                }}
-                rules={[
-                  {
-                    required: false,
-                    message: '请添加库位',
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
+
             <Col span={3}>
               <Button type="primary" size="mini" onClick={() => addTree(1)}>
                 添加

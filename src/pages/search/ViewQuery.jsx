@@ -11,6 +11,7 @@ import {
   Space,
   Table,
   Typography,
+  DatePicker
 } from 'antd';
 import { useEffect, useState } from 'react';
 
@@ -239,11 +240,18 @@ const App = () => {
               {
                 columns&&columns.map((item, index) => {
                   return (
+                    <>
                     <Col span={8} key={index}>
                       <Form.Item label={item.title} name={item.dataIndex}>
                         <Input placeholder="请输入" allowClear/>
                       </Form.Item>
                     </Col>
+                    {/* <Col span={8}>
+                      <Form.Item label="开始时间" name="startTime">
+                        <DatePicker showTime={{format: 'HH:mm'}} format="YYYY-MM-DD HH:mm" style={{width: '100%'}} />
+                      </Form.Item>
+                    </Col> */}
+                    </>
                   )
                 })
               }

@@ -161,12 +161,23 @@ const App = () => {
               修改
             </Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
+            <Typography.Link onClick={() => onChangeCopy(record)}>复制</Typography.Link>
           </Space>
         );
       },
     },
   ];
-
+  const onChangeCopy = (record) => {
+    http
+      .post(config.API_PREFIX + 'barcodegenrule/copy' + `/${record.id}`, {})
+      .then((res) => {
+        fetchData();
+        message.success('复制成功！');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const del = (record) => {
     confirm({
       title: "删除确认",

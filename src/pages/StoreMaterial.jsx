@@ -264,12 +264,23 @@ const App = () => {
           <Space>
             <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
+            <Typography.Link onClick={() => onChangeCopy(record)}>复制</Typography.Link>
           </Space>
         );
       },
     },
   ];
-
+  const onChangeCopy = (record) => {
+    http
+      .post(config.API_PREFIX + 'basic/item/baseInfo/copy' + `/${record.id}`, {})
+      .then((res) => {
+        fetchData();
+        message.success('复制成功！');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const del = (record) => {
     confirm({
       title: '删除确认',
@@ -875,13 +886,8 @@ const App = () => {
                     placeholder="请选择"
                     allowClear
                     options={[ 
-                      { label: 'S-1', value: 'S-1' },
-                      { label: 'S-2', value: 'S-2' },
-                      { label: 'S-3', value: 'S-3' },
-                      { label: 'S-4', value: 'S-4' },
-                      { label: 'I', value: 'I' },
-                      { label: 'II', value: 'II' },
-                      { label: 'III', value: 'III' },
+                      { label: 'UID', value: 'UID' },
+                      { label: '料号', value: '料号' },
                     ]}
                   />
                 </Form.Item>
@@ -1031,7 +1037,19 @@ const App = () => {
                     },
                   ]}
                 >
-                  <Input allowClear placeholder="请输入" />
+                  <Select
+                    placeholder="请选择"
+                    allowClear
+                    options={[ 
+                      { label: 'S-1', value: 'S-1' },
+                      { label: 'S-2', value: 'S-2' },
+                      { label: 'S-3', value: 'S-3' },
+                      { label: 'S-4', value: 'S-4' },
+                      { label: 'I', value: 'I' },
+                      { label: 'II', value: 'II' },
+                      { label: 'III', value: 'III' },
+                    ]}
+                  />
                 </Form.Item>
               </Col>
             </Row>

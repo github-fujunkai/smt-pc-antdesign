@@ -213,12 +213,23 @@ const App = () => {
             <Typography.Link onClick={() => showModal2('create', record)}>新增制令单</Typography.Link>
             <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
+            <Typography.Link onClick={() => onChangeCopy(record)}>复制</Typography.Link>
           </Space>
         )
       },
     },
   ];
-
+  const onChangeCopy = (record) => {
+    http
+      .post(config.API_PREFIX + 'prodworkorder/copy' + `/${record.id}`, {})
+      .then((res) => {
+        fetchData();
+        message.success('复制成功！');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const del = (record) => {
     confirm({
       title: '删除确认',
@@ -731,6 +742,7 @@ const App = () => {
               <Typography.Link onClick={() => showModal2('update', record,'onlyShow')}>状态</Typography.Link>
               <Typography.Link onClick={() => showModal2('update', record)}>修改</Typography.Link>
               <Typography.Link onClick={() => del2(record)}>删除</Typography.Link>
+              <Typography.Link onClick={() => onChangeCopy2(record)}>复制</Typography.Link>
             </Space>
           )
         },
@@ -747,7 +759,17 @@ const App = () => {
       className="custom-table"
     />;
   };
-
+  const onChangeCopy2 = (record) => {
+    http
+      .post(config.API_PREFIX + 'prodproductionorder/copy' + `/${record.id}`, {})
+      .then((res) => {
+        fetchData();
+        message.success('复制成功！');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <div className="content-wrapper">
       <Breadcrumb
