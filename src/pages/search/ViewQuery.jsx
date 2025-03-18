@@ -140,8 +140,8 @@ const App = () => {
   const [tableParams, setTableParams] = useState({ ...paginationInit });
   const [typeList, setTypeList] = useState([]);
   useEffect(() => {
-    // 获取视图类型
-    http.get(config.API_PREFIX + 'dict/view/list', {}).then((res) => {
+     // 获取视图类型
+     http.get(config.API_PREFIX + 'dict/view/list', {}).then((res) => {
       setTypeList(
         res?.bizData.map((item) => ({
           label: item.dictValue,
@@ -151,6 +151,11 @@ const App = () => {
       formSearch.setFieldsValue({ dictType: res?.bizData[0]?.dictKey });
       fetchData();
     });
+  },[])
+  useEffect(() => {
+    if (formSearch.getFieldValue('dictType')) {
+      fetchData();
+    }
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -263,8 +268,8 @@ const App = () => {
       });
   };
   const changeType = (value) => {
-    setTableParams({ ...paginationInit })
-    fetchData();
+    // setTableParams({ ...paginationInit })
+    // fetchData();
   }
   return (
     <div className="content-wrapper">
