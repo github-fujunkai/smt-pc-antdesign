@@ -1,23 +1,11 @@
-import { ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  message,
-  Modal,
-  RangePicker,
-  Row,
-  Select,
-  Space,
-  Table,
-} from 'antd';
+import { DownloadOutlined, ExclamationCircleFilled, SearchOutlined } from '@ant-design/icons';
+import { Button, Col, Form, Input, message, Modal, Row, Select, Space, Table } from 'antd';
 import { useEffect, useState } from 'react';
 
+import qs from 'qs';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
-import { convertEmptyValuesToUndefined } from '../../utils/util';
+import { convertEmptyValuesToUndefined, downloadCSV } from '../../utils/util';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
@@ -218,7 +206,7 @@ const App = () => {
         // if (timestampFields) timestampFields.push('工序');
         // if (dateFields) dateFields.push('工位');
         setDatetimeFields(datetimeFields); //[...datetimeFields, '工序']
-        setTimestampFields(timestampFields);  //[...timestampFields, '工位']
+        setTimestampFields(timestampFields); //[...timestampFields, '工位']
         setDateFields(dateFields);
 
         setLoading(false);
@@ -250,7 +238,34 @@ const App = () => {
       setData([]);
     }
   };
-
+  const [loadingExport, setLoadingExport] = useState(false);
+  const exportData = () => {
+    setLoadingExport(true);
+    const { dictType } = formSearch.getFieldsValue();
+    const query = qs.stringify({
+      ...convertEmptyValuesToUndefined(formSearch.getFieldsValue()),
+      dictType: undefined,
+    });
+    http
+      .post(config.API_PREFIX + `view/export?current=1&size=10000&viewName=${dictType}`, {
+        ...convertEmptyValuesToUndefined(formSearch.getFieldsValue()),
+        dictType: undefined,
+      })
+      .then((res) => {
+        message.success('导出成功！');
+        downloadCSV(res, '信息查询-视图查询-CSV文件');
+        setLoadingExport(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        // message.error('导出失败！');
+        setLoadingExport(false);
+      });
+  };
+  const changeType = (value) => {
+    setTableParams({ ...paginationInit })
+    fetchData();
+  }
   return (
     <div className="content-wrapper">
       <div className="content">
@@ -259,7 +274,7 @@ const App = () => {
             <Row gutter="24">
               <Col span={8}>
                 <Form.Item label="视图类型" name="dictType">
-                  <Select placeholder="请选择" allowClear showSearch options={typeList} />
+                  <Select placeholder="请选择" allowClear showSearch options={typeList} onChange={changeType}/>
                 </Form.Item>
               </Col>
               {columns &&
@@ -306,8 +321,8 @@ const App = () => {
           </Form>
         </div>
         <div className="table-wrapper">
-          {/* <div style={{ marginBottom: 16, textAlign: 'right' }}>
-            <Button
+          <div style={{ marginBottom: 16, textAlign: 'right' }}>
+            {/* <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => {
@@ -315,8 +330,11 @@ const App = () => {
               }}
             >
               新增
+            </Button> */}
+            <Button loading={loadingExport} onClick={exportData} icon={<DownloadOutlined />}>
+              导出
             </Button>
-          </div> */}
+          </div>
           <Table
             columns={columns}
             rowKey={(record) => record.id}
@@ -325,6 +343,7 @@ const App = () => {
             onChange={handleTableChange}
             loading={loading}
             bordered
+            scroll={{ x: 'max-content' }}
           />
         </div>
         <Modal
