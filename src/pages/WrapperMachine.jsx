@@ -218,7 +218,7 @@ const App = () => {
         labelTemplateId,
         packageDateTimeFormatter,
         verifyProjectProductCode,
-        verifyPassStation
+        verifyPassStation,
       } = record;
       activeId = id;
       formCreate.setFieldsValue({
@@ -230,7 +230,7 @@ const App = () => {
         labelTemplateId,
         packageDateTimeFormatter,
         verifyProjectProductCode,
-        verifyPassStation
+        verifyPassStation,
       });
       setType(type);
     } else {
@@ -267,7 +267,7 @@ const App = () => {
           labelTemplateId,
           packageDateTimeFormatter,
           verifyProjectProductCode,
-          verifyPassStation
+          verifyPassStation,
         };
         let action = null;
         let msg = '';
@@ -638,20 +638,23 @@ const App = () => {
             >
               <Input allowClear />
             </Form.Item>
-            <Form.Item
-              label="校验工单/料号"
-              name="verifyProjectProductCode"
-              valuePropName="checked"
-            >
-              <SwitchNumber />
-            </Form.Item>
-            <Form.Item
-              label="校验过站"
-              name="verifyPassStation"
-              valuePropName="checked"
-            >
-              <SwitchNumber />
-            </Form.Item>
+            <Row>
+              <Col span={12}>
+                <Form.Item
+                  label="校验工单/料号"
+                  name="verifyProjectProductCode"
+                  valuePropName="checked"
+                  labelCol={{ span: 12 }}
+                >
+                  <SwitchNumber />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="校验过站" name="verifyPassStation" valuePropName="checked">
+                  <SwitchNumber />
+                </Form.Item>
+              </Col>
+            </Row>
           </Form>
         </Modal>
       </div>
