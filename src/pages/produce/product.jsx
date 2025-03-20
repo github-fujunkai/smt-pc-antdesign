@@ -56,12 +56,22 @@ const App = () => {
       key: 'productCode',
     },
     {
+      title: '产品版本',
+      dataIndex: 'productVersion',
+      key: 'productVersion',
+    },
+    {
       title: '配置时间',
       dataIndex: 'createTime',
       key: 'createTime',
       render: (_, record) => {
         return dayjs(_).format('YYYY-MM-DD HH:mm:ss');
       },
+    },
+    {
+      title: '备注',
+      dataIndex: 'remarks',
+      key: 'remarks',
     },
     {
       title: '操作',
