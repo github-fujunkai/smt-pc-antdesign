@@ -476,7 +476,23 @@ const TechnologicalFrom = (props) => {
       ...isEditData,
     });
   }, [isEditData]);
-
+  const [productList, setProductList] = useState([]);
+  useEffect(() => {
+    http
+      .get(config.API_PREFIX + 'product/info/page', {
+        current: 1,
+        size: 10000,
+      })
+      .then((res) => {
+        const data = res?.bizData;
+        setProductList(
+          data?.records.map((item) => ({ value: item.productCode, label: item.productName })) || [],
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   const handleOk = () => {
     console.log(formCreate.getFieldsValue());
     let modalData = formCreate.getFieldsValue();
@@ -602,7 +618,14 @@ const TechnologicalFrom = (props) => {
             },
           ]}
         >
-          <Input allowClear placeholder="请输入" />
+          {/* <Input allowClear placeholder="请输入" /> */}
+          <Select
+            placeholder="请选择"
+            showSearch
+            optionFilterProp="label"
+            allowClear
+            options={productList}
+          />
         </Form.Item>
         <Form.Item
           label="产品名称"
@@ -778,19 +801,22 @@ const ProductionFrom = (props) => {
       ...selectedRow,
     });
     //获取UID规则
-  
-    http.post(config.API_PREFIX + 'barcodegenrule/rule/code/list', {})
-          .then((res) => {
-            setUidList(res.bizData.map((item) => {
-              return {
-                label: item,
-                value: item,
-              };
-            }));
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+
+    http
+      .post(config.API_PREFIX + 'barcodegenrule/rule/code/list', {})
+      .then((res) => {
+        setUidList(
+          res.bizData.map((item) => {
+            return {
+              label: item,
+              value: item,
+            };
+          }),
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [selectedRow]);
   const [formCreate] = Form.useForm();
 
@@ -1106,12 +1132,7 @@ const ProductionFrom = (props) => {
                 },
               ]}
             >
-              <Select
-                placeholder="请选择"
-                allowClear
-                showSearch
-                options={uidList}
-              />
+              <Select placeholder="请选择" allowClear showSearch options={uidList} />
             </Form.Item>
           </Col>
           <Col span={12}>
