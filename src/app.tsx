@@ -99,47 +99,7 @@ export async function getInitialState(): Promise<{
     settings: defaultSettings as Partial<LayoutSettings>,
   };
 }
-// ----------------------------------------------------------------------------------
-const fetchRouteConfig = async () => {
-  console.log('fetchRouteConfig', ViewQuery);
-  const res = await http.get(config.API_PREFIX + 'dict/view/list', {});
-  return res?.bizData?.map((item, index) => {
-    return {
-      path: '/search1/' + index, // + '?id=' + item.dictValue,
-      name: item.dictValue,
-      element: <ViewQuery />,
-      // parentId: '999',
-      // id: 9999+item.dictValue,
-    };
-  });
-};
 
-let extraRoutes;
-export async function render(oldRender) {
-  extraRoutes = await fetchRouteConfig();
-  oldRender();
-}
-export function patchClientRoutes({ routes }) {
-  // 找到布局路由（通常路径为 '/' 的路由）
-  const layoutRoute = routes.find((r) => r.path === '/');
-  console.log('layoutRoute.routes', layoutRoute.routes);
-  if (layoutRoute) {
-    layoutRoute.routes[0].routes.push({
-      path: '/search1',
-      name: '信息查询',
-      access: 'canAdmin',
-      icon: <SearchOutlined />,
-      wrappers: layoutRoute.wrappers,
-      component: layoutRoute.component,
-      element: <ViewQuery />, // 这里要有页面才显示子组件页面，要不然是空白的
-      id: '999',
-      routes: [...extraRoutes],
-      children: [...extraRoutes],
-    });
-    console.log('Updated routes:', layoutRoute.routes); // 验证添加后的路由
-  }
-}
-// ------------------------------------------------------------------------------------------------------
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
@@ -219,3 +179,58 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 export const request = {
   ...errorConfig,
 };
+
+
+// ----------------------------------------------------------------------------------
+const fetchRouteConfig = async () => {
+  console.log('fetchRouteConfig', ViewQuery);
+  const res = await http.get(config.API_PREFIX + 'dict/view/list', {});
+  if (res) {
+    return res?.bizData?.map((item, index) => {
+      return {
+        path: '/search1/' + index, // + '?id=' + item.dictValue,
+        name: item.dictValue,
+        element: <ViewQuery />,
+        // parentId: '999',
+        // id: 9999+item.dictValue,
+      };
+    });
+  }else {
+    return [];
+  }
+};
+let extraRoutes = [];
+export async function render(oldRender) {
+  try {
+    // 尝试获取路由配置
+    extraRoutes = await fetchRouteConfig();
+  } catch (error) {
+    // 捕获错误并提供降级处理
+    console.error('获取路由配置失败:', error);
+    extraRoutes = []; // 降级为默认空路由或预设默认配置
+  }
+  // 确保继续执行渲染
+  oldRender();
+}
+
+export function patchClientRoutes({ routes }) {
+  // 找到布局路由（通常路径为 '/' 的路由）
+  const layoutRoute = routes.find((r) => r.path === '/');
+  console.log('layoutRoute.routes', layoutRoute.routes);
+  if (layoutRoute) {
+    layoutRoute.routes[0].routes.push({
+      path: '/search1',
+      name: '信息查询',
+      access: 'canAdmin',
+      icon: <SearchOutlined />,
+      wrappers: layoutRoute.wrappers,
+      component: layoutRoute.component,
+      element: <ViewQuery />, // 这里要有页面才显示子组件页面，要不然是空白的
+      id: '999',
+      routes: [...extraRoutes],
+      children: [...extraRoutes],
+    });
+    console.log('Updated routes:', layoutRoute.routes); // 验证添加后的路由
+  }
+}
+// ------------------------------------------------------------------------------------------------------
