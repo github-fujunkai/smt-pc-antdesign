@@ -281,7 +281,7 @@ const App = () => {
         <div className="search-wrapper">
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
-              <Col span={8}>
+              <Col span={8} className='hidden'>
                 <Form.Item label="视图类型" name="dictType">
                   <Select
                     placeholder="请选择"
