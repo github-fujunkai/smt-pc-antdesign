@@ -224,57 +224,57 @@ export default [
       },
     ],
   },
-  {
-    path: '/search',
-    name: '信息查询',
-    icon: 'SearchOutlined',
-    access: 'canAdmin',
-    routes: [
-      {
-        path: '/search',
-        redirect: '/',
-      },{
-        path: '/search/InfoScanning',
-        name: '扫描记录',
-        component: './InfoScanning',
-      },
-      {
-        path: '/search/CrossStation',
-        name: '过站查询',
-        component: './search/CrossStation',
-      },
-      {
-        path: '/search/InfoTransit',
-        name: '过站记录',
-        component: './InfoTransit',
-      },
-      {
-        path: '/search/InfoTrace',
-        name: '追溯信息',
-        component: './InfoTrace',
-      },
-      {
-        path: '/search/InfoShutdown',
-        name: '停机信息',
-        component: './InfoShutdown',
-      },
-      {
-        path: '/search/InfoOrder',
-        name: '工单物料',
-        component: './InfoOrder',
-      },
-      {
-        path: '/search/InfoMaterial',
-        name: '物料记录',
-        component: './InfoMaterial',
-      },
-      {
-        path: '/search/ViewQuery',
-        name: '视图查询',
-        component: './search/ViewQuery',
-      }
-    ],
-  },
+  // {
+  //   path: '/search',
+  //   name: '信息查询',
+  //   icon: 'SearchOutlined',
+  //   access: 'canAdmin',
+  //   routes: [
+  //     {
+  //       path: '/search',
+  //       redirect: '/',
+  //     },{
+  //       path: '/search/InfoScanning',
+  //       name: '扫描记录',
+  //       component: './InfoScanning',
+  //     },
+  //     {
+  //       path: '/search/CrossStation',
+  //       name: '过站查询',
+  //       component: './search/CrossStation',
+  //     },
+  //     {
+  //       path: '/search/InfoTransit',
+  //       name: '过站记录',
+  //       component: './InfoTransit',
+  //     },
+  //     {
+  //       path: '/search/InfoTrace',
+  //       name: '追溯信息',
+  //       component: './InfoTrace',
+  //     },
+  //     {
+  //       path: '/search/InfoShutdown',
+  //       name: '停机信息',
+  //       component: './InfoShutdown',
+  //     },
+  //     {
+  //       path: '/search/InfoOrder',
+  //       name: '工单物料',
+  //       component: './InfoOrder',
+  //     },
+  //     {
+  //       path: '/search/InfoMaterial',
+  //       name: '物料记录',
+  //       component: './InfoMaterial',
+  //     },
+  //     {
+  //       path: '/search/ViewQuery',
+  //       name: '视图查询',
+  //       component: './search/ViewQuery',
+  //     }
+  //   ],
+  // },
   {
     path: '/produce',
     name: '生产计划',

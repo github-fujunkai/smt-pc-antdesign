@@ -98,4 +98,9 @@ export default {
   'menu.生产管理.维修': 'Maintenance',
   'menu.生产管理.包装': 'Packaging',
   'menu.生产管理.出货': 'Shipment',
+
+  // 'menu.过站查询': 'menu.过站查询',
+  // 'menu.测试查询': 'menu.测试查询',
+  // "menu.测试查询.过站查询": 'menu.测试查询.过站查询',
+  // "menu.测试查询.过站查询_v2": 'menu.测试查询.过站查询_v2',
 };

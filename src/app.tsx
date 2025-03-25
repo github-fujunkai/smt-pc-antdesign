@@ -1,4 +1,5 @@
 import { Question, SelectLang } from '@/components/RightContent';
+import { SearchOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
@@ -7,7 +8,7 @@ import defaultSettings from '../config/defaultSettings';
 import './assets/styles/reset.scss';
 import './assets/styles/style.scss';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
-import ViewQuery from './pages/search/ViewQuery';
+import ViewQuery from './pages/search1/ViewQuery';
 import { errorConfig } from './requestErrorConfig';
 import { config } from './utils/config';
 import http from './utils/http';
@@ -99,41 +100,45 @@ export async function getInitialState(): Promise<{
   };
 }
 // ----------------------------------------------------------------------------------
-// const fetchRouteConfig = async () => {
-//   console.log('fetchRouteConfig', ViewQuery);
-//   const res = await http.get(config.API_PREFIX + 'dict/view/list', {});
-//   return res?.bizData?.map((item) => {
-//     return {
-//       path: '/search/' + item.dictValue,
-//       name: item.dictValue,
-//       component: require('@/pages/search/ViewQuery').default,
-//     };
-//   });
-// };
+const fetchRouteConfig = async () => {
+  console.log('fetchRouteConfig', ViewQuery);
+  const res = await http.get(config.API_PREFIX + 'dict/view/list', {});
+  return res?.bizData?.map((item, index) => {
+    return {
+      path: '/search1/' + index, // + '?id=' + item.dictValue,
+      name: item.dictValue,
+      element: <ViewQuery />,
+      // parentId: '999',
+      // id: 9999+item.dictValue,
+    };
+  });
+};
 
-// let extraRoutes;
-// export async function render(oldRender) {
-//   extraRoutes = await fetchRouteConfig();
-//   oldRender();
-// }
-// export function patchClientRoutes({ routes }) {
-//   // 找到布局路由（通常路径为 '/' 的路由）
-//   const layoutRoute = routes.find((r) => r.path === '/');
-//   console.log('layoutRoute.routes', layoutRoute.routes);
-//   if (layoutRoute) {
-//     layoutRoute.routes[0].routes.push({
-//       path: '/search',
-//       name: '测试查询',
-//       access: 'canAdmin',
-//       wrappers: layoutRoute.wrappers,
-//       component: layoutRoute.component,
-//       routes: [
-//         ...extraRoutes,
-//       ],
-//     });
-//     console.log('Updated routes:', layoutRoute.routes); // 验证添加后的路由
-//   }
-// }
+let extraRoutes;
+export async function render(oldRender) {
+  extraRoutes = await fetchRouteConfig();
+  oldRender();
+}
+export function patchClientRoutes({ routes }) {
+  // 找到布局路由（通常路径为 '/' 的路由）
+  const layoutRoute = routes.find((r) => r.path === '/');
+  console.log('layoutRoute.routes', layoutRoute.routes);
+  if (layoutRoute) {
+    layoutRoute.routes[0].routes.push({
+      path: '/search1',
+      name: '信息查询',
+      access: 'canAdmin',
+      icon: <SearchOutlined />,
+      wrappers: layoutRoute.wrappers,
+      component: layoutRoute.component,
+      element: <ViewQuery />, // 这里要有页面才显示子组件页面，要不然是空白的
+      id: '999',
+      routes: [...extraRoutes],
+      children: [...extraRoutes],
+    });
+    console.log('Updated routes:', layoutRoute.routes); // 验证添加后的路由
+  }
+}
 // ------------------------------------------------------------------------------------------------------
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
