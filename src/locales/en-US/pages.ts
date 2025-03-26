@@ -67,7 +67,10 @@ export default {
   'pages.searchTable.batchApproval': 'batch approval',
 
   "pages.searchTable.areaNameProcess": "areaName",
-
+  "pages.add": "add",
+  "pages.edit": "edit",
+  "pages.delete": "delete",
+  "pages.copy": "copy",
   // 系统模块
   "system.menu.menuName": "MemuName",
   "system.menu.menuIcon": "MenuIcon",
@@ -168,6 +171,9 @@ export default {
   "warehouse.outbound.outboundType": "OutboundType",
   "warehouse.outbound.rawMaterialUid": "MATUID",
   "system.audit.createDate": "CreateDate",
+  "system.audit.Plannedproductiondate": "Planned production date",
+  "system.audit.Plannedshipmentdate": "Planned shipment date",
+  "system.audit.Plannedoverdate": "Planned over date",
   "system.audit.creator": "Creator",
   "system.audit.updateDate": "UpdateDate",
   "system.audit.updater": "Reviser",
@@ -196,6 +202,10 @@ export default {
   "mes.program": "Program",
   "mes.wo": "WO",
   "mes.lane": "Division",
+  "mes.feederType": "feeder Type",
+  "mes.feederSn": "feeder Sn",
+  "mes.feederStatus": "feeder Status",
+  "mes.materialstatus": "material status",
   "plant.region": "City",
   "plant.workshop": "WorkShop",
   "plant.code": "Factory",

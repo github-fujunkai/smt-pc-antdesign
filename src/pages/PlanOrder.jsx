@@ -114,48 +114,48 @@ const App = () => {
     //   key: 'id',
     // },
     {
-      title: '工单号',
+      title: <FormattedMessage id="pages.work_order_number" defaultMessage="工单号" />,
       dataIndex: 'orderNumber',
       // sorter: true,
       key: 'orderNumber',
     },
     {
-      title: '工单数量',
+      title: <FormattedMessage id="pages.order_quantity" defaultMessage="工单数量" />,
       dataIndex: 'plannedQty',
       key: 'plannedQty',
     },
     {
-      title: '完工数量',
+      title: <FormattedMessage id="pages.completed_quantity" defaultMessage="完工数量" />,
       dataIndex: 'completedQty',
       key: 'completedQty',
     },
     {
-      title: '产品名称',
+      title: <FormattedMessage id="pages.product_name" defaultMessage="产品名称" />,
       dataIndex: 'productName',
       key: 'productName',
     },
     {
-      title: '产品料号',
+      title: <FormattedMessage id="pages.product_code" defaultMessage="产品料号" />,
       dataIndex: 'productCode',
       key: 'productCode',
     },
     {
-      title: '产品版本',
+      title: <FormattedMessage id="pages.product_version" defaultMessage="产品版本" />,
       dataIndex: 'productVersion',
       key: 'productVersion',
     },
     {
-      title: '客户',
+      title: <FormattedMessage id="pages.customer" defaultMessage="客户" />,
       dataIndex: 'customerName',
       key: 'customerName',
     },
     {
-      title: '销售单号',
+      title: <FormattedMessage id="pages.sales_order" defaultMessage="销售单号" />,
       dataIndex: 'customerOrderNumber',
       key: 'customerOrderNumber',
     },
     {
-      title: '工单状态',
+      title: <FormattedMessage id="pages.order_status" defaultMessage="工单状态" />,
       dataIndex: 'status',
       key: 'status',
       render: (_, record) => {
@@ -163,7 +163,7 @@ const App = () => {
       }
     },
     {
-      title: '工单类型',
+      title: <FormattedMessage id="pages.order_type" defaultMessage="工单类型" />,
       dataIndex: 'workOrderType',
       key: 'workOrderType',
       render: (_, record) => {
@@ -171,12 +171,12 @@ const App = () => {
       }
     },
     {
-      title: '返工工单',
+      title: <FormattedMessage id="pages.rework_order" defaultMessage="返工工单" />,
       dataIndex: 'rework',
       key: 'rework',
     },
     {
-      title: '创建日期',
+      title: <FormattedMessage id="system.audit.createDate" defaultMessage="创建日期" />,
       dataIndex: 'createTime',
       key: 'createTime',
       // sorter: true,
@@ -185,7 +185,7 @@ const App = () => {
       }
     },
     {
-      title: '计划投产日期',
+      title: <FormattedMessage id="system.audit.Plannedproductiondate" defaultMessage="计划投产日期" />,
       dataIndex: 'plannedProductionDate',
       key: 'plannedProductionDate',
       // sorter: true,
@@ -194,7 +194,7 @@ const App = () => {
       }
     },
     {
-      title: '计划出货日期',
+      title: <FormattedMessage id="system.audit.Plannedshipmentdate" defaultMessage="计划出货日期" />,
       dataIndex: 'plannedDeliveryDate',
       key: 'plannedDeliveryDate',
       // sorter: true,
@@ -203,17 +203,17 @@ const App = () => {
       }
     },
     {
-      title: '操作',
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'operation',
       fixed: 'right',
       render: (_, record) => {
         return (
           <Space>
             {/* <Typography.Link onClick={() => showDrawer(record)}>拆单</Typography.Link> */}
-            <Typography.Link onClick={() => showModal2('create', record)}>新增制令单</Typography.Link>
-            <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
-            <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
-            <Typography.Link onClick={() => onChangeCopy(record)}>复制</Typography.Link>
+            <Typography.Link onClick={() => showModal2('create', record)}><FormattedMessage id="pages.add" defaultMessage="新增" /></Typography.Link>
+            <Typography.Link onClick={() => showModal('update', record)}><FormattedMessage id="pages.edit" defaultMessage="修改" /></Typography.Link>
+            <Typography.Link onClick={() => del(record)}><FormattedMessage id="pages.delete" defaultMessage="删除" /></Typography.Link>
+            <Typography.Link onClick={() => onChangeCopy(record)}><FormattedMessage id="pages.copy" defaultMessage="复制" /></Typography.Link>
           </Space>
         )
       },
@@ -603,12 +603,12 @@ const App = () => {
     console.log('record', record.productionOrders)
     const columns1 = [
       {
-        title: '制令单号',
+        title: <FormattedMessage id="pages.manufacturing_order" defaultMessage="制令单号" />,
         dataIndex: 'orderNumber',
         key: 'orderNumber',
       },
       {
-        title: '工单号',
+        title: <FormattedMessage id="pages.work_order_number" defaultMessage="工单号" />,
         dataIndex: 'orderNumber',
         key: 'orderNumber',
         render: (_, record) => {
@@ -616,7 +616,7 @@ const App = () => {
         }
       },
       {
-        title: '产品名称',
+        title: <FormattedMessage id="pages.product_name" defaultMessage="产品名称" />,
         dataIndex: 'productName',
         key: 'productName',
         render: (_, record) => {
@@ -624,7 +624,7 @@ const App = () => {
         }
       },
       {
-        title: '产品料号',
+        title: <FormattedMessage id="pages.product_code" defaultMessage="产品料号" />,
         dataIndex: 'productCode',
         key: 'productCode',
         render: (_, record) => {
@@ -632,7 +632,7 @@ const App = () => {
         }
       },
       {
-        title: '产品版本',
+        title: <FormattedMessage id="pages.product_version" defaultMessage="产品版本" />,
         dataIndex: 'productVersion',
         key: 'productVersion',
         render: (_, record) => {
@@ -640,52 +640,47 @@ const App = () => {
         }
       },
       {
-        title: '制令单数量',
+        title: <FormattedMessage id="pages.manufacturing_order_quantity" defaultMessage="制令单数量" />,
         dataIndex: 'prodProductionOrderQty',
         key: 'prodProductionOrderQty',
       },
-      // {
-      //   title: '投产数量（计划投产数量？）',
-      //   dataIndex: 'plannedQty',
-      //   key: 'plannedQty',
-      // },
       {
-        title: '完工数量',
+        title: <FormattedMessage id="pages.completed_quantity" defaultMessage="完工数量" />,
         dataIndex: 'completedQty',
         key: 'completedQty',
       },
       {
-        title: '工艺',
+        title: <FormattedMessage id="pages.craft" defaultMessage="工艺" />,
         dataIndex: 'upgradeNum',
         key: 'upgradeNum',
       },
       {
-        title: '产线',
+        title: <FormattedMessage id="pages.line" defaultMessage="产线" />,
         dataIndex: 'productionAreaNameProcess',
         key: 'productionAreaNameProcess',
       },
       {
-        title: '轨道（Lane）',
+        title: <FormattedMessage id="pages.track" defaultMessage="轨道（Lane）" />,
         dataIndex: 'lane',
         key: 'lane',
       },
       {
-        title: '产线CT',
+        title: <FormattedMessage id="pages.line_ct" defaultMessage="产线CT" />,
         dataIndex: 'cycleTime',
         key: 'cycleTime',
       },
       {
-        title: '面次',
+        title: <FormattedMessage id="pages.surface_times" defaultMessage="面次" />,
         dataIndex: 'boardSide',
         key: 'boardSide',
       },
       {
-        title: '阶别',
+        title: <FormattedMessage id="pages.grade" defaultMessage="阶别" />,
         dataIndex: 'productionStage',
         key: 'productionStage',
       },
       {
-        title: '制令单状态',
+        title: <FormattedMessage id="pages.manufacturing_order_status" defaultMessage="制令单状态" />,
         dataIndex: 'status',
         key: 'status',
         render: (_, record) => {
@@ -693,7 +688,7 @@ const App = () => {
         }
       },
       {
-        title: '实际投产时间',
+        title: <FormattedMessage id="pages.actual_start_time" defaultMessage="实际投产时间" />,
         dataIndex: 'actualProductionTime',
         key: 'actualProductionTime',
         render: (_, record) => {
@@ -701,7 +696,7 @@ const App = () => {
         }
       },
       {
-        title: '实际完工时间',
+        title: <FormattedMessage id="pages.actual_completion_time" defaultMessage="实际完工时间" />,
         dataIndex: 'actualCompletionDate',
         key: 'actualCompletionDate',
         render: (_, record) => {
@@ -709,7 +704,7 @@ const App = () => {
         }
       },
       {
-        title: '创建日期',
+        title: <FormattedMessage id="system.audit.createDate" defaultMessage="创建日期" />,
         dataIndex: 'createTime',
         key: 'createTime',
         render: (_, record) => {
@@ -717,7 +712,7 @@ const App = () => {
         }
       },
       {
-        title: '计划投产日期',
+        title: <FormattedMessage id="system.audit.Plannedproductiondate" defaultMessage="计划投产日期" />,
         dataIndex: 'plannedProductionDate',
         key: 'plannedProductionDate',
         render: (_, record) => {
@@ -725,7 +720,7 @@ const App = () => {
         }
       },
       {
-        title: '计划完工日期',
+        title: <FormattedMessage id="system.audit.Plannedoverdate" defaultMessage="计划完工日期" />,
         dataIndex: 'plannedCompletionDate',
         key: 'plannedCompletionDate',
         render: (_, record) => {
@@ -733,16 +728,16 @@ const App = () => {
         }
       },
       {
-        title: '操作',
+        title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
         key: 'operation',
         fixed: 'right',
         render: (_, record) => {
           return (
             <Space>
-              <Typography.Link onClick={() => showModal2('update', record,'onlyShow')}>状态</Typography.Link>
-              <Typography.Link onClick={() => showModal2('update', record)}>修改</Typography.Link>
-              <Typography.Link onClick={() => del2(record)}>删除</Typography.Link>
-              <Typography.Link onClick={() => onChangeCopy2(record)}>复制</Typography.Link>
+              <Typography.Link onClick={() => showModal2('update', record,'onlyShow')}><FormattedMessage id="factory.status" defaultMessage="状态" /></Typography.Link>
+              <Typography.Link onClick={() => showModal2('update', record)}><FormattedMessage id="pages.edit" defaultMessage="修改" /></Typography.Link>
+              <Typography.Link onClick={() => del2(record)}><FormattedMessage id="pages.delete" defaultMessage="删除" /></Typography.Link>
+              <Typography.Link onClick={() => onChangeCopy2(record)}><FormattedMessage id="pages.copy" defaultMessage="复制" /></Typography.Link>
             </Space>
           )
         },
@@ -1439,7 +1434,7 @@ const App = () => {
                   </thead>
                   <tbody>
                   {fields.map(({ key, name, ...restField }, index) => (
-                    <tr>
+                    <tr key={index}>
                       <td>
                         <Form.Item
                           name={[name, 'orderNumber']}
