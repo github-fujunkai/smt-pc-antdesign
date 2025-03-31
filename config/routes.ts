@@ -148,12 +148,12 @@ export default [
       {
         path: '/rule/BarcodeComparing',
         name: '料号对比',
-        component: './BarcodeComparing',
+        component: './rule/BarcodeComparing',
       },
       {
         path: '/rule/BarcodeDecoding',
         name: '条码解析',
-        component: './BarcodeDecoding',
+        component: './rule/BarcodeDecoding',
       },
       {
         path: '/rule/BarcodeCreation',
