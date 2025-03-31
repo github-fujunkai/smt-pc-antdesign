@@ -6,24 +6,23 @@ import {
 } from '@ant-design/icons';
 import {
   Button,
+  Card,
   Col,
   Form,
   Input,
   message,
   Modal,
   Row,
-  Select,
   Space,
   Table,
   Typography,
-  Card
 } from 'antd';
 import { useEffect, useState } from 'react';
 
 import dayjs from 'dayjs';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
-import { convertEmptyValuesToUndefined, downloadCSV } from '../../utils/util';
+import { convertEmptyValuesToUndefined } from '../../utils/util';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
@@ -67,11 +66,11 @@ const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const columns = [
-    {
-      title: '对比名称',
-      dataIndex: 'name',
-      key: 'name',
-    },
+    // {
+    //   title: '对比名称',
+    //   dataIndex: 'name',
+    //   key: 'name',
+    // },
     {
       title: '分隔符',
       dataIndex: 'separator',
@@ -228,7 +227,7 @@ const App = () => {
 
     params = {
       ...params,
-      ...convertEmptyValuesToUndefined(formSearch.getFieldsValue())
+      ...convertEmptyValuesToUndefined(formSearch.getFieldsValue()),
     };
     http
       .get(config.API_PREFIX + 'item/contrast/parent/page', params)
@@ -334,11 +333,11 @@ const App = () => {
         <div className="search-wrapper">
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
-              <Col span={8}>
+              {/* <Col span={8}>
                 <Form.Item label="名称" name="name">
                   <Input allowClear placeholder="请输入" />
                 </Form.Item>
-              </Col>
+              </Col> */}
               <Col span={8}>
                 <Form.Item label="分隔符" name="separator">
                   <Input allowClear placeholder="请输入" />
@@ -395,7 +394,7 @@ const App = () => {
         >
           <Form form={formComparing}>
             <Row>
-              <Col span={8}>
+              {/* <Col span={8}>
                 <Form.Item
                   label="名称"
                   name="name"
@@ -408,7 +407,7 @@ const App = () => {
                 >
                   <Input allowClear placeholder="请输入" />
                 </Form.Item>
-              </Col>
+              </Col> */}
               <Col span={8}>
                 <Form.Item
                   label="分隔符"
@@ -438,138 +437,97 @@ const App = () => {
                 </Form.Item>
               </Col>
             </Row>
-            <h2 className='font-size-18 font-weight-bold'>料号对比</h2>
+            <h2 className="font-size-18 font-weight-bold">料号对比</h2>
             <Card>
-            <Form.List name="items">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <Row gutter={10} key={key}>
-                      <Col span={10}>
-                        <Form.Item
-                          name={[name, 'num']}
-                          initialValue={key}
-                          style={{ display: 'none' }}
-                        >
-                          <Input />
-                        </Form.Item>
-                        <Form.Item name={[name, 'id']} style={{ display: 'none' }}>
-                          <Input />
-                        </Form.Item>
-                        <Form.Item
-                          label={`规则${key+1}`}
-                          labelCol={{ span: 5, style: { textAlign: 'left' } }}
-                          name={[name, 'ruleName']}
-                          rules={[
-                            {
-                              required: true,
-                              message: '请选择',
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="请选择"
-                            allowClear
-                            options={['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((item) => ({
-                              value: item,
-                              label: item,
-                            }))}
-                          />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={12}>
-                        <Form.Item
-                          label="内容"
-                          labelCol={{ span: 6 }}
-                          name={[name, 'valueChar']}
-                          rules={[
-                            {
-                              required: true,
-                              message: '请选择',
-                            },
-                          ]}
-                        >
-                          <Select
-                            placeholder="请选择"
-                            allowClear
-                            options={[
+              <Form.List name="items">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Row gutter={10} key={key}>
+                        <Col span={7}>
+                          <Form.Item
+                            label={`名称`}
+                            labelCol={{ span: 6, style: { textAlign: 'left' } }}
+                            name={[name, 'ruleName']}
+                            rules={[
                               {
-                                value: '料号',
-                                label: '料号',
-                              },
-                              {
-                                value: '数量',
-                                label: '数量',
-                              },
-                              {
-                                value: '批次号',
-                                label: '批次号',
-                              },
-                              {
-                                value: 'Datecode',
-                                label: 'Datecode',
-                              },
-                              {
-                                value: '供应商料号',
-                                label: '供应商料号',
-                              },
-                              {
-                                value: 'MSL',
-                                label: 'MSL',
-                              },
-                              {
-                                value: '其它1',
-                                label: '其它1',
-                              },
-                              {
-                                value: '其它2',
-                                label: '其它2',
+                                required: true,
+                                message: '请输入',
                               },
                             ]}
-                          />
-                        </Form.Item>
-                      </Col>
+                          >
+                            <Input allowClear placeholder="请输入" />
+                          </Form.Item>
+                        </Col>
+                        <Col span={7}>
+                          <Form.Item
+                            name={[name, 'num']}
+                            initialValue={key}
+                            style={{ display: 'none' }}
+                          >
+                            <Input />
+                          </Form.Item>
+                          <Form.Item name={[name, 'id']} style={{ display: 'none' }}>
+                            <Input />
+                          </Form.Item>
 
-                      {/* <Col span={7}>
-                                  <Form.Item
-                                    label="备注"
-                                    labelCol={{ span: 6 }}
-                                    name={[name, 'memo']} 
-                                  >
-                                    <Input
-                                      placeholder="请输入"
-                                    />
-                                  </Form.Item>
-                                </Col> */}
-                      <Col span={2}>
-                        <Form.Item>
-                          <Button
-                            onClick={() => {
-                              handleDeleteItem(name, remove);
-                            }}
-                            loading={loadingRemove}
-                            shape="circle"
-                            icon={<CloseOutlined />}
-                          />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  ))}
-                  <Space>
-                    <Button
-                      onClick={() => {
-                        add();
-                      }}
-                      icon={<PlusOutlined />}
-                      type="dashed"
-                    >
-                      添加规则
-                    </Button>
-                  </Space>
-                </>
-              )}
-            </Form.List>
+                          <Form.Item
+                            label={`规则值`}
+                            labelCol={{ span: 6, style: { textAlign: 'left' } }}
+                            name={[name, 'valueChar']}
+                            rules={[
+                              {
+                                required: true,
+                                message: '请输入',
+                              },
+                            ]}
+                          >
+                            <Input allowClear placeholder="请输入" />
+                          </Form.Item>
+                        </Col>
+                        <Col span={7}>
+                          <Form.Item
+                            label="备注"
+                            labelCol={{ span: 6 }}
+                            name={[name, 'memo']}
+                            rules={[
+                              {
+                                required: true,
+                                message: '请输入',
+                              },
+                            ]}
+                          >
+                            <Input allowClear placeholder="请输入" />
+                          </Form.Item>
+                        </Col>
+                        <Col span={2}>
+                          <Form.Item>
+                            <Button
+                              onClick={() => {
+                                handleDeleteItem(name, remove);
+                              }}
+                              loading={loadingRemove}
+                              shape="circle"
+                              icon={<CloseOutlined />}
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    ))}
+                    <Space>
+                      <Button
+                        onClick={() => {
+                          add();
+                        }}
+                        icon={<PlusOutlined />}
+                        type="dashed"
+                      >
+                        添加规则
+                      </Button>
+                    </Space>
+                  </>
+                )}
+              </Form.List>
             </Card>
           </Form>
         </Modal>
