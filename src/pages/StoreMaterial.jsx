@@ -6,8 +6,11 @@ import {
   SearchOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
+import { KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useAntdResizableHeader } from '@minko-fe/use-antd-resizable-header';
+import '@minko-fe/use-antd-resizable-header/index.css';
 import {
-  Breadcrumb,
   Button,
   Col,
   Form,
@@ -18,11 +21,13 @@ import {
   Row,
   Select,
   Space,
+  Switch,
   Table,
+  Tooltip,
   Typography,
   Upload,
 } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import dayjs from 'dayjs';
 import qs from 'qs';
@@ -58,6 +63,11 @@ const App = () => {
     tableParams?.order,
   ]);
   */
+  const [isShowSearch, setIsShowSearch] = useState(false);
+  const onSearchChange = (checked) => {
+    console.log(`switch to ${checked}`);
+    setIsShowSearch(checked);
+  };
   const mslList = [
     { value: 1, label: '1' },
     { value: 2, label: '2' },
@@ -170,53 +180,62 @@ const App = () => {
   const [formSearch] = Form.useForm();
   const [data, setData] = useState([]);
 
-  const columns = [
+  const [columns, setColumns] = useState([
     {
       title: '物料ID',
       dataIndex: 'id',
       // sorter: true,
       key: 'id',
+      width: 120,
     },
     {
       title: '料号',
       dataIndex: 'itemCode',
       // sorter: true,
       key: 'itemCode',
+      width: 120,
     },
     {
       title: '供应商料号',
       dataIndex: 'supplierItemCode',
       key: 'supplierItemCode',
+      width: 120,
     },
     {
       title: '物料描述',
       dataIndex: 'itemSpec',
       key: 'itemSpec',
+      width: 120,
     },
     {
       title: '供应商',
       dataIndex: 'supplier',
       key: 'supplier',
+      width: 120,
     },
     {
       title: '包装数量',
       dataIndex: 'packageQty',
       key: 'packageQty',
+      width: 120,
     },
     {
       title: '物料类型',
       dataIndex: 'itemCategory',
       key: 'itemCategory',
+      width: 120,
     },
     {
       title: 'MSL',
       dataIndex: 'msl',
       key: 'msl',
+      width: 120,
     },
     {
       title: '有效期',
       dataIndex: 'shelfLife',
       key: 'shelfLife',
+      width: 120,
     },
     {
       title: '创建时间',
@@ -269,7 +288,7 @@ const App = () => {
         );
       },
     },
-  ];
+  ]);
   const onChangeCopy = (record) => {
     http
       .post(config.API_PREFIX + 'basic/item/baseInfo/copy' + `/${record.id}`, {})
@@ -322,7 +341,9 @@ const App = () => {
         uniqueCodeRuleId,
         labelTemplateId,
         remark,
-        stockThreshold,storageType,inspectionStandard
+        stockThreshold,
+        storageType,
+        inspectionStandard,
       } = record;
       activeId = id;
       formCreate.setFieldsValue({
@@ -338,7 +359,9 @@ const App = () => {
         uniqueCodeRuleId,
         labelTemplateId,
         remark,
-        stockThreshold,storageType,inspectionStandard
+        stockThreshold,
+        storageType,
+        inspectionStandard,
       });
     } else {
       activeId = -1;
@@ -369,7 +392,9 @@ const App = () => {
           uniqueCodeRuleId,
           labelTemplateId,
           remark,
-          stockThreshold,storageType,inspectionStandard
+          stockThreshold,
+          storageType,
+          inspectionStandard,
         } = values;
         let params = {
           itemCode,
@@ -384,7 +409,9 @@ const App = () => {
           uniqueCodeRuleId,
           labelTemplateId,
           remark,
-          stockThreshold,storageType,inspectionStandard
+          stockThreshold,
+          storageType,
+          inspectionStandard,
         };
         let action = null;
         let msg = '';
@@ -610,21 +637,111 @@ const App = () => {
     console.log('value', value);
   };
 
+  // --------------------------------------------------------------------------------------------------------------------
+  const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
+    columns: useMemo(() => columns, [columns]),
+    columnsState: {
+      persistenceKey: 'localKeyStoreMaterial',
+      persistenceType: 'localStorage',
+    },
+  });
+
+  // 可拖动的单个项目组件
+  function SortableItem({ id, content, isDraggable }) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+      id: id,
+      disabled: !isDraggable, // 使用 disabled 属性来控制是否可以拖动
+    });
+
+    const style = {
+      transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
+      transition,
+      // 如果不可拖动，可以添加不同的样式或逻辑
+      opacity: isDraggable ? 1 : 0.5,
+      cursor: isDraggable ? 'grab' : 'not-allowed',
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+        {content}
+      </div>
+    );
+  }
+
+  // 定义传感器
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: verticalListSortingStrategy,
+    }),
+  );
+
+  // 拖放逻辑处理函数
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.key === active.id);
+      const newIndex = columns.findIndex((col) => col.key === over.id);
+
+      if (oldIndex !== newIndex) {
+        setColumns((prevColumns) => {
+          const updatedColumns = Array.from(prevColumns);
+          const [movedColumn] = updatedColumns.splice(oldIndex, 1);
+          updatedColumns.splice(newIndex, 0, movedColumn);
+
+          // 保存新的列顺序
+          saveColumnsOrder(updatedColumns);
+
+          return updatedColumns;
+        });
+      }
+    } else {
+      // 如果没有有效的放置目标，强制更新状态以触发重渲染
+      setColumns((prevItems) => [...prevItems]);
+    }
+  };
+
+  const saveColumnsOrder = (columns) => {
+    localStorage.setItem('columnsStoreMaterial', JSON.stringify(columns.map((col) => col.key)));
+  };
+
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('columnsStoreMaterial');
+    if (savedOrder) {
+      const order = JSON.parse(savedOrder);
+      const orderedColumns = order
+        .map((key) => columns.find((col) => col.key === key))
+        .filter(Boolean);
+      setColumns(orderedColumns);
+    }
+    // 其他初始化逻辑...
+  }, []);
+  function refreshPage() {
+    localStorage.removeItem('columnsStoreMaterial');
+    message.success('复原成功！');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
+
+  const [isSortableOpen, setIsSortableOpen] = useState(false);
+  // --------------------------------------------------------------------------------------------------------------------
   return (
     <div className="content-wrapper">
-      <Breadcrumb
-        className="breadcrumb"
-        items={[
-          {
-            title: '仓库信息',
-          },
-          {
-            title: '物料信息',
-          },
-        ]}
-      ></Breadcrumb>
       <div className="content">
-        <div className="search-wrapper">
+        <div className="tools">
+          <Space size="middle">
+            <Tooltip title={isShowSearch ? '隐藏搜索' : '显示搜索'}>
+              <Switch
+                onChange={onSearchChange}
+                checkedChildren={<SearchOutlined />}
+                unCheckedChildren={<SearchOutlined />}
+              />
+            </Tooltip>
+          </Space>
+        </div>
+        <div className="search-wrapper" style={{ display: isShowSearch ? 'block' : 'none' }}>
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
               <Col span={8}>
@@ -764,7 +881,9 @@ const App = () => {
             </Button>
           </div>
           <Table
-            columns={columns}
+            columns={resizableColumns}
+            components={components}
+            scroll={{ x: tableWidth }}
             rowKey={(record) => record.id}
             dataSource={data}
             pagination={tableParams.pagination}
@@ -882,10 +1001,10 @@ const App = () => {
                     },
                   ]}
                 >
-                   <Select
+                  <Select
                     placeholder="请选择"
                     allowClear
-                    options={[ 
+                    options={[
                       { label: 'UID', value: 'UID' },
                       { label: '料号', value: '料号' },
                     ]}
@@ -1040,7 +1159,7 @@ const App = () => {
                   <Select
                     placeholder="请选择"
                     allowClear
-                    options={[ 
+                    options={[
                       { label: 'S-1', value: 'S-1' },
                       { label: 'S-2', value: 'S-2' },
                       { label: 'S-3', value: 'S-3' },
