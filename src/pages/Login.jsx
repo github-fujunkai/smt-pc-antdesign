@@ -60,10 +60,8 @@ const Login = () => {
     const { username, password } = values;
     setLoading(true);
     http
-      .post(config.API_PREFIX + api.authLogin + '?username=admin&password=123456&scope=MANAGER', {
-        // username,
-        // password,
-        // scope: 'MANAGER',
+      .post(config.API_PREFIX + api.authLogin + `?username=${username}&password=${password}&scope=MANAGER`, {
+        
       })
       .then(async (res) => {
         const data = res?.bizData;
