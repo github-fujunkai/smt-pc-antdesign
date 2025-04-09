@@ -1,5 +1,5 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Modal, Typography } from 'antd';
+import { Button, Form, Input, Modal, Typography,message } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api'
@@ -56,7 +56,11 @@ const Login = () => {
   };
   const navigate = useNavigate();
   const onFinish = async (values) => {
-    console.log('Form submitted:', values);
+    console.log('Form submitted:', config.API_PREFIX ,values);
+    if(!config.API_PREFIX){
+      message.error('请先设置链接地址');
+      return;
+    }
     const { username, password } = values;
     setLoading(true);
     http

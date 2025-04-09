@@ -9,7 +9,7 @@ const isHttps = document.location.protocol === 'https:';
 const getDictionary = async () => {
   // 获取字典类型
   http.get(`${config.API_PREFIX}sys/params/type/list`, {}).then((res) => {
-    localStorage.setItem('dictionaryType', JSON.stringify(res.bizData));
+    localStorage.setItem('dictionaryType', JSON.stringify(res?.bizData));
   });
   // 获取字典数据
   const dictionary = await http

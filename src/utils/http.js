@@ -91,6 +91,8 @@ function request(url, data, method) {
 function action(res, resolve, reject, url) {
   // todo 各种状态码逻辑待完善
   const data = res?.data;
+  const responseURL = res?.config?.url;
+  console.log('各种状态码各种状态码',res, resolve, reject, url);
   if (
     res?.status === 200 &&
     (/\/downloadTemplate/.test(url) ||
@@ -98,6 +100,12 @@ function action(res, resolve, reject, url) {
       /\/exportData/.test(url) ||
       /\/export/.test(url) ||
       /\/importData/.test(url))
+  ) {
+    resolve(data);
+  } else if (
+    responseURL.indexOf('sys/params/type/list') !== -1 ||
+    responseURL.indexOf('sys/params/page') !== -1 ||
+    responseURL.indexOf('dict/view/list') !== -1
   ) {
     resolve(data);
   } else if (data?.respCode === '200') {
