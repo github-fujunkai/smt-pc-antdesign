@@ -118,7 +118,7 @@ const App = () => {
     // 创建一个 FormData 对象，用于构建包含文件的请求
     const formData = new FormData();
     formData.append('file', file);
-    // formData.append("importType", 0); //导入新增一个数据？
+    formData.append("importType", 1); //导入类型：1.提示；2.覆盖；3.忽略
     http
       .post(config.API_PREFIX + 'basic/item/baseInfo/importData', formData)
       .then((res) => {
