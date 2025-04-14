@@ -1086,7 +1086,7 @@ const App = () => {
                     .toLowerCase()
                     .localeCompare((optionB?.label ?? '').toLowerCase())
                 }
-                options={getDictionaryListByCode('发料人')}
+                options={getDictionaryListByCode('24')}
               />
             </Form.Item>
 
@@ -1100,7 +1100,7 @@ const App = () => {
                 },
               ]}
             >
-              <Select
+              {/* <Select
                 placeholder="请选择"
                 allowClear
                 showSearch
@@ -1111,7 +1111,8 @@ const App = () => {
                     .localeCompare((optionB?.label ?? '').toLowerCase())
                 }
                 options={getDictionaryListByCode('领料人')}
-              />
+              /> */}
+              <Input allowClear placeholder="请输入" />
             </Form.Item>
 
             <Form.Item label="上料表" name="quantity">

@@ -279,29 +279,6 @@ const StorageLocation = () => {
         >
           <Row>
             <Col span={12}>
-              {/* <Form.Item
-                label="仓库类型"
-                name="storageType"
-                rules={[
-                  {
-                    required: false,
-                    message: '请选择仓库类型!',
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="请选择"
-                  allowClear
-                  showSearch
-                  optionFilterProp="label"
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? '')
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? '').toLowerCase())
-                  }
-                  options={getDictionaryListByCode('仓库类型')}
-                />
-              </Form.Item> */}
               <Form.Item
                 label="库位前缀"
                 name="code"

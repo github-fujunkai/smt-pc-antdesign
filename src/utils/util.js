@@ -44,16 +44,23 @@ export function downloadCSV(csvString, filename) {
 // downloadCSV(csvData, fileName);
 
 export function getDictionaryListByCode(name) {
-  let typeList =  JSON.parse(localStorage.getItem('dictionaryType') || '[]');
-  let code = typeList.find(item => item.label === name)?.value;
-  // console.log('codecodecodecodecodecodecodecodecodecode',code)
-  let list =  JSON.parse(localStorage.getItem('dictionaryList') || '[]');
-  return list.filter(item => item.dictType == code).map(item => {
-    return {
-      label: item.dictKey,
-      value: item.dictValue
-    }
-  });
+  // console.log('name111', localStorage.getItem('dictionaryType'));
+  if (localStorage.getItem('dictionaryType')&& localStorage.getItem('dictionaryType') !== 'undefined') {
+    let typeList = JSON.parse(localStorage.getItem('dictionaryType') || '[]');
+    let code = typeList.find((item) => item.value === name)?.value; //通过code匹配
+    // console.log('codecodecodecodecodecodecodecodecodecode',code)
+    let list = JSON.parse(localStorage.getItem('dictionaryList') || '[]');
+    return list
+      .filter((item) => item.dictType == code)
+      .map((item) => {
+        return {
+          label: item.dictKey,
+          value: item.dictValue,
+        };
+      });
+  } else {
+    return [];
+  }
 }
 
 // 查询时空数据转undefined
@@ -70,12 +77,3 @@ export function convertEmptyValuesToUndefined(obj) {
   }
   return newObj;
 }
-
-
-
-
-
-
-
-
-

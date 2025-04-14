@@ -401,7 +401,6 @@ const App = () => {
   useEffect(() => {
     fetchData();
     // console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
-    // console.log('getDictionaryListByCode', getDictionaryListByCode('送货人'));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -964,7 +963,7 @@ const App = () => {
                 filterSort={(optionA, optionB) =>
                   (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                 }
-                options={getDictionaryListByCode('供应商名称')}
+                options={getDictionaryListByCode('10')} // 供应商
               />
             </Form.Item>
 
@@ -978,7 +977,18 @@ const App = () => {
                 },
               ]}
             >
-              <Input allowClear placeholder="请输入" />
+              <Select
+                 mode="SECRET_COMBOBOX_MODE_DO_NOT_USE"
+                placeholder="请选择"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                filterSort={(optionA, optionB) =>
+                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                }
+                options={getDictionaryListByCode('33')} // 采购单
+              />
+              {/* <Input allowClear placeholder="请输入" /> */}
             </Form.Item>
 
             <Form.Item
@@ -1025,7 +1035,7 @@ const App = () => {
                 filterSort={(optionA, optionB) =>
                   (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                 }
-                options={getDictionaryListByCode('送货人')}
+                options={getDictionaryListByCode('22')} // 送货人
               />
             </Form.Item>
 
@@ -1047,7 +1057,7 @@ const App = () => {
                 filterSort={(optionA, optionB) =>
                   (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                 }
-                options={getDictionaryListByCode('入库人')}
+                options={getDictionaryListByCode('36')}
               />
             </Form.Item>
 

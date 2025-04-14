@@ -103,9 +103,9 @@ function action(res, resolve, reject, url) {
   ) {
     resolve(data);
   } else if (
-    responseURL.indexOf('sys/params/type/list') !== -1 ||
-    responseURL.indexOf('sys/params/page') !== -1 ||
-    responseURL.indexOf('dict/view/list') !== -1
+    responseURL?.indexOf('sys/params/type/list') !== -1 ||
+    responseURL?.indexOf('sys/params/page') !== -1 ||
+    responseURL?.indexOf('dict/view/list') !== -1
   ) {
     resolve(data);
   } else if (data?.respCode === '200') {
