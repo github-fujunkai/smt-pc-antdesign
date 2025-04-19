@@ -40,7 +40,7 @@ const App = ({ isModalOpen, onClose }) => {
         .then((res) => {
           if (JSON.stringify(res.bizData) !== '{}') {
             // console.log('res', res.bizData);
-            setCodeList(res.bizData.uniqueCodeList || []);
+            setCodeList(res.bizData.uniqueCodeList.filter((item) => item !== null)|| []);
           }
         });
     }
