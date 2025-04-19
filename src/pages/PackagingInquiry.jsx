@@ -934,7 +934,7 @@ const App = () => {
             columns={resizableColumns}
             components={components}
             scroll={{ x: tableWidth }}
-            rowKey={(record) => record.id}
+            // rowKey={(record) => record.id}
             dataSource={data}
             pagination={tableParams.pagination}
             onChange={handleTableChange}
