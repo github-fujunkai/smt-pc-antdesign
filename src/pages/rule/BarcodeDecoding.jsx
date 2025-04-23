@@ -208,7 +208,17 @@ const App = () => {
     tableParams?.columnKey,
     tableParams?.order,
   ]);
-
+  const [contentData, setContentData] = useState([]);
+ useEffect(() => {
+   http.post(`${config.API_PREFIX}barcode/reader/enum/list`).then((res) => {
+    setContentData(res?.bizData.map(item => {
+      return {
+        value: item,
+        label: item,
+      }
+    }) || []);
+   })
+ }, []);
   const fetchData = () => {
     setLoading(true);
     const {
@@ -490,43 +500,11 @@ const App = () => {
                             },
                           ]}
                         >
+                          
                           <Select
                             placeholder="请选择"
                             allowClear
-                            options={[
-                              {
-                                value: '料号',
-                                label: '料号',
-                              },
-                              {
-                                value: '数量',
-                                label: '数量',
-                              },
-                              {
-                                value: '批次号',
-                                label: '批次号',
-                              },
-                              {
-                                value: 'Datecode',
-                                label: 'Datecode',
-                              },
-                              {
-                                value: '供应商料号',
-                                label: '供应商料号',
-                              },
-                              {
-                                value: 'MSL',
-                                label: 'MSL',
-                              },
-                              {
-                                value: '其它1',
-                                label: '其它1',
-                              },
-                              {
-                                value: '其它2',
-                                label: '其它2',
-                              },
-                            ]}
+                            options={contentData}
                           />
                         </Form.Item>
                       </Col>
