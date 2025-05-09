@@ -1,5 +1,5 @@
+import { downloadCSV } from '@/utils/util';
 import {
-  DownloadOutlined,
   ExclamationCircleFilled,
   PlusOutlined,
   RollbackOutlined,
@@ -38,13 +38,11 @@ import qs from 'qs';
 import { useEffect, useMemo, useState } from 'react';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
-import { downloadCSV } from '../../utils/util';
-import WmsCount from './WmsCount';
+import TransferOrderDialog from './TransferOrderDialog';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
 let activeId = -1;
-let activeId1 = -1;
 
 const App = () => {
   const [isShowSearch, setIsShowSearch] = useState(false);
@@ -76,59 +74,60 @@ const App = () => {
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([
     {
-      title: '盘点单',
-      dataIndex: 'inventoryCode',
-      // sorter: true,
-      key: 'inventoryCode',
-      width: 180,
+      title: '调拨单',
+      dataIndex: 'transfer',
+      key: 'transfer',
+      width: 150,
     },
+    // 调拨状态(0:待调拨,1:已调拨,2:关单)
     {
-      title: '盘点类型',
-      dataIndex: 'inventoryType',
-      key: 'inventoryType',
-      width: 130,
-    },
-    {
-      title: '盘点内容',
-      dataIndex: 'inventoryContent',
-      key: 'inventoryContent',
-      width: 130,
-    },
-    {
-      title: '盘点人',
-      dataIndex: 'approver',
-      key: 'approver',
-      width: 130,
-    },
-    {
-      title: '确认人',
-      dataIndex: 'approver',
-      key: 'approver1',
-      width: 130,
-    },
-    {
-      title: '盘点状态',
-      dataIndex: 'inventoryStatus',
-      key: 'inventoryStatus',
+      title: '调拨单状态',
+      dataIndex: 'transferStatus',
+      key: 'transferStatus',
       render: (_, record) => {
-        return <>{record.inventoryStatus == 0 ? '新增' : '确认'}</>;
+        return record.transferStatus === 1
+          ? '已调拨'
+          : record.transferStatus === 2
+          ? '关单'
+          : '待调拨';
       },
-      width: 130,
+      width: 150,
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-      key: 'remark',
-      width: 130,
+      title: '创建人',
+      dataIndex: 'createBy',
+      key: 'createBy',
+      width: 150,
     },
     {
-      title: '盘点日期',
+      title: '关单人',
+      dataIndex: 'closer',
+      key: 'closer',
+      width: 150,
+    },
+    {
+      title: '创建日期',
       dataIndex: 'createTime',
       key: 'createTime',
       render: (_, record) => {
         return dayjs(_).format('YYYY-MM-DD');
       },
-      width: 130,
+      width: 150,
+    },
+    {
+      title: '关单日期',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      render: (_, record) => {
+        return dayjs(_).format('YYYY-MM-DD');
+      },
+      width: 150,
+    },
+    {
+      title: '备注',
+      dataIndex: 'supplier',
+      key: 'supplier',
+      width: 150,
     },
     {
       title: '操作',
@@ -139,60 +138,16 @@ const App = () => {
           <Space>
             <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
-            <Typography.Link onClick={() => InventoryOrder(record)}>盘点</Typography.Link>
-            <Typography.Link onClick={() => confirmOrder(record)}>确认</Typography.Link>
+            <Typography.Link onClick={() => handleSelect(record)}>选料</Typography.Link>
+            <Typography.Link onClick={() => linght(1, record)}>亮灯</Typography.Link>
+            <Typography.Link onClick={() => linght(2, record)}>灭灯</Typography.Link>
+            <Typography.Link onClick={() => closeOrder(record)}>关单</Typography.Link>
           </Space>
         );
       },
     },
   ]);
-  const confirmOrder = (record) => {
-    confirm({
-      title: '确认',
-      icon: <ExclamationCircleFilled />,
-      content: '是否确认当前盘点单?',
-      onOk() {
-        console.log('OK');
-        http
-          .del(config.API_PREFIX + 'inventory/order/confirm?id=' + `${record?.id}`, {})
-          .then((res) => {
-            fetchData();
-            message.success('确认成功！');
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      },
-      onCancel() {
-        console.log('Cancel');
-      },
-    });
-  };
-  const InventoryOrder = (record) => {
-    confirm({
-      title: '盘点',
-      icon: <ExclamationCircleFilled />,
-      content: '是否进行盘点?',
-      onOk() {
-        console.log('OK');
-        http
-          .del(
-            config.API_PREFIX + 'inventory/order/inventory?inventoryOrderId=' + `${record?.id}`,
-            {},
-          )
-          .then((res) => {
-            fetchData();
-            message.success('盘点成功！');
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      },
-      onCancel() {
-        console.log('Cancel');
-      },
-    });
-  };
+
   const del = (record) => {
     confirm({
       title: '删除确认',
@@ -201,7 +156,7 @@ const App = () => {
       onOk() {
         console.log('OK');
         http
-          .del(config.API_PREFIX + 'inventory/order' + `/${record?.id}`, {})
+          .del(config.API_PREFIX + 'location/transfer' + `/${record?.id}`, {})
           .then((res) => {
             fetchData();
             message.success('删除成功！');
@@ -215,26 +170,75 @@ const App = () => {
       },
     });
   };
+  const closeOrder = (record) => {
+    confirm({
+      title: '关单确认',
+      icon: <ExclamationCircleFilled />,
+      content: '请确认是否关单?',
+      onOk() {
+        console.log('OK');
+        http
+          .del(
+            config.API_PREFIX +
+              'location/transfer/status/change' +
+              `?id=${record?.id}&transferStatus=2`,
+            {},
+          )
+          .then((res) => {
+            fetchData();
+            message.success('关单成功！');
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+
+  const linght = (status, record) => {
+    let url = status === 2 ? 'location/transfer/lightOff' : 'location/transfer/lightUp';
+    http
+      .post(
+        config.API_PREFIX +
+          url +
+          `?${qs.stringify({
+            id: record.id,
+          })}`,
+        {},
+      )
+      .then((res) => {
+        console.log(res);
+        message.success('操作成功！');
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+  const [isConfirm, setIsConfirm] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   // 生成单号
   const getAddOrder = () => {
     http
-      .get(config.API_PREFIX + 'inventory/order/generateOrderNumber', {})
+      .get(config.API_PREFIX + 'location/transfer/generateTransferNo', {})
       .then((res) => {
-        formCreate.setFieldValue('inventoryCode', res.bizData || '');
+        formCreate.setFieldValue('transfer', res.bizData || '');
       })
       .catch((err) => {});
   };
-  //新增盘点单
+  //新增调拨单
   const showModal = (action, record, confirm) => {
     if (action === 'update' && record) {
-      const { id, inventoryCode, inventoryType, inventoryContent, approver, remark } = record;
+      console.log(action, record);
+      const { id, transfer, transferStatus, closer, closeDate, remark } = record;
       activeId = id;
       formCreate.setFieldsValue({
-        inventoryCode,
-        inventoryType,
-        inventoryContent,
-        approver,
+        transfer,
+        transferStatus,
+        closer,
+        closeDate: dayjs(closeDate),
         remark,
       });
     } else {
@@ -246,35 +250,49 @@ const App = () => {
     setIsModalOpen(true);
   };
 
-  //新增/修改盘点单保存
+  const [isModalOpen1, setIsModalOpen1] = useState(false);
+  const [isAddOrPrint, setIsAddOrPrint] = useState('create');
+  const [isPrintData, setIsPrintData] = useState({});
+  const handlePrint = (action, record) => {
+    setIsAddOrPrint(action);
+    setIsPrintData(record);
+    activeId1 = record.id;
+    console.log('action', action, record);
+    if (action == 'create') {
+      setIsModalOpen1(true);
+    }
+  };
+
+  //新增/修改调拨单保存
   const handleOk = () => {
     formCreate
       .validateFields()
       .then((values) => {
         console.log('values', values);
         setLoadingOk(true);
-        const { inventoryCode, inventoryType, inventoryContent, approver, remark } = values;
+        // wtf
+        const { transfer, transferStatus, closer, closeDate, remark } = values;
         let params = {
-          inventoryCode,
-          inventoryType,
-          inventoryContent,
-          approver,
+          transfer,
+          transferStatus,
+          closer,
+          closeDate,
           remark,
         };
         let action = null;
         let msg = '';
         let apiUrl = '';
-        console.log('activeId', activeId);
         if (activeId !== -1) {
           action = http.post;
-          apiUrl = `${config.API_PREFIX}inventory/order`;
+          apiUrl = `${config.API_PREFIX}location/transfer/saveOrUpdate`;
           params.id = activeId;
           msg = '修改成功！';
         } else {
           action = http.post;
-          apiUrl = `${config.API_PREFIX}inventory/order`;
+          apiUrl = `${config.API_PREFIX}location/transfer/saveOrUpdate`;
           msg = '新增成功！';
         }
+        console.log('paramsparamsparamsparamsparamsparams', params, isConfirm);
         action(apiUrl, params)
           .then((res) => {
             formCreate.resetFields();
@@ -315,7 +333,7 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
+    // console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -353,55 +371,30 @@ const App = () => {
       params['orders[0].asc'] = order === 'ascend' ? true : false;
     }
 
-    const {
-      inventoryCode,
-      inventoryType,
-      inventoryContent,
-      approver,
-      lotNo,
-      materialUid,
-      storageLocation,
-      startTime,
-      endTime,
-    } = formSearch.getFieldsValue();
-    if (inventoryCode) {
-      params.inventoryCode = inventoryCode;
+    const { transfer, transferStatus, closer, closeDate } = formSearch.getFieldsValue();
+    if (transfer) {
+      params.transfer = transfer;
     }
-    if (inventoryType) {
-      params.inventoryType = inventoryType;
+    if (transferStatus) {
+      params.transferStatus = transferStatus;
     }
-    if (inventoryContent) {
-      params.inventoryContent = inventoryContent;
+    if (closer) {
+      params.closer = closer;
     }
-    if (approver) {
-      params.approver = approver;
+    if (closeDate) {
+      params.closeDate = closeDate.format('YYYY-MM-DD 00:00:00');
     }
-    if (materialUid) {
-      params.materialUid = materialUid;
-    }
-    if (storageLocation) {
-      params.storageLocation = storageLocation;
-    }
-    if (lotNo) {
-      params.lotNo = lotNo;
-    }
-    if (startTime) {
-      params.createTimeStart = startTime.format('YYYY-MM-DD 00:00:00');
-    }
-    if (endTime) {
-      params.createTimeEnd = endTime.format('YYYY-MM-DD 00:00:00');
-    }
+    // 传到wms汇总
     setWmsCountData(params);
     setQueryParams(params);
     http
-      .get(config.API_PREFIX + 'inventory/order/page', params)
+      .get(config.API_PREFIX + 'location/transfer/page', params)
       .then((res) => {
         console.log('res', res);
         const data = res?.bizData;
         setQueryTotal(data?.total);
         setData(data?.records || []);
         setLoading(false);
-        console.log('fetchData pagination', tableParams);
         setTableParams({
           ...tableParams,
           pagination: {
@@ -434,10 +427,15 @@ const App = () => {
   const [loadingUpload, setLoadingUpload] = useState(false);
 
   const expandedRowRender = (record) => {
-    console.log('record', record.inventoryOrderMaterialDetails);
+    console.log('record', record.details);
     const columns1 = [
       {
-        title: '料盘UID',
+        title: '调拨单号',
+        dataIndex: 'transferNo',
+        key: 'transferNo',
+      },
+      {
+        title: '物料UID',
         dataIndex: 'materialUid',
         key: 'materialUid',
       },
@@ -447,55 +445,48 @@ const App = () => {
         key: 'itemCode',
       },
       {
-        title: '供应商料号',
-        dataIndex: 'supplierItemCode',
-        key: 'supplierItemCode',
-      },
-      {
         title: '物料描述',
         dataIndex: 'materialDescription',
         key: 'materialDescription',
       },
       {
-        title: '数量',
-        dataIndex: 'qty',
-        key: 'qty',
+        title: '批次号',
+        dataIndex: 'lotNo',
+        key: 'lotNo',
       },
       {
-        title: '盘点数量',
-        dataIndex: 'inventoryQty',
-        key: 'inventoryQty',
+        title: '调出仓位',
+        dataIndex: 'packoutboundageQty',
+        key: 'outbound',
       },
       {
-        title: '差异数量',
-        dataIndex: 'differenceQty',
-        key: 'differenceQty',
+        title: '调出库位',
+        dataIndex: 'outStorageLocation',
+        key: 'outStorageLocation',
       },
       {
-        title: '库位',
-        dataIndex: 'storageLocation',
-        key: 'storageLocation',
+        title: '调拨数量',
+        dataIndex: 'transferQty',
+        key: 'transferQty',
       },
-      {
-        title: '库位类型',
-        dataIndex: 'storageLocationType',
-        key: 'storageLocationType',
-      },
-      {
-        title: '仓库',
-        dataIndex: 'warehouse',
-        key: 'warehouse',
-      },
-      {
-        title: '已盘点',
-        dataIndex: 'isInventory',
-        key: 'isInventory',
-      },
+      // {
+      //   title: '操作',
+      //   key: 'operation',
+      //   fixed: 'right',
+      //   render: (_, record) => {
+      //     return (
+      //       <Space>
+      //         <Typography.Link onClick={() => handlePrint('update', record)}>打印</Typography.Link>
+      //         <Typography.Link onClick={() => del2(record)}>删除</Typography.Link>
+      //       </Space>
+      //     );
+      //   },
+      // },
     ];
     return (
       <Table
         columns={columns1}
-        dataSource={record?.inventoryOrderMaterialDetails || []}
+        dataSource={record?.details || []}
         pagination={false}
         size="small"
         scroll={{ x: 'max-content' }}
@@ -505,24 +496,11 @@ const App = () => {
       />
     );
   };
-  // 弹窗组件
-  const [isCommonModal, setIsCommonModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState([]);
-  const [selectedAction, setSelectedAction] = useState('');
-  const showCommonModal = (action, record, confirm) => {
-    console.log(action, action, confirm);
-    setSelectedAction(action);
-    setSelectedRow(record);
-    setIsCommonModal(true);
-  };
-  const hideCommonModal = () => {
-    setIsCommonModal(false);
-  };
   // --------------------------------------------------------------------------------------------------------------------
   const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
     columns: useMemo(() => columns, [columns]),
     columnsState: {
-      persistenceKey: 'localKeyMaterialInbound',
+      persistenceKey: 'localKeyTransferOrder',
       persistenceType: 'localStorage',
     },
   });
@@ -584,11 +562,11 @@ const App = () => {
   };
 
   const saveColumnsOrder = (columns) => {
-    localStorage.setItem('columnsInventoryCount', JSON.stringify(columns.map((col) => col.key)));
+    localStorage.setItem('columnsTransferOrder', JSON.stringify(columns.map((col) => col.key)));
   };
 
   useEffect(() => {
-    const savedOrder = localStorage.getItem('columnsInventoryCount');
+    const savedOrder = localStorage.getItem('columnsTransferOrder');
     if (savedOrder) {
       const order = JSON.parse(savedOrder);
       const orderedColumns = order
@@ -599,7 +577,7 @@ const App = () => {
     // 其他初始化逻辑...
   }, []);
   function refreshPage() {
-    localStorage.removeItem('columnsInventoryCount');
+    localStorage.removeItem('columnsTransferOrder');
     message.success('复原成功！');
     setTimeout(() => {
       window.location.reload();
@@ -607,7 +585,7 @@ const App = () => {
   }
 
   const [isSortableOpen, setIsSortableOpen] = useState(false);
-  // 导入--------------------------------------------------------------------------------------------------------------------
+  // 导出--------------------------------------------------------------------------------------------------------------------
   const [queryParams, setQueryParams] = useState(null);
   const [queryTotal, setQueryTotal] = useState(0);
   const [loadingExport, setLoadingExport] = useState(false);
@@ -618,10 +596,10 @@ const App = () => {
       size: queryTotal,
     });
     http
-      .post(config.API_PREFIX + 'inventory/order/exportData' + `?${query}`)
+      .post(config.API_PREFIX + 'inbound/order/exportData' + `?${query}`)
       .then((res) => {
         message.success('导出成功！');
-        downloadCSV(res, '库存盘点导出-CSV文件');
+        downloadCSV(res, '调拨管理导出-CSV文件');
         setLoadingExport(false);
       })
       .catch((err) => {
@@ -629,6 +607,13 @@ const App = () => {
         message.error('导出失败！');
         setLoadingExport(false);
       });
+  };
+  // 选料
+  const [transferOrderOpen, setTransferOrderOpen] = useState(false);
+  const [transferOrderData, setTransferOrderData] = useState({});
+  const handleSelect = (record) => {
+    setTransferOrderOpen(true);
+    setTransferOrderData(record);
   };
   return (
     <div className="content-wrapper  flex flex-col">
@@ -666,61 +651,30 @@ const App = () => {
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
               <Col span={8}>
-                <Form.Item label="盘点单号" name="inventoryCode">
+                <Form.Item label="调拨单" name="transfer">
                   <Input allowClear placeholder="请输入" />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="盘点类型" name="inventoryType">
+                <Form.Item label="调拨单状态" name="transferStatus">
                   <Select
                     placeholder="请选择"
                     allowClear
-                    showSearch
                     options={[
-                      {
-                        label: '库位',
-                        value: '库位',
-                      },
-                      {
-                        label: '料号',
-                        value: '料号',
-                      },
+                      { label: '待调拨', value: 0 },
+                      { label: '已调拨', value: 1 },
+                      { label: '关单', value: 2 },
                     ]}
                   />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="盘点内容" name="inventoryContent">
+                <Form.Item label="关单人" name="closerr">
                   <Input allowClear placeholder="请输入" />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="盘点人" name="approver">
-                  <Input allowClear placeholder="请输入" />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="料号" name="lotNo">
-                  <Input allowClear placeholder="请输入" />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="原材UID" name="materialUid">
-                  <Input allowClear placeholder="请输入" />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="库位" name="storageLocation">
-                  <Input allowClear placeholder="请输入" />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="盘点日期（开始）" name="startTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="盘点日期（结束）" name="endTime">
+                <Form.Item label="关单日期" name="closeDate">
                   <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
@@ -738,9 +692,9 @@ const App = () => {
             </Row>
           </Form>
         </div>
-        <div className="table-wrapper  h-[40vh] overflow-auto">
+        <div className="table-wrapper overflow-auto">
           <div style={{ marginBottom: 16, textAlign: 'right' }}>
-            <Button
+            {/* <Button
               className="mr-2"
               loading={loadingExport}
               onClick={exportData}
@@ -749,7 +703,7 @@ const App = () => {
               icon={<DownloadOutlined />}
             >
               导出
-            </Button>
+            </Button> */}
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -757,9 +711,12 @@ const App = () => {
                 showModal('create');
               }}
             >
-              新增盘点单
+              新增调拨单
             </Button>
           </div>
+
+          {/* columns={columns} */}
+          {/* scroll={{ x: "max-content" }} */}
           <Table
             columns={resizableColumns}
             components={components}
@@ -777,8 +734,6 @@ const App = () => {
             }}
           />
         </div>
-        {/* 汇总方式 */}
-        <WmsCount type={4} WmsCountData={WmsCountData} className=" h-[40vh]" />
         {/* 拖拽组件 */}
         <Modal
           title="调整列顺序（拖动排序）"
@@ -805,9 +760,9 @@ const App = () => {
             </SortableContext>
           </DndContext>
         </Modal>
-        {/* 新增/修改盘点单 */}
+        {/* 新增/修改调拨单 */}
         <Modal
-          title="新增/修改盘点单"
+          title="新增/修改调拨单"
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
@@ -817,50 +772,13 @@ const App = () => {
           }}
         >
           <Form
-            labelCol={{ span: 6 }}
+            labelCol={{ span: 8 }}
             form={formCreate}
             style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
           >
             <Form.Item
-              label="盘点单"
-              name="inventoryCode"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入',
-                },
-              ]}
-            >
-              <Input allowClear placeholder="请输入" />
-            </Form.Item>
-            <Form.Item
-              label="盘点类型"
-              name="inventoryType"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入',
-                },
-              ]}
-            >
-              <Select
-                placeholder="请选择"
-                allowClear
-                options={[
-                  {
-                    label: '库位',
-                    value: '库位',
-                  },
-                  {
-                    label: '料号',
-                    value: '料号',
-                  },
-                ]}
-              />
-            </Form.Item>
-            <Form.Item
-              label="盘点内容"
-              name="inventoryContent"
+              label="调拨单"
+              name="transfer"
               rules={[
                 {
                   required: true,
@@ -872,8 +790,29 @@ const App = () => {
             </Form.Item>
 
             <Form.Item
-              label="盘点人"
-              name="approver"
+              label="调拨单状态"
+              name="transferStatus"
+              rules={[
+                {
+                  required: true,
+                  message: '请输入',
+                },
+              ]}
+            >
+              <Select
+                placeholder="请选择"
+                allowClear
+                options={[
+                  { label: '待调拨', value: 0 },
+                  { label: '已调拨', value: 1 },
+                  { label: '关单', value: 2 },
+                ]}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="关单人"
+              name="closer"
               rules={[
                 {
                   required: false,
@@ -882,6 +821,18 @@ const App = () => {
               ]}
             >
               <Input allowClear placeholder="请输入" />
+            </Form.Item>
+            <Form.Item
+              label="关单日期"
+              name="closeDate"
+              rules={[
+                {
+                  required: false,
+                  message: '请输入',
+                },
+              ]}
+            >
+              <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
             </Form.Item>
             <Form.Item
               label="备注"
@@ -897,96 +848,17 @@ const App = () => {
             </Form.Item>
           </Form>
         </Modal>
-        {/* 录入 下架 补发 扫描 */}
-        <CommonModal
-          isCommonModal={isCommonModal}
-          selectedRow={selectedRow}
-          selectedAction={selectedAction}
-          onClose={() => {
-            hideCommonModal();
+        {/* 选料 */}
+        <TransferOrderDialog
+          isModalOpen={transferOrderOpen}
+          transferOrderData={transferOrderData}
+          close={() => {
+            setTransferOrderOpen(false);
+            fetchData();
           }}
-        />
+        ></TransferOrderDialog>
       </div>
     </div>
-  );
-};
-
-// 录入---弃用了
-const CommonModal = (props) => {
-  //selectedAction create 录入   reissue补发 scan扫描
-  const { isCommonModal, selectedAction, selectedRow, onClose } = props;
-  const [form] = Form.useForm();
-  const options = {
-    stocktaking: '盘点',
-    confirm: '确认',
-  };
-  const onCancel = () => {
-    onClose();
-  };
-  const onFinish = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log(values);
-        if (selectedAction === 'stocktaking') {
-          let url = '';
-          if (selectedAction === 'stocktaking') {
-            url = `inventory/order/inventory`;
-          }
-          http
-            .get(
-              config.API_PREFIX +
-                url +
-                `?${qs.stringify({
-                  itemCode: form.getFieldValue('itemCode'),
-                  inventoryOrderId: selectedRow.id,
-                })}`,
-              {},
-            )
-            .then((res) => {})
-            .catch((err) => {});
-        }
-      })
-      .catch((info) => {
-        console.log('Validate Failed:', info);
-      });
-  };
-  return (
-    <Modal
-      open={isCommonModal}
-      title={options[selectedAction]}
-      okText="确认"
-      cancelText="取消"
-      onCancel={() => {
-        onCancel();
-      }}
-      onOk={() => {
-        onFinish();
-      }}
-    >
-      <Form
-        form={form}
-        layout="vertical"
-        labelCol={{ span: 6 }}
-        style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
-        autoComplete="off"
-      >
-        {selectedAction === 'stocktaking' && (
-          <Form.Item
-            label="料号"
-            name="itemCode"
-            rules={[
-              {
-                required: true,
-                message: '请输入',
-              },
-            ]}
-          >
-            <Input allowClear placeholder="请输入" />
-          </Form.Item>
-        )}
-      </Form>
-    </Modal>
   );
 };
 export default App;

@@ -178,13 +178,18 @@ export default [
       },
       {
         path: '/warehouse/MaterialInbound',
-        name: '原材入库',
+        name: '入库管理',
         component: './warehouse/MaterialInbound',
       },
       {
         path: '/warehouse/MaterialOutbound',
-        name: '原材出库',
+        name: '出库管理',
         component: './warehouse/MaterialOutbound',
+      },
+      {
+        path: '/warehouse/TransferOrder',
+        name: '库位调拨',
+        component: './warehouse/TransferOrder',
       },
       {
         path: '/warehouse/InventoryQuery',
@@ -198,7 +203,7 @@ export default [
       },
       {
         path: '/warehouse/MaterialHistory',
-        name: '原材履历',
+        name: '操作履历',
         component: './warehouse/MaterialHistory',
       },
     ],

@@ -1,39 +1,23 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import {
-  Badge,
-  Dropdown,
-  Drawer,
-  Tooltip,
-  Switch,
-  Typography,
-  DatePicker,
-  Image,
-  Tag,
-  Table,
-  Modal,
-  Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
   Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
   message,
-} from "antd";
-import {
-  ExclamationCircleFilled,
-  DownOutlined,
-  LoadingOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import http from "../../utils/http";
-import { config } from "../../utils/config";
-import api from "../../utils/api";
-import qs, { stringify } from "qs";
-import  dayjs from "dayjs";
+  Modal,
+  Row,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+} from 'antd';
+import qs from 'qs';
+import { useEffect, useState } from 'react';
+import { config } from '../../utils/config';
+import http from '../../utils/http';
+import { downloadCSV } from '../../utils/util';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
@@ -45,7 +29,7 @@ const App = () => {
   };
 
   const onFinish = (values) => {
-    console.log("search values", values);
+    console.log('search values', values);
     if (tableParams.pagination?.current !== 1) {
       setTableParams(paginationInit);
     } else {
@@ -66,40 +50,40 @@ const App = () => {
 
   const columns = [
     {
-      title: "原材UID",
-      dataIndex: "materialUid",
+      title: '原材UID',
+      dataIndex: 'materialUid',
       // sorter: true,
-      key: "materialUid",
+      key: 'materialUid',
     },
     {
-      title: "料号",
-      dataIndex: "itemCode",
-      key: "itemCode",
+      title: '料号',
+      dataIndex: 'itemCode',
+      key: 'itemCode',
     },
     {
-      title: "供应商料号",
-      dataIndex: "supplierItemCode",
-      key: "supplierItemCode",
+      title: '供应商料号',
+      dataIndex: 'supplierItemCode',
+      key: 'supplierItemCode',
     },
     {
-      title: "物料描述",
-      dataIndex: "materialDescription",
-      key: "materialDescription",
+      title: '物料描述',
+      dataIndex: 'materialDescription',
+      key: 'materialDescription',
     },
     {
-      title: "批次号",
-      dataIndex: "batchNumber",
-      key: "batchNumber",
+      title: '批次号',
+      dataIndex: 'batchNumber',
+      key: 'batchNumber',
     },
     {
-      title: "包装数量",
-      dataIndex: "packageQty",
-      key: "packageQty",
+      title: '包装数量',
+      dataIndex: 'packageQty',
+      key: 'packageQty',
     },
     {
-      title: "入库数量",
-      dataIndex: "inboundQty",
-      key: "inboundQty",
+      title: '入库数量',
+      dataIndex: 'inboundQty',
+      key: 'inboundQty',
     },
     // {
     //   title: "入库单状态",
@@ -110,44 +94,59 @@ const App = () => {
     //   },
     // },
     {
-      title: "当前数量",
-      dataIndex: "currentQty",
-      key: "currentQty",
+      title: '当前数量',
+      dataIndex: 'currentQty',
+      key: 'currentQty',
     },
     {
-      title: "单号",
-      dataIndex: "documentNumber",
-      key: "documentNumber",
+      title: '单号',
+      dataIndex: 'documentNumber',
+      key: 'documentNumber',
     },
     {
-      title: "操作类型",
-      dataIndex: "operationType",
-      key: "operationType"
+      title: '关联单号',
+      dataIndex: 'relatedDocumentNumber',
+      key: 'relatedDocumentNumber',
     },
     {
-      title: "线体",
-      dataIndex: "areaId",
-      key: "areaId",
+      title: '操作类型',
+      dataIndex: 'operationType',
+      key: 'operationType',
     },
     {
-      title: "位置",
-      dataIndex: "location",
-      key: "location",
+      title: '线体',
+      dataIndex: 'areaId',
+      key: 'areaId',
     },
     {
-      title: "库位",
-      dataIndex: "storageLocation",
-      key: "storageLocation",
+      title: '位置',
+      dataIndex: 'location',
+      key: 'location',
     },
     {
-      title: "日期时间",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '库位',
+      dataIndex: 'storageLocation',
+      key: 'storageLocation',
     },
     {
-      title: "操作员",
-      dataIndex: "createBy",
-      key: "createBy",
+      title: '库位类型',
+      dataIndex: 'storageLocationType',
+      key: 'storageLocationType',
+    },
+    {
+      title: '仓库',
+      dataIndex: 'warehouse',
+      key: 'warehouse',
+    },
+    {
+      title: '日期时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
+    },
+    {
+      title: '操作员',
+      dataIndex: 'createBy',
+      key: 'createBy',
     },
   ];
 
@@ -178,14 +177,13 @@ const App = () => {
   */
   useEffect(() => {
     fetchData();
-    console.log("JSON.stringify(tableParams)]", JSON.stringify(tableParams));
+    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams?.columnKey,
     tableParams?.order,
   ]);
-
 
   const fetchData = () => {
     setLoading(true);
@@ -197,7 +195,7 @@ const App = () => {
 
     // sequelize 举例
     // order: [[ 'created_at', 'desc' ], [ 'categoryId', 'desc' ]],
-    console.log("order, field", order, field);
+    console.log('order, field', order, field);
 
     // 多个传参举例-hzry
     // GET /api/resource?sort=created_at:desc,categoryId:asc
@@ -213,11 +211,18 @@ const App = () => {
       // 举例：lxy
       // orders[0].column: id
       // orders[0].asc: true
-      params["orders[0].column"] = field;
-      params["orders[0].asc"] = order === "ascend" ? true : false;
+      params['orders[0].column'] = field;
+      params['orders[0].asc'] = order === 'ascend' ? true : false;
     }
     const {
-      materialUid,itemCode,supplierItemCode,batchNumber,operationType,areaId,createTimeStart,createTimeEnd
+      materialUid,
+      itemCode,
+      supplierItemCode,
+      batchNumber,
+      operationType,
+      areaId,
+      createTimeStart,
+      createTimeEnd,
     } = formSearch.getFieldsValue();
     if (materialUid) {
       params.materialUid = materialUid;
@@ -238,21 +243,21 @@ const App = () => {
       params.areaId = areaId;
     }
     if (createTimeStart) {
-      params.createTimeStart = createTimeStart.format("YYYY-MM-DD 00:00:00");
+      params.createTimeStart = createTimeStart.format('YYYY-MM-DD 00:00:00');
     }
     if (createTimeEnd) {
-      params.endTime = createTimeEnd.format("YYYY-MM-DD 00:00:00");
+      params.endTime = createTimeEnd.format('YYYY-MM-DD 00:00:00');
     }
-
+    setQueryParams(params);
     http
-      .get(config.API_PREFIX + "material/history/page", params)
+      .get(config.API_PREFIX + 'material/history/page', params)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
-
+        setQueryTotal(data?.total);
         setData(data?.records || []);
         setLoading(false);
-        console.log("fetchData pagination", tableParams);
+        console.log('fetchData pagination', tableParams);
         setTableParams({
           ...tableParams,
           pagination: {
@@ -268,25 +273,48 @@ const App = () => {
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange: ", pagination, filters, sorter);
+    console.log('handleTableChange: ', pagination, filters, sorter);
     setTableParams({
       pagination,
       filters,
       ...sorter,
     });
-    console.log("tableParams1", tableParams);
+    console.log('tableParams1', tableParams);
 
     // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
       setData([]);
     }
   };
+  // 导入--------------------------------------------------------------------------------------------------------------------
+  const [queryParams, setQueryParams] = useState(null);
+  const [queryTotal, setQueryTotal] = useState(0);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const exportData = () => {
+    const query = qs.stringify({
+      ...queryParams,
+      current: 1,
+      size: queryTotal,
+    });
+    http
+      .post(config.API_PREFIX + 'material/history/exportData' + `?${query}`)
+      .then((res) => {
+        message.success('导出成功！');
+        downloadCSV(res, '操作履历导出-CSV文件');
+        setLoadingExport(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error('导出失败！');
+        setLoadingExport(false);
+      });
+  };
   return (
     <div className="content-wrapper  flex flex-col">
       <div className="content">
         <div className="tools">
           <Space size="middle">
-            <Tooltip title={isShowSearch ? "隐藏搜索" : "显示搜索"}>
+            <Tooltip title={isShowSearch ? '隐藏搜索' : '显示搜索'}>
               <Switch
                 onChange={onSearchChange}
                 checkedChildren={<SearchOutlined />}
@@ -295,10 +323,7 @@ const App = () => {
             </Tooltip>
           </Space>
         </div>
-        <div
-          className="search-wrapper"
-          style={{ display: isShowSearch ? "block" : "none" }}
-        >
+        <div className="search-wrapper" style={{ display: isShowSearch ? 'block' : 'none' }}>
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
               <Col span={8}>
@@ -333,22 +358,18 @@ const App = () => {
               </Col>
               <Col span={8}>
                 <Form.Item label="操作日期（开始）" name="createTimeStart">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item label="操作日期（结束）" name="createTimeEnd">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
 
               <Col span={8}>
                 <Space size="small">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
-                  >
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     查询
                   </Button>
                   <Button onClick={resetFormSearch} htmlType="button">
@@ -360,8 +381,20 @@ const App = () => {
           </Form>
         </div>
         <div className="table-wrapper">
+          <div style={{ marginBottom: 16, textAlign: 'right' }}>
+            <Button
+              className="mr-2"
+              loading={loadingExport}
+              onClick={exportData}
+              type="dashed"
+              htmlType="button"
+              icon={<DownloadOutlined />}
+            >
+              导出
+            </Button>
+          </div>
           <Table
-            scroll={{ x: "max-content" }}
+            scroll={{ x: 'max-content' }}
             columns={columns}
             rowKey={(record) => record.id}
             dataSource={data}

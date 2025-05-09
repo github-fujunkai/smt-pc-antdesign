@@ -1,10 +1,13 @@
 import {
+  DownloadOutlined,
   ExclamationCircleFilled,
   PlusOutlined,
   RollbackOutlined,
   SearchOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
+import qs from 'qs';
+import { downloadCSV } from '@/utils/util';
 import {
   closestCenter,
   DndContext,
@@ -36,9 +39,9 @@ import {
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import api from '../../utils/api';
-import { getDictionaryListByCode } from '../../utils/util';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
+import { getDictionaryListByCode } from '../../utils/util';
 import WmsCount from './WmsCount';
 const { TextArea } = Input;
 
@@ -138,7 +141,7 @@ const App = () => {
     //   key: "xxxxx",
     // },
     {
-      title: '仓库',
+      title: '库位',
       dataIndex: 'storageLocation',
       key: 'storageLocation',
       width: 100,
@@ -491,12 +494,13 @@ const App = () => {
     console.log('inboundStatus', params);
     // 传到wms汇总
     setWmsCountData(params);
+    setQueryParams(params);
     http
       .get(config.API_PREFIX + 'inbound/order/page', params)
       .then((res) => {
         console.log('res', res);
         const data = res?.bizData;
-
+        setQueryTotal(data?.total);
         setData(data?.records || []);
         setLoading(false);
         setTableParams({
@@ -594,6 +598,16 @@ const App = () => {
         key: 'storageLocation',
       },
       {
+        title: '库位类型',
+        dataIndex: 'storageLocationType',
+        key: 'storageLocationType',
+      },
+      {
+        title: '仓库',
+        dataIndex: 'warehouse',
+        key: 'warehouse',
+      },
+      {
         title: '创建日期',
         dataIndex: 'createTime',
         key: 'createTime',
@@ -668,7 +682,7 @@ const App = () => {
       coordinateGetter: verticalListSortingStrategy,
     }),
   );
-  
+
   // 拖放逻辑处理函数
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -719,7 +733,29 @@ const App = () => {
   }
 
   const [isSortableOpen, setIsSortableOpen] = useState(false);
-  // --------------------------------------------------------------------------------------------------------------------
+  // 导出--------------------------------------------------------------------------------------------------------------------
+  const [queryParams, setQueryParams] = useState(null);
+  const [queryTotal, setQueryTotal] = useState(0);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const exportData = () => {
+    const query = qs.stringify({
+      ...queryParams,
+      current: 1,
+      size: queryTotal,
+    });
+    http
+      .post(config.API_PREFIX + 'inbound/order/exportData' + `?${query}`)
+      .then((res) => {
+        message.success('导出成功！');
+        downloadCSV(res, '入库管理导出-CSV文件');
+        setLoadingExport(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error('导出失败！');
+        setLoadingExport(false);
+      });
+  };
   return (
     <div className="content-wrapper  flex flex-col">
       <div className="content h-auto">
@@ -791,20 +827,7 @@ const App = () => {
                     placeholder="请选择"
                     allowClear
                     showSearch
-                    options={[
-                      {
-                        label: '采购入库',
-                        value: 1,
-                      },
-                      {
-                        label: '客户供料',
-                        value: 2,
-                      },
-                      {
-                        label: '产线退库',
-                        value: 3,
-                      },
-                    ]}
+                    options={getDictionaryListByCode('37')}
                   />
                 </Form.Item>
               </Col>
@@ -858,6 +881,16 @@ const App = () => {
         </div>
         <div className="table-wrapper h-[40vh] overflow-auto">
           <div style={{ marginBottom: 16, textAlign: 'right' }}>
+            <Button
+              className="mr-2"
+              loading={loadingExport}
+              onClick={exportData}
+              type="dashed"
+              htmlType="button"
+              icon={<DownloadOutlined />}
+            >
+              导出
+            </Button>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -961,7 +994,9 @@ const App = () => {
                 showSearch
                 optionFilterProp="label"
                 filterSort={(optionA, optionB) =>
-                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                  (optionA?.label ?? '')
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? '').toLowerCase())
                 }
                 options={getDictionaryListByCode('10')} // 供应商
               />
@@ -978,13 +1013,15 @@ const App = () => {
               ]}
             >
               <Select
-                 mode="SECRET_COMBOBOX_MODE_DO_NOT_USE"
+                mode="SECRET_COMBOBOX_MODE_DO_NOT_USE"
                 placeholder="请选择"
                 allowClear
                 showSearch
                 optionFilterProp="label"
                 filterSort={(optionA, optionB) =>
-                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                  (optionA?.label ?? '')
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? '').toLowerCase())
                 }
                 options={getDictionaryListByCode('33')} // 采购单
               />
@@ -1033,7 +1070,9 @@ const App = () => {
                 showSearch
                 optionFilterProp="label"
                 filterSort={(optionA, optionB) =>
-                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                  (optionA?.label ?? '')
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? '').toLowerCase())
                 }
                 options={getDictionaryListByCode('22')} // 送货人
               />
@@ -1055,7 +1094,9 @@ const App = () => {
                 showSearch
                 optionFilterProp="label"
                 filterSort={(optionA, optionB) =>
-                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                  (optionA?.label ?? '')
+                    .toLowerCase()
+                    .localeCompare((optionB?.label ?? '').toLowerCase())
                 }
                 options={getDictionaryListByCode('36')}
               />
@@ -1074,20 +1115,7 @@ const App = () => {
               <Select
                 placeholder="请选择"
                 allowClear
-                options={[
-                  {
-                    value: 1,
-                    label: '采购入库',
-                  },
-                  {
-                    value: 2,
-                    label: '客户供料',
-                  },
-                  {
-                    value: 3,
-                    label: '产线退库',
-                  },
-                ]}
+                options={getDictionaryListByCode('37')}
               />
             </Form.Item>
             <Form.Item
@@ -1136,6 +1164,7 @@ const UIDprint = (props) => {
   useEffect(() => {
     //如果是自动打印就执行打印逻辑
     if (isModalOpen1) {
+      formCreate1.setFieldValue('generateQty',1)
       http
         .post(`${config.API_PREFIX}param/config/get?areaId=&code=inboundMaterialUid`, {})
         .then((res) => {

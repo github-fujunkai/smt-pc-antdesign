@@ -6,6 +6,7 @@ import {
   SearchOutlined,
   SwapOutlined,
   UploadOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 import {
   closestCenter,
@@ -499,12 +500,13 @@ const App = () => {
       params.createTimeEnd = endTime.format('YYYY-MM-DD 00:00:00');
     }
     setWmsCountData(params);
+    setQueryParams(params);
     http
       .get(config.API_PREFIX + 'outbound/order/page', params)
       .then((res) => {
         console.log('res', res);
         const data = res?.bizData;
-
+        setQueryTotal(data?.total);
         setData(data?.records || []);
         setLoading(false);
         setTableParams({
@@ -598,6 +600,16 @@ const App = () => {
         title: '库位',
         dataIndex: 'storageLocation',
         key: 'storageLocation',
+      },
+      {
+        title: '库位类型',
+        dataIndex: 'storageLocationType',
+        key: 'storageLocationType',
+      },
+      {
+        title: '仓库',
+        dataIndex: 'warehouse',
+        key: 'warehouse',
       },
       {
         title: '创建日期',
@@ -831,7 +843,29 @@ const App = () => {
   }
 
   const [isSortableOpen, setIsSortableOpen] = useState(false);
-  // --------------------------------------------------------------------------------------------------------------------
+  // 导入--------------------------------------------------------------------------------------------------------------------
+    const [queryParams, setQueryParams] = useState(null);
+    const [queryTotal, setQueryTotal] = useState(0);
+    const [loadingExport, setLoadingExport] = useState(false);
+    const exportData = () => {
+      const query = qs.stringify({
+        ...queryParams,
+        current: 1,
+        size: queryTotal,
+      });
+      http
+        .post(config.API_PREFIX + 'outbound/order/exportData' + `?${query}`)
+        .then((res) => {
+          message.success('导出成功！');
+          downloadCSV(res, '出库管理导出-CSV文件');
+          setLoadingExport(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          message.error('导出失败！');
+          setLoadingExport(false);
+        });
+    };
   return (
     <div className="content-wrapper  flex flex-col">
       <div className="content h-auto">
@@ -921,24 +955,7 @@ const App = () => {
                     placeholder="请选择"
                     allowClear
                     showSearch
-                    options={[
-                      {
-                        label: '产线领料',
-                        value: 1,
-                      },
-                      {
-                        label: '维修领料',
-                        value: 2,
-                      },
-                      {
-                        label: '退供应商',
-                        value: 3,
-                      },
-                      {
-                        label: '产品制样',
-                        value: 4,
-                      },
-                    ]}
+                    options={getDictionaryListByCode('38')}
                   />
                 </Form.Item>
               </Col>
@@ -968,6 +985,16 @@ const App = () => {
         </div>
         <div className="table-wrapper  h-[40vh] overflow-auto">
           <div style={{ marginBottom: 16, textAlign: 'right' }}>
+          <Button
+              className="mr-2"
+              loading={loadingExport}
+              onClick={exportData}
+              type="dashed"
+              htmlType="button"
+              icon={<DownloadOutlined />}
+            >
+              导出
+            </Button>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -1157,24 +1184,7 @@ const App = () => {
                 placeholder="请选择"
                 allowClear
                 showSearch
-                options={[
-                  {
-                    label: '产线领料',
-                    value: 1,
-                  },
-                  {
-                    label: '维修领料',
-                    value: 2,
-                  },
-                  {
-                    label: '退供应商',
-                    value: 3,
-                  },
-                  {
-                    label: '产品制样',
-                    value: 4,
-                  },
-                ]}
+                options={getDictionaryListByCode('38')}
               />
             </Form.Item>
             <Form.Item

@@ -153,11 +153,11 @@ const AdminLayout = ({ children, handleAddTab }) => {
         // },
         {
           key: "MaterialInbound",
-          label: <Link to="/MaterialInbound">原材入库</Link>,
+          label: <Link to="/MaterialInbound">入库管理</Link>,
         },
         {
           key: "MaterialOutbound",
-          label: <Link to="/MaterialOutbound">原材出库</Link>,
+          label: <Link to="/MaterialOutbound">出库管理</Link>,
         },
         {
           key: "InventoryQuery",
@@ -169,7 +169,7 @@ const AdminLayout = ({ children, handleAddTab }) => {
         },
         {
           key: "MaterialHistory",
-          label: <Link to="/MaterialHistory">原材履历</Link>,
+          label: <Link to="/MaterialHistory">操作履历</Link>,
         },
       ],
     },

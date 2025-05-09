@@ -610,7 +610,11 @@ const PutOut = () => {
                     },
                     {
                       value: '4',
-                      label: '时效时长',
+                      label: '失效时长',
+                    },
+                    {
+                      value: '5',
+                      label: '批次号',
                     },
                   ]}
                 />

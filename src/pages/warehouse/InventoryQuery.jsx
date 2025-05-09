@@ -1,40 +1,25 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import {
-  Badge,
-  Dropdown,
-  Drawer,
-  Tooltip,
-  Switch,
-  Typography,
-  DatePicker,
-  Image,
-  Tag,
-  Table,
-  Modal,
-  Breadcrumb,
-  Form,
-  Row,
-  Col,
-  Select,
-  Input,
-  InputNumber,
-  Space,
   Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
   message,
-} from "antd";
-import {
-  ExclamationCircleFilled,
-  DownOutlined,
-  LoadingOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import WmsCount from "./WmsCount";
-import http from "../../utils/http";
-import { config } from "../../utils/config";
-import api from "../../utils/api";
-import qs, { stringify } from "qs";
-import  dayjs from "dayjs";
+  Modal,
+  Row,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+} from 'antd';
+import dayjs from 'dayjs';
+import qs from 'qs';
+import { useEffect, useState } from 'react';
+import { config } from '../../utils/config';
+import http from '../../utils/http';
+import { downloadCSV } from '../../utils/util';
+import WmsCount from './WmsCount';
 const { TextArea } = Input;
 
 const { confirm } = Modal;
@@ -46,7 +31,7 @@ const App = () => {
   };
 
   const onFinish = (values) => {
-    console.log("search values", values);
+    console.log('search values', values);
     if (tableParams.pagination?.current !== 1) {
       setTableParams(paginationInit);
     } else {
@@ -67,55 +52,55 @@ const App = () => {
 
   const columns = [
     {
-      title: "原材UID",
-      dataIndex: "itemUniqueCode",
+      title: '原材UID',
+      dataIndex: 'itemUniqueCode',
       // sorter: true,
-      key: "itemUniqueCode",
+      key: 'itemUniqueCode',
     },
     {
-      title: "入库单",
-      dataIndex: "inboundOrder",
-      key: "inboundOrder",
+      title: '入库单',
+      dataIndex: 'inboundOrder',
+      key: 'inboundOrder',
     },
     {
-      title: "料号",
-      dataIndex: "itemCode",
-      key: "itemCode",
+      title: '料号',
+      dataIndex: 'itemCode',
+      key: 'itemCode',
     },
     {
-      title: "供应商",
-      dataIndex: "supplier",
-      key: "supplier",
+      title: '供应商',
+      dataIndex: 'supplier',
+      key: 'supplier',
     },
     {
-      title: "供应商料号",
-      dataIndex: "supplierItemCode",
-      key: "supplierItemCode",
+      title: '供应商料号',
+      dataIndex: 'supplierItemCode',
+      key: 'supplierItemCode',
     },
     {
-      title: "物料描述",
-      dataIndex: "itemSpec",
-      key: "itemSpec",
+      title: '物料描述',
+      dataIndex: 'itemSpec',
+      key: 'itemSpec',
     },
     {
-      title: "批次号",
-      dataIndex: "lotNo",
-      key: "lotNo",
+      title: '批次号',
+      dataIndex: 'lotNo',
+      key: 'lotNo',
     },
     {
-      title: "当前数量",
-      dataIndex: "qty",
-      key: "qty",
+      title: '当前数量',
+      dataIndex: 'qty',
+      key: 'qty',
     },
     {
-      title: "入库数量",
-      dataIndex: "inboundQty",
-      key: "inboundQty",
+      title: '入库数量',
+      dataIndex: 'inboundQty',
+      key: 'inboundQty',
     },
     {
-      title: "入库日期",
-      dataIndex: "inboundDate",
-      key: "inboundDate",
+      title: '入库日期',
+      dataIndex: 'inboundDate',
+      key: 'inboundDate',
     },
     // {
     //   title: "入库单状态",
@@ -126,37 +111,47 @@ const App = () => {
     //   },
     // },
     {
-      title: "DateCode",
-      dataIndex: "dateCode",
-      key: "dateCode",
+      title: 'DateCode',
+      dataIndex: 'dateCode',
+      key: 'dateCode',
     },
     {
-      title: "物料类型",
-      dataIndex: "itemCategory",
-      key: "itemCategory",
+      title: '物料类型',
+      dataIndex: 'itemCategory',
+      key: 'itemCategory',
     },
     {
-      title: "MSL",
-      dataIndex: "msl",
-      key: "msl",
+      title: 'MSL',
+      dataIndex: 'msl',
+      key: 'msl',
     },
     {
-      title: "有效期",
-      dataIndex: "expirationDate",
-      key: "expirationDate",
+      title: '有效期',
+      dataIndex: 'expirationDate',
+      key: 'expirationDate',
       render: (_, record) => {
-        return dayjs(_).format("YYYY-MM-DD");
+        return dayjs(_).format('YYYY-MM-DD');
       },
     },
     {
-      title: "库位",
-      dataIndex: "storageLocation",
-      key: "storageLocation",
+      title: '库位',
+      dataIndex: 'storageLocation',
+      key: 'storageLocation',
     },
     {
-      title: "入库人",
-      dataIndex: "inboundUser",
-      key: "inboundUser",
+      title: '库位类型',
+      dataIndex: 'storageLocationType',
+      key: 'storageLocationType',
+    },
+    {
+      title: '仓库',
+      dataIndex: 'warehouse',
+      key: 'warehouse',
+    },
+    {
+      title: '入库人',
+      dataIndex: 'inboundUser',
+      key: 'inboundUser',
     },
   ];
 
@@ -187,7 +182,7 @@ const App = () => {
   */
   useEffect(() => {
     fetchData();
-    console.log("JSON.stringify(tableParams)]", JSON.stringify(tableParams));
+    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
   }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
@@ -195,7 +190,7 @@ const App = () => {
     tableParams?.order,
   ]);
 
-const [WmsCountData, setWmsCountData] = useState();
+  const [WmsCountData, setWmsCountData] = useState();
   const fetchData = () => {
     setLoading(true);
     const {
@@ -206,7 +201,7 @@ const [WmsCountData, setWmsCountData] = useState();
 
     // sequelize 举例
     // order: [[ 'created_at', 'desc' ], [ 'categoryId', 'desc' ]],
-    console.log("order, field", order, field);
+    console.log('order, field', order, field);
 
     // 多个传参举例-hzry
     // GET /api/resource?sort=created_at:desc,categoryId:asc
@@ -222,12 +217,20 @@ const [WmsCountData, setWmsCountData] = useState();
       // 举例：lxy
       // orders[0].column: id
       // orders[0].asc: true
-      params["orders[0].column"] = field;
-      params["orders[0].asc"] = order === "ascend" ? true : false;
+      params['orders[0].column'] = field;
+      params['orders[0].asc'] = order === 'ascend' ? true : false;
     }
 
     const {
-      itemUniqueCode,itemCode,supplier,lotNo,dateCode,storageLocation,inboundUser,startTime,endTime
+      itemUniqueCode,
+      itemCode,
+      supplier,
+      lotNo,
+      dateCode,
+      storageLocation,
+      inboundUser,
+      startTime,
+      endTime,
     } = formSearch.getFieldsValue();
     if (itemUniqueCode) {
       params.itemUniqueCode = itemUniqueCode;
@@ -251,21 +254,22 @@ const [WmsCountData, setWmsCountData] = useState();
       params.lotNo = lotNo;
     }
     if (startTime) {
-      params.createTimeStart = startTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeStart = startTime.format('YYYY-MM-DD 00:00:00');
     }
     if (endTime) {
-      params.createTimeEnd = endTime.format("YYYY-MM-DD 00:00:00");
+      params.createTimeEnd = endTime.format('YYYY-MM-DD 00:00:00');
     }
     setWmsCountData(params);
+    setQueryParams(params);
     http
-      .get(config.API_PREFIX + "wms/item/uniqueCode/page", params)
+      .get(config.API_PREFIX + 'wms/item/uniqueCode/page', params)
       .then((res) => {
-        console.log("res", res);
+        console.log('res', res);
         const data = res?.bizData;
-
+        setQueryTotal(data?.total);
         setData(data?.records || []);
         setLoading(false);
-        console.log("fetchData pagination", tableParams);
+        console.log('fetchData pagination', tableParams);
         setTableParams({
           ...tableParams,
           pagination: {
@@ -281,25 +285,48 @@ const [WmsCountData, setWmsCountData] = useState();
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange: ", pagination, filters, sorter);
+    console.log('handleTableChange: ', pagination, filters, sorter);
     setTableParams({
       pagination,
       filters,
       ...sorter,
     });
-    console.log("tableParams1", tableParams);
+    console.log('tableParams1', tableParams);
 
     // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
       setData([]);
     }
   };
+  // 导入--------------------------------------------------------------------------------------------------------------------
+  const [queryParams, setQueryParams] = useState(null);
+  const [queryTotal, setQueryTotal] = useState(0);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const exportData = () => {
+    const query = qs.stringify({
+      ...queryParams,
+      current: 1,
+      size: queryTotal,
+    });
+    http
+      .post(config.API_PREFIX + 'wms/item/uniqueCode/exportData' + `?${query}`)
+      .then((res) => {
+        message.success('导出成功！');
+        downloadCSV(res, '库存查询导出-CSV文件');
+        setLoadingExport(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error('导出失败！');
+        setLoadingExport(false);
+      });
+  };
   return (
     <div className="content-wrapper  flex flex-col">
       <div className="content h-auto">
         <div className="tools">
           <Space size="middle">
-            <Tooltip title={isShowSearch ? "隐藏搜索" : "显示搜索"}>
+            <Tooltip title={isShowSearch ? '隐藏搜索' : '显示搜索'}>
               <Switch
                 onChange={onSearchChange}
                 checkedChildren={<SearchOutlined />}
@@ -308,10 +335,7 @@ const [WmsCountData, setWmsCountData] = useState();
             </Tooltip>
           </Space>
         </div>
-        <div
-          className="search-wrapper"
-          style={{ display: isShowSearch ? "block" : "none" }}
-        >
+        <div className="search-wrapper" style={{ display: isShowSearch ? 'block' : 'none' }}>
           <Form form={formSearch} onFinish={onFinish}>
             <Row gutter="24">
               <Col span={8}>
@@ -351,22 +375,18 @@ const [WmsCountData, setWmsCountData] = useState();
               </Col>
               <Col span={8}>
                 <Form.Item label="入库日期（开始）" name="startTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item label="入库日期（结束）" name="endTime">
-                  <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                  <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
 
               <Col span={8}>
                 <Space size="small">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    icon={<SearchOutlined />}
-                  >
+                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     查询
                   </Button>
                   <Button onClick={resetFormSearch} htmlType="button">
@@ -378,8 +398,20 @@ const [WmsCountData, setWmsCountData] = useState();
           </Form>
         </div>
         <div className="table-wrapper  h-[45vh] overflow-auto">
+          <div style={{ marginBottom: 16, textAlign: 'right' }}>
+            <Button
+              className="mr-2"
+              loading={loadingExport}
+              onClick={exportData}
+              type="dashed"
+              htmlType="button"
+              icon={<DownloadOutlined />}
+            >
+              导出
+            </Button>
+          </div>
           <Table
-            scroll={{ x: "max-content" }}
+            scroll={{ x: 'max-content' }}
             columns={columns}
             rowKey={(record) => record.id}
             dataSource={data}
@@ -389,7 +421,7 @@ const [WmsCountData, setWmsCountData] = useState();
             bordered
           />
         </div>
-        
+
         {/* 汇总方式 */}
         <WmsCount type={3} WmsCountData={WmsCountData} className="h-[35vh]" />
       </div>
