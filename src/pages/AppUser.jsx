@@ -275,7 +275,7 @@ const App = () => {
     },
   };
 
-  const [tableParams, setTableParams] = useState(paginationInit);
+  const [tableParams, setTableParams] = useState({ ...paginationInit });
 
   const [isModalOpen1, setIsModalOpen1] = useState(false);
 
@@ -342,18 +342,29 @@ const App = () => {
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log("handleTableChange pagination: ", pagination);
+    console.log('handleTableChange: ', pagination, filters, sorter);
     setTableParams({
       pagination,
       filters,
       ...sorter,
     });
+    console.log('tableParams1', tableParams);
 
     // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
       setData([]);
     }
   };
+    useEffect(() => {
+    fetchData();
+    console.log('JSON.stringify(tableParams)]', JSON.stringify(tableParams));
+  }, [
+    tableParams.pagination?.current,
+    tableParams.pagination?.pageSize,
+    tableParams?.columnKey,
+    tableParams?.order,
+  ]);
+  
   return (
     <div className="content-wrapper">
       <Breadcrumb
