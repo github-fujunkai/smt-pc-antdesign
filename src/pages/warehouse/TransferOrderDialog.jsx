@@ -105,7 +105,7 @@ const App = ({ isModalOpen, transferOrderData, close }) => {
           value={record.inbound} // 绑定当前值
           onChange={(value) => handleSelectChange(value, 'inbound', index)}
           placeholder="请选择"
-          options={getDictionaryListByCode('38')}
+          options={getDictionaryListByCode('26')}
         />
       ),
     },
