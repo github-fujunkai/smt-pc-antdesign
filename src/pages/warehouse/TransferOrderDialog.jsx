@@ -1,5 +1,6 @@
+import { getDictionaryListByCode } from '@/utils/util';
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Col, Form, Input, message, Modal, Row, Space, Table } from 'antd';
+import { Button, Col, Form, Input, message, Modal, Row, Select, Space, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { config } from '../../utils/config';
 import http from '../../utils/http';
@@ -32,7 +33,11 @@ const App = ({ isModalOpen, transferOrderData, close }) => {
   const [loading, setLoading] = useState(false);
   const [formSearch] = Form.useForm();
   const [data, setData] = useState([]);
-
+  const handleSelectChange = (value, key, index) => {
+    const newData = [...data];
+    newData[index] = { ...newData[index], [key]: value };
+    setData(newData);
+  };
   const columns = [
     {
       title: '物料UID',
@@ -76,8 +81,33 @@ const App = ({ isModalOpen, transferOrderData, close }) => {
     },
     {
       title: '调拨原因',
-      dataIndex: 'remark',
-      key: 'remark',
+      dataIndex: 'locationTransferReason',
+      key: 'locationTransferReason',
+      render: (
+        text,
+        record,
+        index, // 增加record和index参数
+      ) => (
+        <Select
+          value={record.locationTransferReason} // 绑定当前值
+          onChange={(value) => handleSelectChange(value, 'locationTransferReason', index)}
+          placeholder="请选择"
+          options={getDictionaryListByCode('39')}
+        />
+      ),
+    },
+    {
+      title: '调入仓库',
+      dataIndex: 'inbound',
+      key: 'inbound',
+      render: (text, record, index) => (
+        <Select
+          value={record.inbound} // 绑定当前值
+          onChange={(value) => handleSelectChange(value, 'inbound', index)}
+          placeholder="请选择"
+          options={getDictionaryListByCode('38')}
+        />
+      ),
     },
   ];
 

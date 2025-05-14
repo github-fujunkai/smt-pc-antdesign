@@ -310,7 +310,7 @@ const App = () => {
       showSizeChanger: true,
     },
   };
-
+ 
   const [tableParams, setTableParams] = useState({ ...paginationInit });
 
   useEffect(() => {
