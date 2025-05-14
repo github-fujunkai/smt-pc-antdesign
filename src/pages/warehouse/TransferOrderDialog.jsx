@@ -129,6 +129,9 @@ const App = ({ isModalOpen, transferOrderData, close }) => {
 
   useEffect(() => {
     if (isModalOpen) {
+      setData([]);
+      setSelectedRowKeys([]);
+      setSelectedTable([]);
       fetchData();
     }
   }, [
