@@ -745,11 +745,7 @@ const App = () => {
   const [testList, setTestList] = useState([]);
   const getTestList = () => {
     http
-      .get(
-        config.API_PREFIX +
-          'qc/quality/inspection-plan/page?current=1&size=1000',
-        {}
-      )
+      .get(config.API_PREFIX + 'qc/quality/inspection-plan/page?current=1&size=1000', {})
       .then((res) => {
         setTestList(res?.bizData?.records || []);
       })
@@ -948,11 +944,7 @@ const App = () => {
                     },
                   ]}
                 >
-                  <Input
-                    style={{ width: '100%' }}
-                    allowClear
-                    placeholder="请输入"
-                  />
+                  <Input style={{ width: '100%' }} allowClear placeholder="请输入" />
                 </Form.Item>
 
                 <Form.Item
@@ -1194,10 +1186,6 @@ const App = () => {
                   <Select
                     placeholder="请选择"
                     allowClear
-                    // fieldNames={{
-                    //   label: 'name',
-                    //   value: 'id'
-                    // }}
                     options={tpls.map((item) => ({
                       label: `${item.name}（${item.type}）`,
                       value: item.id,

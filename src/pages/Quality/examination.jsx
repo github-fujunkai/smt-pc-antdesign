@@ -164,7 +164,7 @@ const App = () => {
       render: (_, record) => {
         return (
           <Space>
-            <Typography.Link onClick={() => openModalEnter(record)}>录入</Typography.Link>
+            <Typography.Link onClick={() => openModalEnter('create', record)}>录入</Typography.Link>
             <Typography.Link onClick={() => showModal('update', record)}>修改</Typography.Link>
             <Typography.Link onClick={() => del(record)}>删除</Typography.Link>
             <Typography.Link onClick={() => confirmRecord(record)}>确认</Typography.Link>
@@ -539,7 +539,9 @@ const App = () => {
               {/* <Typography.Link onClick={() => handlePrint('update', record)}>打印</Typography.Link> */}
               <Typography.Link onClick={() => handlePrint('create', record)}>打印</Typography.Link>
               <Typography.Link onClick={() => del2(record)}>删除</Typography.Link>
-              <Typography.Link onClick={() => {}}>详情</Typography.Link>
+              <Typography.Link onClick={() => openModalEnter('update', record)}>
+                详情
+              </Typography.Link>
             </Space>
           );
         },
@@ -665,16 +667,23 @@ const App = () => {
       })
       .catch((err) => {});
   };
-  const openModalEnter = (record) => {
-    setRowDataEnter(record);
+  // 录入和子集的详情
+  const openModalEnter = (type, record) => {
+    if (type === 'create') {
+      formCreateEnter.resetFields();
+      setSchemeList([]);
+      getTestList();
+      setRowDataEnter(record);
+      // 聚焦到料号输入框
+      setTimeout(() => {
+        itemCodeRefEnter.current?.focus();
+      }, 100);
+    } else {
+      formCreateEnter.setFieldsValue({
+        ...record,
+      });
+    }
     setIsModalEnter(true);
-    formCreateEnter.resetFields();
-    setSchemeList([]);
-    getTestList();
-    // 聚焦到料号输入框
-    setTimeout(() => {
-      itemCodeRefEnter.current?.focus();
-    }, 100);
   };
   const handleCancelEnter = () => {
     setIsModalEnter(false);
@@ -725,6 +734,22 @@ const App = () => {
           }, 1000);
         })
         .catch((err) => {});
+    });
+  };
+  // 根据送检数量生成检验明细
+  const createItemList = () => {
+    formCreateEnter.setFieldsValue({
+      itemDetails: Array.from(
+        { length: formCreateEnter.getFieldValue('inspectionQty') },
+        (v, k) => ({
+          itemName: '',
+          itemValue: '',
+          ext1: '',
+          ext2: '',
+          result: 0, //检验结果 0-不合格 1-合格
+          remarks: '',
+        }),
+      ),
     });
   };
   return (
@@ -854,7 +879,7 @@ const App = () => {
           />
         </div>
         {/* 汇总方式 */}
-        <WmsCount type={1} WmsCountData={WmsCountData} className="h-[40vh]" />
+        <WmsCount type={5} WmsCountData={WmsCountData} className="h-[40vh]" />
         {/* 拖拽组件 */}
         <Modal
           title="调整列顺序（拖动排序）"
@@ -1040,9 +1065,10 @@ const App = () => {
           onOk={handleOkEnter}
           onCancel={handleCancelEnter}
           okText="录入"
+          width={800}
         >
           <Form
-            labelCol={{ span: 8 }}
+            labelCol={{ span: 4 }}
             form={formCreateEnter}
             style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
           >
@@ -1084,7 +1110,6 @@ const App = () => {
             <Form.Item
               label="批次号"
               name="lotNo"
-              labelCol={{ span: 8 }}
               rules={[
                 {
                   required: false,
@@ -1116,7 +1141,7 @@ const App = () => {
                 },
               ]}
             >
-              <Input allowClear placeholder="" />
+              <Input allowClear placeholder="" onPressEnter={() => createItemList()} />
             </Form.Item>
             <Form.Item
               label="检验方案"
@@ -1137,93 +1162,66 @@ const App = () => {
                 }))}
               />
             </Form.Item>
+            <h3>检验明细</h3>
             <Row gutter={16}>
-              <h3>检验明细</h3>
               <Form.List name="itemDetails">
-                {(fields, { add, remove }) => (
+                {(outerFields, { add: addOuter, remove: removeOuter }) => (
                   <>
-                    {fields.map(({ key, name, ...restField }) => {
-                      return (
-                        <Row key={key} gutter={16} style={{ marginBottom: 8 }}>
-                          <Col span={6}>
+                    {outerFields.map(({ key, name: outerName, ...restOuterField }) => (
+                      <div key={key} style={{ marginBottom: 16 }}>
+                        <Row gutter={16}>
+                          <Col span={12}>
                             <Form.Item
-                              {...restField}
-                              label="平整度"
-                              name={[name, 'inspectionItem']}
-                              fieldKey={[key, 'inspectionItem']}
-                              rules={[
-                                {
-                                  required: true,
-                                  message: '请输入检验项',
-                                },
-                              ]}
+                              {...restOuterField}
+                              name={[outerName, 'mainField']}
+                              label="主字段"
+                              labelCol={{span:8}}
+                              rules={[{ required: true }]}
                             >
-                              <Input allowClear placeholder="请输入检验项" />
+                              <Input placeholder="请输入主字段" />
                             </Form.Item>
                           </Col>
-                          <Col span={6}>
-                            <Form.Item
-                              {...restField}
-                              label="外观"
-                              name={[name, 'inspectionResult']}
-                              fieldKey={[key, 'inspectionResult']}
-                              rules={[
-                                {
-                                  required: true,
-                                  message: '请选择检验结果',
-                                },
-                              ]}
-                            >
-                              <Select
-                                allowClear
-                                placeholder="请选择"
-                                options={[
-                                  { label: '合格', value: 1 },
-                                  { label: '不合格', value: 0 },
-                                ]}
-                              />
-                            </Form.Item>
-                          </Col>
-                          <Col span={6}>
-                            <Form.Item
-                              {...restField}
-                              label="量值"
-                              name={[name, 'inspectionResult']}
-                              fieldKey={[key, 'inspectionResult']}
-                              rules={[
-                                {
-                                  required: true,
-                                  message: '请选择检验结果',
-                                },
-                              ]}
-                            >
-                              <Select
-                                allowClear
-                                placeholder="请选择"
-                                options={[
-                                  { label: '合格', value: 1 },
-                                  { label: '不合格', value: 0 },
-                                ]}
-                              />
-                            </Form.Item>
-                          </Col>
-                          <Col span={6}>
-                            <Form.Item
-                              {...restField}
-                              name={[name, 'remark']}
-                              fieldKey={[key, 'remark']}
-                            >
-                              <Input allowClear placeholder="请输入备注" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={6}>
-                            <Button type="link" onClick={() => remove(name)}>
-                              删除
-                            </Button>
-                          </Col>
+
+                          {/* 嵌套的Form.List   --- 循环检验项 */}
+                          <Form.List name={[outerName, 'subItems']}>
+                            {(innerFields, { add: addInner, remove: removeInner }) => (
+                              <>
+                                {innerFields.map(({ key, name: innerName, ...restInnerField }) => (
+                                  <Row key={key} gutter={16} style={{ marginBottom: 8 }}>
+                                    <Col span={10}>
+                                      <Form.Item
+                                        {...restInnerField}
+                                        name={[innerName, 'subField']}
+                                        label="子字段"
+                                        rules={[{ required: true }]}
+                                      >
+                                        <Input placeholder="请输入子字段" />
+                                      </Form.Item>
+                                    </Col>
+                                  </Row>
+                                ))}
+                                {/* <Button
+                                  type="dashed"
+                                  onClick={() => addInner()}
+                                  icon={<PlusOutlined />}
+                                >
+                                  添加子项
+                                </Button> */}
+                              </>
+                            )}
+                          </Form.List>
                         </Row>
-                      );
-                    })}
+                        {/* <Button
+                          danger
+                          onClick={() => removeOuter(outerName)}
+                        >
+                          删除
+                        </Button> */}
+                      </div>
+                    ))}
+                    {/* <Button type="dashed" onClick={() => addOuter()} icon={<PlusOutlined />}>
+                      添加主项
+                    </Button> */}
                   </>
                 )}
               </Form.List>
@@ -1473,7 +1471,7 @@ const UIDprint = (props) => {
               supplier: item.supplier,
               packageQty: item.packageQty,
               qty: item.packageQty,
-              generateQty: (receiptQty / item.generateQty).toFixed(0) + 1 || 1, //收货数量/包装数量取整+1
+              generateQty: ((receiptQty / item.packageQty).toFixed(0) || 0) + 1 || 1, //收货数量/包装数量取整+1
               msl: item.msl,
               shelfLife: item.shelfLife,
               itemSpec: item.itemSpec,

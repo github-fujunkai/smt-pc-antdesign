@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Space, Table, Tag, Checkbox, Col, Row } from "antd";
-import http from "../../utils/http";
-import { config } from "../../utils/config";
-import api from "../../utils/api";
-import qs, { stringify } from "qs";
+import { Checkbox, Col, Row, Table } from 'antd';
+import { useEffect, useState } from 'react';
+import { config } from '../../utils/config';
+import http from '../../utils/http';
 const App = (props) => {
   const { type = 1, WmsCountData } = props;
   const [checkedValues, setCheckedValues] = useState([]);
   const onChange = (checkedValues) => {
-    console.log("checked = ", checkedValues);
-    console.log("fieldsColumns[type] = ", fieldsColumns[type]);
+    console.log('checked = ', checkedValues);
+    console.log('fieldsColumns[type] = ', fieldsColumns[type]);
     setCheckedValues(checkedValues);
     if (WmsCountData) {
       WmsCountData.size = undefined;
@@ -31,81 +29,95 @@ const App = (props) => {
   const fieldsOptions = {
     1: [
       {
-        label: "供应商",
-        value: "supplier",
+        label: '供应商',
+        value: 'supplier',
       },
       {
-        label: "采购单号",
-        value: "purchase_order_number",
+        label: '采购单号',
+        value: 'purchase_order_number',
       },
       {
-        label: "入库单",
-        value: "inbound_order_id",
+        label: '入库单',
+        value: 'inbound_order_id',
       },
       {
-        label: "入库人",
-        value: "create_by",
+        label: '入库人',
+        value: 'create_by',
       },
     ],
     2: [
       {
-        label: "出库单",
-        value: "outbound_order_id",
-        key: "outbound_order_id",
+        label: '出库单',
+        value: 'outbound_order_id',
+        key: 'outbound_order_id',
       },
       {
-        label: "产线",
-        value: "area_id",
-        key: "area_id",
+        label: '产线',
+        value: 'area_id',
+        key: 'area_id',
       },
       {
-        label: "领料人",
-        value: "issuer",
-        key: "issuer",
+        label: '领料人',
+        value: 'issuer',
+        key: 'issuer',
       },
       {
-        label: "发料人",
-        value: "receiver",
-        key: "receiver",
+        label: '发料人',
+        value: 'receiver',
+        key: 'receiver',
       },
     ],
     3: [
       {
-        label: "库位",
-        value: "STORAGE_LOCATION",
-        key: "STORAGE_LOCATION",
+        label: '库位',
+        value: 'STORAGE_LOCATION',
+        key: 'STORAGE_LOCATION',
       },
       {
-        label: "供应商",
-        value: "SUPPLIER",
-        key: "SUPPLIER",
+        label: '供应商',
+        value: 'SUPPLIER',
+        key: 'SUPPLIER',
       },
       {
-        label: "批次号",
-        value: "LOT_NO",
-        key: "LOT_NO",
-      }
+        label: '批次号',
+        value: 'LOT_NO',
+        key: 'LOT_NO',
+      },
     ],
     4: [
       {
-        label: "盘点单",
-        value: "inventory_order_id",
-        key: "inventory_order_id",
+        label: '盘点单',
+        value: 'inventory_order_id',
+        key: 'inventory_order_id',
       },
       {
-        label: "库位",
-        value: "storage_location",
-        key: "storage_location",
+        label: '库位',
+        value: 'storage_location',
+        key: 'storage_location',
       },
       {
-        label: "盘点人",
-        value: "create_by",
-        key: "create_by",
+        label: '盘点人',
+        value: 'create_by',
+        key: 'create_by',
       },
       {
-        label: "盘点类型",
-        value: "inventory_type",
-        key: "inventory_type",
+        label: '盘点类型',
+        value: 'inventory_type',
+        key: 'inventory_type',
+      },
+    ],
+    5: [
+      {
+        label: '检验单',
+        value: 'inspection_order_id',
+      },
+      {
+        label: '供应商',
+        value: 'supplier',
+      },
+      {
+        label: '检验人',
+        value: 'inspection_person',
       },
     ],
   };
@@ -119,180 +131,212 @@ const App = (props) => {
   const fieldsColumns = {
     1: [
       {
-        title: "料号",
-        dataIndex: "item_code",
-        key: "item_code",
+        title: '料号',
+        dataIndex: 'item_code',
+        key: 'item_code',
       },
       {
-        title: "物料描述",
-        dataIndex: "material_description",
-        key: "material_description",
+        title: '物料描述',
+        dataIndex: 'material_description',
+        key: 'material_description',
       },
       {
-        title: "盘数",
-        dataIndex: "package_qty",
-        key: "package_qty",
+        title: '盘数',
+        dataIndex: 'package_qty',
+        key: 'package_qty',
       },
       {
-        title: "数量",
-        dataIndex: "qty",
-        key: "qty",
+        title: '数量',
+        dataIndex: 'qty',
+        key: 'qty',
       },
       {
-        title: "供应商",
-        dataIndex: "supplier",
-        key: "supplier",
+        title: '供应商',
+        dataIndex: 'supplier',
+        key: 'supplier',
       },
       {
-        title: "采购单号",
-        dataIndex: "purchase_order_number",
-        key: "purchase_order_number",
+        title: '采购单号',
+        dataIndex: 'purchase_order_number',
+        key: 'purchase_order_number',
       },
       {
-        title: "入库单",
-        dataIndex: "inbound_order_id",
-        key: "inbound_order_id",
+        title: '入库单',
+        dataIndex: 'inbound_order_id',
+        key: 'inbound_order_id',
       },
       {
-        title: "入库人",
-        dataIndex: "create_by",
-        key: "create_by",
+        title: '入库人',
+        dataIndex: 'create_by',
+        key: 'create_by',
       },
     ],
     2: [
       {
-        title: "料号",
-        dataIndex: "item_code",
-        key: "item_code",
+        title: '料号',
+        dataIndex: 'item_code',
+        key: 'item_code',
       },
       {
-        title: "物料描述",
-        dataIndex: "material_description",
-        key: "material_description",
+        title: '物料描述',
+        dataIndex: 'material_description',
+        key: 'material_description',
       },
       {
-        title: "盘数",
-        dataIndex: "package_qty",
-        key: "package_qty",
+        title: '盘数',
+        dataIndex: 'package_qty',
+        key: 'package_qty',
       },
       {
-        title: "数量",
-        dataIndex: "qty",
-        key: "qty",
+        title: '数量',
+        dataIndex: 'qty',
+        key: 'qty',
       },
       {
-        title: "出库单",
-        dataIndex: "outbound_order_id",
-        key: "outbound_order_id",
+        title: '出库单',
+        dataIndex: 'outbound_order_id',
+        key: 'outbound_order_id',
       },
       {
-        title: "产线",
-        dataIndex: "area_id",
-        key: "area_id",
+        title: '产线',
+        dataIndex: 'area_id',
+        key: 'area_id',
       },
       {
-        title: "领料人",
-        dataIndex: "issuer",
-        key: "issuer",
+        title: '领料人',
+        dataIndex: 'issuer',
+        key: 'issuer',
       },
       {
-        title: "发料人",
-        dataIndex: "receiver",
-        key: "receiver",
+        title: '发料人',
+        dataIndex: 'receiver',
+        key: 'receiver',
       },
     ],
     3: [
       {
-        title: "料号",
-        dataIndex: "item_code",
-        key: "item_code",
+        title: '料号',
+        dataIndex: 'item_code',
+        key: 'item_code',
       },
       {
-        title: "物料描述",
-        dataIndex: "material_description",
-        key: "material_description",
+        title: '物料描述',
+        dataIndex: 'material_description',
+        key: 'material_description',
       },
       {
-        title: "盘数",
-        dataIndex: "package_qty",
-        key: "package_qty",
+        title: '盘数',
+        dataIndex: 'package_qty',
+        key: 'package_qty',
       },
       {
-        title: "数量",
-        dataIndex: "qty",
-        key: "qty",
+        title: '数量',
+        dataIndex: 'qty',
+        key: 'qty',
       },
       {
-        title: "阈值",
-        dataIndex: "threshold",
-        key: "threshold",
+        title: '阈值',
+        dataIndex: 'threshold',
+        key: 'threshold',
       },
       {
-        title: "库存状态",
-        dataIndex: "status",
-        key: "status",
+        title: '库存状态',
+        dataIndex: 'status',
+        key: 'status',
       },
       {
-        title: "库位",
-        dataIndex: "STORAGE_LOCATION",
-        key: "STORAGE_LOCATION",
+        title: '库位',
+        dataIndex: 'STORAGE_LOCATION',
+        key: 'STORAGE_LOCATION',
       },
       {
-        title: "供应商",
-        dataIndex: "SUPPLIER",
-        key: "SUPPLIER",
+        title: '供应商',
+        dataIndex: 'SUPPLIER',
+        key: 'SUPPLIER',
       },
       {
-        title: "批次号",
-        dataIndex: "LOT_NO",
-        key: "LOT_NO",
-      }
+        title: '批次号',
+        dataIndex: 'LOT_NO',
+        key: 'LOT_NO',
+      },
     ],
     4: [
       {
-        title: "料号",
-        dataIndex: "item_code",
-        key: "item_code",
+        title: '料号',
+        dataIndex: 'item_code',
+        key: 'item_code',
       },
       {
-        title: "物料描述",
-        dataIndex: "material_description",
-        key: "material_description",
+        title: '物料描述',
+        dataIndex: 'material_description',
+        key: 'material_description',
       },
       {
-        title: "盘数",
-        dataIndex: "package_qty",
-        key: "package_qty",
+        title: '盘数',
+        dataIndex: 'package_qty',
+        key: 'package_qty',
       },
       {
-        title: "数量",
-        dataIndex: "qty",
-        key: "qty",
+        title: '数量',
+        dataIndex: 'qty',
+        key: 'qty',
       },
       {
-        title: "盘点单",
-        dataIndex: "inventory_order_id",
-        key: "inventory_order_id",
+        title: '盘点单',
+        dataIndex: 'inventory_order_id',
+        key: 'inventory_order_id',
       },
       {
-        title: "库位",
-        dataIndex: "storage_location",
-        key: "storage_location",
+        title: '库位',
+        dataIndex: 'storage_location',
+        key: 'storage_location',
       },
       {
-        title: "盘点人",
-        dataIndex: "create_by",
-        key: "create_by",
+        title: '盘点人',
+        dataIndex: 'create_by',
+        key: 'create_by',
       },
       {
-        title: "盘点类型",
-        dataIndex: "inventory_type",
-        key: "inventory_type",
+        title: '盘点类型',
+        dataIndex: 'inventory_type',
+        key: 'inventory_type',
+      },
+    ],
+    5: [
+      {
+        title: '料号',
+        dataIndex: 'item_code',
+        key: 'item_code',
+      },
+      {
+        title: '物料描述',
+        dataIndex: 'material_description',
+        key: 'material_description',
+      },
+      {
+        title: '采购单',
+        dataIndex: 'purchase_order_number',
+        key: 'purchase_order_number',
+      },
+      {
+        title: '检验单',
+        dataIndex: 'inspection_order_id',
+        key: 'inspection_order_id',
+      },
+      {
+        title: '数量',
+        dataIndex: 'qty',
+        key: 'qty',
+      },
+      {
+        title: '盘数',
+        dataIndex: 'package_qty',
+        key: 'package_qty',
       },
     ],
   };
   useEffect(() => {
-    console.log("WmsCountData", WmsCountData);
+    console.log('WmsCountData', WmsCountData);
     if (WmsCountData) {
       WmsCountData.size = undefined;
       WmsCountData.current = undefined;
@@ -323,12 +367,12 @@ const App = (props) => {
         columns={fieldsColumns[type].filter((item) => {
           return (
             checkedValues.includes(item.dataIndex) ||
-            item.dataIndex === "item_code" ||
-            item.dataIndex === "material_description" ||
-            item.dataIndex === "package_qty" ||
-            item.dataIndex === "threshold" ||
-            item.dataIndex === "status" ||
-            item.dataIndex === "qty"
+            item.dataIndex === 'item_code' ||
+            item.dataIndex === 'material_description' ||
+            item.dataIndex === 'package_qty' ||
+            item.dataIndex === 'threshold' ||
+            item.dataIndex === 'status' ||
+            item.dataIndex === 'qty'
           );
         })}
         dataSource={data}
