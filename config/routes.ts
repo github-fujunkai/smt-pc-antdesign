@@ -340,7 +340,7 @@ export default [
   {
     path: '/Quality',
     name: '品质管理',
-    icon: 'SolutionOutlined',
+    icon: 'DownSquareOutlined',
     access: 'canAdmin',
     routes: [
       {

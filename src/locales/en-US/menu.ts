@@ -100,6 +100,8 @@ export default {
   'menu.生产管理.包装': 'Packaging',
   'menu.生产管理.出货': 'Shipment',
 
+  'menu.品质管理.检验': 'Inspection',
+  'menu.品质管理.检验方案': 'Inspection Scheme',
   // 'menu.过站查询': 'menu.过站查询',
   // 'menu.测试查询': 'menu.测试查询',
   // "menu.测试查询.过站查询": 'menu.测试查询.过站查询',
