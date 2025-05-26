@@ -118,7 +118,7 @@ const App = () => {
     // 创建一个 FormData 对象，用于构建包含文件的请求
     const formData = new FormData();
     formData.append('file', file);
-    formData.append("importType", 1); //导入类型：1.提示；2.覆盖；3.忽略
+    formData.append('importType', 1); //导入类型：1.提示；2.覆盖；3.忽略
     http
       .post(config.API_PREFIX + 'basic/item/baseInfo/importData', formData)
       .then((res) => {
@@ -344,6 +344,9 @@ const App = () => {
         stockThreshold,
         storageType,
         inspectionStandard,
+        autoPickup,
+        valueRangeStart,
+        valueRangeEnd,
       } = record;
       activeId = id;
       formCreate.setFieldsValue({
@@ -362,10 +365,15 @@ const App = () => {
         stockThreshold,
         storageType,
         inspectionStandard,
+        autoPickup,
+        valueRangeStart,
+        valueRangeEnd,
       });
     } else {
       activeId = -1;
       formCreate.resetFields();
+      formCreate.setFieldValue('autoPickup', true);
+      getTestList();
     }
     setIsModalOpen(true);
     getBarCode();
@@ -395,6 +403,9 @@ const App = () => {
           stockThreshold,
           storageType,
           inspectionStandard,
+          autoPickup,
+          valueRangeStart,
+          valueRangeEnd,
         } = values;
         let params = {
           itemCode,
@@ -412,6 +423,9 @@ const App = () => {
           stockThreshold,
           storageType,
           inspectionStandard,
+          autoPickup,
+          valueRangeStart,
+          valueRangeEnd,
         };
         let action = null;
         let msg = '';
@@ -727,6 +741,20 @@ const App = () => {
 
   const [isSortableOpen, setIsSortableOpen] = useState(false);
   // --------------------------------------------------------------------------------------------------------------------
+  // 获取检验方案列表
+  const [testList, setTestList] = useState([]);
+  const getTestList = () => {
+    http
+      .get(
+        config.API_PREFIX +
+          'qc/quality/inspection-plan/page?current=1&size=1000',
+        {}
+      )
+      .then((res) => {
+        setTestList(res?.bizData?.records || []);
+      })
+      .catch((err) => {});
+  };
   return (
     <div className="content-wrapper">
       <div className="content">
@@ -920,7 +948,11 @@ const App = () => {
                     },
                   ]}
                 >
-                  <Input style={{ width: '100%' }} allowClear placeholder="请输入" />
+                  <Input
+                    style={{ width: '100%' }}
+                    allowClear
+                    placeholder="请输入"
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -1010,17 +1042,43 @@ const App = () => {
                     ]}
                   />
                 </Form.Item>
+                <Row>
+                  <Col span={14}>
+                    <Form.Item
+                      label="量值范围"
+                      name="valueRangeStart"
+                      rules={[
+                        {
+                          required: false,
+                          message: '请输入',
+                        },
+                      ]}
+                    >
+                      <Input allowClear placeholder="请输入" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={10}>
+                    <Form.Item
+                      label=""
+                      name="valueRangeEnd"
+                      rules={[
+                        {
+                          required: false,
+                          message: '请输入',
+                        },
+                      ]}
+                    >
+                      <Input allowClear placeholder="请输入" />
+                    </Form.Item>
+                  </Col>
+                </Row>
                 <Form.Item
-                  label="备注"
-                  name="remark"
-                  rules={[
-                    {
-                      required: false,
-                      message: '请输入',
-                    },
-                  ]}
+                  label="自动挑料"
+                  name="autoPickup"
+                  valuePropName="checked"
+                  labelCol={{ span: 6 }}
                 >
-                  <Input allowClear placeholder="请输入" />
+                  <Switch checkedChildren="是" unCheckedChildren="否" />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -1147,7 +1205,7 @@ const App = () => {
                   />
                 </Form.Item>
                 <Form.Item
-                  label="检验标准"
+                  label="检验方案"
                   name="inspectionStandard"
                   rules={[
                     {
@@ -1159,16 +1217,24 @@ const App = () => {
                   <Select
                     placeholder="请选择"
                     allowClear
-                    options={[
-                      { label: 'S-1', value: 'S-1' },
-                      { label: 'S-2', value: 'S-2' },
-                      { label: 'S-3', value: 'S-3' },
-                      { label: 'S-4', value: 'S-4' },
-                      { label: 'I', value: 'I' },
-                      { label: 'II', value: 'II' },
-                      { label: 'III', value: 'III' },
-                    ]}
+                    options={testList.map((item) => ({
+                      label: item.planName,
+                      value: item.planName,
+                    }))}
                   />
+                </Form.Item>
+
+                <Form.Item
+                  label="备注"
+                  name="remark"
+                  rules={[
+                    {
+                      required: false,
+                      message: '请输入',
+                    },
+                  ]}
+                >
+                  <Input allowClear placeholder="请输入" />
                 </Form.Item>
               </Col>
             </Row>

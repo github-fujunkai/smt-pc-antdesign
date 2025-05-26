@@ -337,6 +337,26 @@ export default [
       },
     ],
   },
+  {
+    path: '/Quality',
+    name: '品质管理',
+    icon: 'SolutionOutlined',
+    access: 'canAdmin',
+    routes: [
+      {
+        path: '/Quality',
+        redirect: '/',
+      },{
+        path: '/Quality/InspectionScheme',
+        name: '检验方案',
+        component: './Quality/InspectionScheme',
+      },{
+        path: '/Quality/examination',
+        name: '检验',
+        component: './Quality/examination',
+      },
+    ],
+  },
   // {
   //   path: '/admin',
   //   name: 'admin',
