@@ -689,6 +689,7 @@ const App = () => {
     setIsModalEnter(false);
     formCreateEnter.resetFields();
   };
+  const [inspectionList, setInspectionList] = useState([])
   const getSchemeList = () => {
     http
       .get(
@@ -699,6 +700,7 @@ const App = () => {
       )
       .then((res) => {
         setSchemeList(res.bizData);
+        setInspectionList(res.bizData[0]?.inspectionItemsList || []);
       })
       .catch((err) => {});
   };
@@ -742,6 +744,7 @@ const App = () => {
       itemDetails: Array.from(
         { length: formCreateEnter.getFieldValue('inspectionQty') },
         (v, k) => ({
+          // inspectionItemsList:inspectionList,
           itemName: '',
           itemValue: '',
           ext1: '',
@@ -1170,20 +1173,10 @@ const App = () => {
                     {outerFields.map(({ key, name: outerName, ...restOuterField }) => (
                       <div key={key} style={{ marginBottom: 16 }}>
                         <Row gutter={16}>
-                          <Col span={12}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'mainField']}
-                              label="主字段"
-                              labelCol={{span:8}}
-                              rules={[{ required: true }]}
-                            >
-                              <Input placeholder="请输入主字段" />
-                            </Form.Item>
-                          </Col>
-
                           {/* 嵌套的Form.List   --- 循环检验项 */}
-                          <Form.List name={[outerName, 'subItems']}>
+                          {/* 除了量值其他都是下拉，让操作员选择良还是不良 */}
+                          {/* 量值和量值范围比较，在范围内（包含量值=范围值）自动判定为正常，超出量值范围判定为不良。 */}
+                          <Form.List name={[outerName, 'inspectionItemsList']}>
                             {(innerFields, { add: addInner, remove: removeInner }) => (
                               <>
                                 {innerFields.map(({ key, name: innerName, ...restInnerField }) => (
@@ -1195,7 +1188,21 @@ const App = () => {
                                         label="子字段"
                                         rules={[{ required: true }]}
                                       >
-                                        <Input placeholder="请输入子字段" />
+                                        <Select
+                                          placeholder="请选择"
+                                          allowClear
+                                          onChange={fillInOtherFields}
+                                          options={[
+                                            {
+                                              label: '良',
+                                              value: '良',
+                                            },
+                                            {
+                                              label: '不良',
+                                              value: '不良',
+                                            },
+                                          ]}
+                                        />
                                       </Form.Item>
                                     </Col>
                                   </Row>
@@ -1210,6 +1217,26 @@ const App = () => {
                               </>
                             )}
                           </Form.List>
+                          <Col span={12}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'result']}
+                              label="结果"
+                              labelCol={{ span: 10 }}
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="请输入结果" />
+                            </Form.Item>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'remarks']}
+                              label="备注"
+                              labelCol={{ span: 10 }}
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="请输入备注" />
+                            </Form.Item>
+                          </Col>
                         </Row>
                         {/* <Button
                           danger
