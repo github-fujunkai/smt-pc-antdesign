@@ -689,7 +689,7 @@ const App = () => {
     setIsModalEnter(false);
     formCreateEnter.resetFields();
   };
-  const [inspectionList, setInspectionList] = useState([])
+  const [inspectionList, setInspectionList] = useState([]);
   const getSchemeList = () => {
     http
       .get(
@@ -722,6 +722,8 @@ const App = () => {
       .catch((err) => {});
   };
   const handleOkEnter = () => {
+    console.log(formCreateEnter.getFieldValue());
+    return;
     formCreateEnter.validateFields().then((values) => {
       http
         .post(config.API_PREFIX + 'inspection/order/detail', {
@@ -744,13 +746,22 @@ const App = () => {
       itemDetails: Array.from(
         { length: formCreateEnter.getFieldValue('inspectionQty') },
         (v, k) => ({
-          // inspectionItemsList:inspectionList,
+          inspectionItemsList: [
+            {
+              itemName: '测试1',
+              itemValue: 0, // 0-不合格 1-合格
+            },
+            {
+              itemName: '测试2',
+              itemValue: 0, // 0-不合格 1-合格
+            },
+          ],
           itemName: '',
           itemValue: '',
           ext1: '',
           ext2: '',
           result: 0, //检验结果 0-不合格 1-合格
-          remarks: '',
+          remarks: '备注问问请问',
         }),
       ),
     });
@@ -1166,88 +1177,106 @@ const App = () => {
               />
             </Form.Item>
             <h3>检验明细</h3>
-            <Row gutter={16}>
+            <Row>
               <Form.List name="itemDetails">
                 {(outerFields, { add: addOuter, remove: removeOuter }) => (
                   <>
                     {outerFields.map(({ key, name: outerName, ...restOuterField }) => (
-                      <div key={key} style={{ marginBottom: 16 }}>
+                      <div
+                        key={key}
+                        style={{ marginBottom: 16, border: '1px dashed #d9d9d9', padding: 16 }}
+                      >
                         <Row gutter={16}>
-                          {/* 嵌套的Form.List   --- 循环检验项 */}
-                          {/* 除了量值其他都是下拉，让操作员选择良还是不良 */}
-                          {/* 量值和量值范围比较，在范围内（包含量值=范围值）自动判定为正常，超出量值范围判定为不良。 */}
+                          <Col span={10}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'result']}
+                              labelCol={{ span: 10 }}
+                              label="结果"
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="" />
+                            </Form.Item>
+                          </Col>
+                          <Col span={10}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'remarks']}
+                              labelCol={{ span: 10 }}
+                              label="备注"
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="输入备注" />
+                            </Form.Item>
+                          </Col>
+                          {/* 嵌套的检测项列表 */}
                           <Form.List name={[outerName, 'inspectionItemsList']}>
                             {(innerFields, { add: addInner, remove: removeInner }) => (
-                              <>
-                                {innerFields.map(({ key, name: innerName, ...restInnerField }) => (
-                                  <Row key={key} gutter={16} style={{ marginBottom: 8 }}>
-                                    <Col span={10}>
-                                      <Form.Item
-                                        {...restInnerField}
-                                        name={[innerName, 'subField']}
-                                        label="子字段"
-                                        rules={[{ required: true }]}
-                                      >
-                                        <Select
-                                          placeholder="请选择"
-                                          allowClear
-                                          onChange={fillInOtherFields}
-                                          options={[
-                                            {
-                                              label: '良',
-                                              value: '良',
-                                            },
-                                            {
-                                              label: '不良',
-                                              value: '不良',
-                                            },
-                                          ]}
-                                        />
-                                      </Form.Item>
-                                    </Col>
-                                  </Row>
-                                ))}
+                              <Col span={24}>
+                                {innerFields.map(({ key, name: innerName, ...restInnerField }) => {
+                                  console.log('innerName', innerName);
+                                  return (
+                                    <Row key={key} gutter={16} style={{ marginBottom: 8 }}>
+                                      <Col span={10}>
+                                        <Form.Item
+                                          {...restInnerField}
+                                          name={[innerName, 'itemName']}
+                                          labelCol={{ span: 10 }}
+                                          label={`检测项 ${innerName}`}
+                                          rules={[{ required: true, message: '请输入检测内容' }]}
+                                        >
+                                          <Input placeholder="" disabled />
+                                        </Form.Item>
+                                      </Col>
+                                      <Col span={10}>
+                                        <Form.Item
+                                          {...restInnerField}
+                                          name={[innerName, 'itemValue']}
+                                          labelCol={{ span: 10 }}
+                                          label={`检测值 ${innerName}`}
+                                          rules={[{ required: true, message: '请输入检测值' }]}
+                                        >
+                                          <Input placeholder="例如: 测试1" />
+                                        </Form.Item>
+                                      </Col>
+                                      {/* <Col span={4}>
+                                      <MinusCircleOutlined
+                                        onClick={() => removeInner(innerName)}
+                                        style={{ color: 'red', marginTop: 8 }}
+                                      />
+                                    </Col> */}
+                                    </Row>
+                                  );
+                                })}
                                 {/* <Button
                                   type="dashed"
                                   onClick={() => addInner()}
                                   icon={<PlusOutlined />}
+                                  style={{ width: '60%' }}
                                 >
-                                  添加子项
+                                  添加检测项
                                 </Button> */}
-                              </>
+                              </Col>
                             )}
                           </Form.List>
-                          <Col span={12}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'result']}
-                              label="结果"
-                              labelCol={{ span: 10 }}
-                              rules={[{ required: true }]}
-                            >
-                              <Input placeholder="请输入结果" />
-                            </Form.Item>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'remarks']}
-                              label="备注"
-                              labelCol={{ span: 10 }}
-                              rules={[{ required: true }]}
-                            >
-                              <Input placeholder="请输入备注" />
-                            </Form.Item>
-                          </Col>
                         </Row>
                         {/* <Button
                           danger
                           onClick={() => removeOuter(outerName)}
+                          icon={<MinusCircleOutlined />}
+                          style={{ marginTop: 8 }}
                         >
-                          删除
+                          删除此组
                         </Button> */}
                       </div>
                     ))}
-                    {/* <Button type="dashed" onClick={() => addOuter()} icon={<PlusOutlined />}>
-                      添加主项
+                    {/* <Button
+                      type="dashed"
+                      onClick={() => addOuter()}
+                      icon={<PlusOutlined />}
+                      style={{ width: '60%' }}
+                    >
+                      添加检测组
                     </Button> */}
                   </>
                 )}
