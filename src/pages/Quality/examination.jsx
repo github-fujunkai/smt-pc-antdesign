@@ -667,8 +667,10 @@ const App = () => {
       })
       .catch((err) => {});
   };
+  const [isEnterAdd, setsEnterAdd] = useState('create');
   // 录入和子集的详情
   const openModalEnter = (type, record) => {
+    console.log('openModalEnter', type, record);
     if (type === 'create') {
       formCreateEnter.resetFields();
       setSchemeList([]);
@@ -678,10 +680,13 @@ const App = () => {
       setTimeout(() => {
         itemCodeRefEnter.current?.focus();
       }, 100);
+      setsEnterAdd('create');
     } else {
       formCreateEnter.setFieldsValue({
         ...record,
+        showCache: JSON.parse(record.showCache),
       });
+      setsEnterAdd('update');
     }
     setIsModalEnter(true);
   };
@@ -692,7 +697,7 @@ const App = () => {
   const [itemCodeData, setItemCodeData] = useState({});
   const [inspectionList, setInspectionList] = useState([]);
 
-  // 获取方案相关信息
+  // 用料号获取方案相关信息
   const getSchemeList = () => {
     http
       .get(
@@ -707,7 +712,7 @@ const App = () => {
           res.bizData[0]?.inspectionItemsList.map((item) => {
             return {
               itemName: item,
-              itemValue: item,
+              itemValue: 1,
             };
           }) || [],
         );
@@ -735,9 +740,22 @@ const App = () => {
   };
   const handleOkEnter = () => {
     console.log(formCreateEnter.getFieldValue());
-    let itemDetails = formCreateEnter.getFieldValue().itemDetailsMe;
-    return;
+    let originalData = formCreateEnter.getFieldValue().showCache;
+    let itemDetails = originalData.reduce((acc, curr, index) => {
+      const items = curr.inspectionItemsList.map((item, i) => ({
+        orders: i + 1,
+        itemName: item.itemName,
+        itemValue: item.itemValue.toString(),
+        resultStatus: curr.result.toString(),
+      }));
+      acc[(index + 1).toString()] = items;
+      return acc;
+    }, {});
     formCreateEnter.validateFields().then((values) => {
+      console.log('values', values);
+
+      values.itemDetails = itemDetails;
+      values.showCache = JSON.stringify(values.showCache);
       http
         .post(config.API_PREFIX + 'inspection/order/detail', {
           inspectionOrderId: rowDataEnter.id,
@@ -753,32 +771,30 @@ const App = () => {
         .catch((err) => {});
     });
   };
+
   // 根据送检数量生成检验明细
   const createItemList = () => {
     console.log('itemCodeData', itemCodeData);
     formCreateEnter.setFieldsValue({
-      itemDetailsMe: Array.from(
-        { length: formCreateEnter.getFieldValue('inspectionQty') },
-        (v, k) => ({
-          inspectionItemsList: [
-            {
-              itemName: '测试1',
-              itemValue: 1,
-            },
-            {
-              itemName: '测试2',
-              itemValue: 1,
-            },
-          ],
-          // inspectionItemsList: inspectionList,
-          itemName: '',
-          itemValue: '',
-          ext1: itemCodeData.valueRangeStart || '',
-          ext2: itemCodeData.valueRangeEnd || '',
-          result: 1, //检验结果 0-不合格 1-合格
-          remarks: '',
-        }),
-      ),
+      showCache: Array.from({ length: formCreateEnter.getFieldValue('inspectionQty') }, (v, k) => ({
+        inspectionItemsList: [
+          {
+            itemName: '测试1',
+            itemValue: 1,
+          },
+          {
+            itemName: '测试2',
+            itemValue: 1,
+          },
+        ],
+        // inspectionItemsList: inspectionList,
+        itemName: '',
+        itemValue: '',
+        ext1: itemCodeData.valueRangeStart || '',
+        ext2: itemCodeData.valueRangeEnd || '',
+        result: 1, //检验结果 0-不合格 1-合格
+        remarks: '',
+      })),
     });
   };
   return (
@@ -1100,6 +1116,7 @@ const App = () => {
             labelCol={{ span: 4 }}
             form={formCreateEnter}
             style={{ padding: 16, maxHeight: '60vh', overflow: 'scroll' }}
+            disabled={isEnterAdd === 'update'}
           >
             <Form.Item
               label="料号"
@@ -1194,7 +1211,7 @@ const App = () => {
             </Form.Item>
             <h3>检验明细</h3>
             <Row>
-              <Form.List name="itemDetailsMe">
+              <Form.List name="showCache">
                 {(outerFields, { add: addOuter, remove: removeOuter }) => (
                   <>
                     {outerFields.map(({ key, name: outerName, ...restOuterField }) => (
@@ -1267,7 +1284,40 @@ const App = () => {
                               label="量值"
                               rules={[{ required: true }]}
                             >
-                              <Input placeholder="" />
+                              <Input
+                                placeholder=""
+                                onBlur={(e) => {
+                                  const value = parseFloat(e.target.value);
+                                  const minValue = parseFloat(
+                                    formCreateEnter.getFieldValue(['showCache', outerName, 'ext1']),
+                                  );
+                                  const maxValue = parseFloat(
+                                    formCreateEnter.getFieldValue(['showCache', outerName, 'ext2']),
+                                  );
+
+                                  if (!isNaN(value) && !isNaN(minValue) && !isNaN(maxValue)) {
+                                    if (value >= minValue && value <= maxValue) {
+                                      // 在范围内设为合格
+                                      formCreateEnter.setFieldsValue({
+                                        showCache: {
+                                          [outerName]: {
+                                            result: 1,
+                                          },
+                                        },
+                                      });
+                                    } else {
+                                      // 超出范围设为不合格
+                                      formCreateEnter.setFieldsValue({
+                                        showCache: {
+                                          [outerName]: {
+                                            result: 0,
+                                          },
+                                        },
+                                      });
+                                    }
+                                  }
+                                }}
+                              />
                             </Form.Item>
                           </Col>
                           <Col span={7}>
