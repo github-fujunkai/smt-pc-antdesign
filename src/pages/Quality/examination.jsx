@@ -689,7 +689,10 @@ const App = () => {
     setIsModalEnter(false);
     formCreateEnter.resetFields();
   };
+  const [itemCodeData, setItemCodeData] = useState({});
   const [inspectionList, setInspectionList] = useState([]);
+
+  // 获取方案相关信息
   const getSchemeList = () => {
     http
       .get(
@@ -700,10 +703,18 @@ const App = () => {
       )
       .then((res) => {
         setSchemeList(res.bizData);
-        setInspectionList(res.bizData[0]?.inspectionItemsList || []);
+        setInspectionList(
+          res.bizData[0]?.inspectionItemsList.map((item) => {
+            return {
+              itemName: item,
+              itemValue: item,
+            };
+          }) || [],
+        );
       })
       .catch((err) => {});
   };
+  // 获取物料信息
   const getItemInfo = () => {
     http
       .get(
@@ -718,11 +729,13 @@ const App = () => {
           itemSpec: res.bizData?.itemSpec || '',
           planName: res.bizData?.inspectionStandard || '',
         });
+        setItemCodeData(res.bizData);
       })
       .catch((err) => {});
   };
   const handleOkEnter = () => {
     console.log(formCreateEnter.getFieldValue());
+    let itemDetails = formCreateEnter.getFieldValue().itemDetailsMe;
     return;
     formCreateEnter.validateFields().then((values) => {
       http
@@ -742,26 +755,28 @@ const App = () => {
   };
   // 根据送检数量生成检验明细
   const createItemList = () => {
+    console.log('itemCodeData', itemCodeData);
     formCreateEnter.setFieldsValue({
-      itemDetails: Array.from(
+      itemDetailsMe: Array.from(
         { length: formCreateEnter.getFieldValue('inspectionQty') },
         (v, k) => ({
           inspectionItemsList: [
             {
               itemName: '测试1',
-              itemValue: 0, // 0-不合格 1-合格
+              itemValue: 1,
             },
             {
               itemName: '测试2',
-              itemValue: 0, // 0-不合格 1-合格
+              itemValue: 1,
             },
           ],
+          // inspectionItemsList: inspectionList,
           itemName: '',
           itemValue: '',
-          ext1: '',
-          ext2: '',
-          result: 0, //检验结果 0-不合格 1-合格
-          remarks: '备注问问请问',
+          ext1: itemCodeData.valueRangeStart || '',
+          ext2: itemCodeData.valueRangeEnd || '',
+          result: 1, //检验结果 0-不合格 1-合格
+          remarks: '',
         }),
       ),
     });
@@ -1145,18 +1160,7 @@ const App = () => {
             >
               <Input allowClear placeholder="" />
             </Form.Item>
-            <Form.Item
-              label="送检数量"
-              name="inspectionQty"
-              rules={[
-                {
-                  required: false,
-                  message: '请输入',
-                },
-              ]}
-            >
-              <Input allowClear placeholder="" onPressEnter={() => createItemList()} />
-            </Form.Item>
+
             <Form.Item
               label="检验方案"
               name="planName"
@@ -1176,9 +1180,21 @@ const App = () => {
                 }))}
               />
             </Form.Item>
+            <Form.Item
+              label="送检数量"
+              name="inspectionQty"
+              rules={[
+                {
+                  required: false,
+                  message: '请输入',
+                },
+              ]}
+            >
+              <Input allowClear placeholder="" onPressEnter={() => createItemList()} />
+            </Form.Item>
             <h3>检验明细</h3>
             <Row>
-              <Form.List name="itemDetails">
+              <Form.List name="itemDetailsMe">
                 {(outerFields, { add: addOuter, remove: removeOuter }) => (
                   <>
                     {outerFields.map(({ key, name: outerName, ...restOuterField }) => (
@@ -1187,28 +1203,6 @@ const App = () => {
                         style={{ marginBottom: 16, border: '1px dashed #d9d9d9', padding: 16 }}
                       >
                         <Row gutter={16}>
-                          <Col span={10}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'result']}
-                              labelCol={{ span: 10 }}
-                              label="结果"
-                              rules={[{ required: true }]}
-                            >
-                              <Input placeholder="" />
-                            </Form.Item>
-                          </Col>
-                          <Col span={10}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'remarks']}
-                              labelCol={{ span: 10 }}
-                              label="备注"
-                              rules={[{ required: true }]}
-                            >
-                              <Input placeholder="输入备注" />
-                            </Form.Item>
-                          </Col>
                           {/* 嵌套的检测项列表 */}
                           <Form.List name={[outerName, 'inspectionItemsList']}>
                             {(innerFields, { add: addInner, remove: removeInner }) => (
@@ -1236,7 +1230,13 @@ const App = () => {
                                           label={`检测值 ${innerName}`}
                                           rules={[{ required: true, message: '请输入检测值' }]}
                                         >
-                                          <Input placeholder="例如: 测试1" />
+                                          <Select
+                                            placeholder="请选择检测值"
+                                            options={[
+                                              { value: 1, label: '合格' },
+                                              { value: 0, label: '不合格' },
+                                            ]}
+                                          />
                                         </Form.Item>
                                       </Col>
                                       {/* <Col span={4}>
@@ -1259,6 +1259,67 @@ const App = () => {
                               </Col>
                             )}
                           </Form.List>
+                          <Col span={10}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'ext3']}
+                              labelCol={{ span: 10 }}
+                              label="量值"
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="" />
+                            </Form.Item>
+                          </Col>
+                          <Col span={7}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'ext1']}
+                              labelCol={{ span: 10 }}
+                              label="量值范围"
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="" disabled />
+                            </Form.Item>
+                          </Col>
+                          <Col span={5}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'ext2']}
+                              labelCol={{ span: 10 }}
+                              // label="量值结束"
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="" disabled />
+                            </Form.Item>
+                          </Col>
+                          <Col span={10}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'result']}
+                              labelCol={{ span: 10 }}
+                              label="结果"
+                              rules={[{ required: true }]}
+                            >
+                              <Select
+                                placeholder="请选择检测值"
+                                options={[
+                                  { value: 1, label: '合格' },
+                                  { value: 0, label: '不合格' },
+                                ]}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={10}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'remarks']}
+                              labelCol={{ span: 10 }}
+                              label="备注"
+                              rules={[{ required: true }]}
+                            >
+                              <Input placeholder="输入备注" />
+                            </Form.Item>
+                          </Col>
                         </Row>
                         {/* <Button
                           danger

@@ -373,8 +373,8 @@ const App = () => {
       activeId = -1;
       formCreate.resetFields();
       formCreate.setFieldValue('autoPickup', true);
-      getTestList();
     }
+    getTestList();
     setIsModalOpen(true);
     getBarCode();
   };
