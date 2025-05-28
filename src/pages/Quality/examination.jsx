@@ -786,6 +786,10 @@ const App = () => {
         //     itemName: '测试2',
         //     itemValue: 1,
         //   },
+        //   {
+        //     itemName: '量值',
+        //     itemValue: '',
+        //   },
         // ],
         inspectionItemsList: inspectionList,
         itemName: '',
@@ -1247,13 +1251,68 @@ const App = () => {
                                           label={`检测值 ${innerName}`}
                                           rules={[{ required: true, message: '请输入检测值' }]}
                                         >
-                                          <Select
-                                            placeholder="请选择检测值"
-                                            options={[
-                                              { value: 1, label: '合格' },
-                                              { value: 0, label: '不合格' },
-                                            ]}
-                                          />
+                                          {formCreateEnter.getFieldValue([
+                                            'showCache',
+                                            outerName,
+                                            'inspectionItemsList',
+                                            innerName,
+                                            'itemName',
+                                          ]) === '量值' ? (
+                                            <Input
+                                              placeholder=""
+                                              onBlur={(e) => {
+                                                const value = parseFloat(e.target.value);
+                                                const minValue = parseFloat(
+                                                  formCreateEnter.getFieldValue([
+                                                    'showCache',
+                                                    outerName,
+                                                    'ext1',
+                                                  ]),
+                                                );
+                                                const maxValue = parseFloat(
+                                                  formCreateEnter.getFieldValue([
+                                                    'showCache',
+                                                    outerName,
+                                                    'ext2',
+                                                  ]),
+                                                );
+
+                                                if (
+                                                  !isNaN(value) &&
+                                                  !isNaN(minValue) &&
+                                                  !isNaN(maxValue)
+                                                ) {
+                                                  if (value >= minValue && value <= maxValue) {
+                                                    // 在范围内设为合格
+                                                    formCreateEnter.setFieldsValue({
+                                                      showCache: {
+                                                        [outerName]: {
+                                                          result: 1,
+                                                        },
+                                                      },
+                                                    });
+                                                  } else {
+                                                    // 超出范围设为不合格
+                                                    formCreateEnter.setFieldsValue({
+                                                      showCache: {
+                                                        [outerName]: {
+                                                          result: 0,
+                                                        },
+                                                      },
+                                                    });
+                                                  }
+                                                }
+                                              }}
+                                            />
+                                          ) : (
+                                            <Select
+                                              placeholder="请选择检测值"
+                                              options={[
+                                                { value: 1, label: '合格' },
+                                                { value: 0, label: '不合格' },
+                                              ]}
+                                            />
+                                          )}
                                         </Form.Item>
                                       </Col>
                                       {/* <Col span={4}>
@@ -1276,7 +1335,7 @@ const App = () => {
                               </Col>
                             )}
                           </Form.List>
-                          <Col span={10}>
+                          {/* <Col span={10}>
                             <Form.Item
                               {...restOuterField}
                               name={[outerName, 'ext3']}
@@ -1319,29 +1378,8 @@ const App = () => {
                                 }}
                               />
                             </Form.Item>
-                          </Col>
-                          <Col span={7}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'ext1']}
-                              labelCol={{ span: 10 }}
-                              label="量值范围"
-                              rules={[{ required: true }]}
-                            >
-                              <Input placeholder="" disabled />
-                            </Form.Item>
-                          </Col>
-                          <Col span={5}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'ext2']}
-                              labelCol={{ span: 10 }}
-                              // label="量值结束"
-                              rules={[{ required: true }]}
-                            >
-                              <Input placeholder="" disabled />
-                            </Form.Item>
-                          </Col>
+                          </Col> */}
+
                           <Col span={10}>
                             <Form.Item
                               {...restOuterField}
@@ -1365,9 +1403,31 @@ const App = () => {
                               name={[outerName, 'remarks']}
                               labelCol={{ span: 10 }}
                               label="备注"
-                              rules={[{ required: true }]}
+                              rules={[{ required: false }]}
                             >
                               <Input placeholder="输入备注" />
+                            </Form.Item>
+                          </Col>
+                          <Col span={7}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'ext1']}
+                              labelCol={{ span: 10 }}
+                              label="量值范围"
+                              rules={[{ required: false }]}
+                            >
+                              <Input placeholder="" disabled />
+                            </Form.Item>
+                          </Col>
+                          <Col span={5}>
+                            <Form.Item
+                              {...restOuterField}
+                              name={[outerName, 'ext2']}
+                              labelCol={{ span: 10 }}
+                              // label="量值结束"
+                              rules={[{ required: false }]}
+                            >
+                              <Input placeholder="" disabled />
                             </Form.Item>
                           </Col>
                         </Row>

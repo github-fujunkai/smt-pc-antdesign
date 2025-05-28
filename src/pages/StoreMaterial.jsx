@@ -182,13 +182,6 @@ const App = () => {
 
   const [columns, setColumns] = useState([
     {
-      title: '物料ID',
-      dataIndex: 'id',
-      // sorter: true,
-      key: 'id',
-      width: 120,
-    },
-    {
       title: '料号',
       dataIndex: 'itemCode',
       // sorter: true,
@@ -427,6 +420,7 @@ const App = () => {
           valueRangeStart,
           valueRangeEnd,
         };
+        let inspectionStandardId = testList.find((item) => item.planName === inspectionStandard)?.id || '';
         let action = null;
         let msg = '';
         let apiUrl = '';
@@ -436,11 +430,17 @@ const App = () => {
           // apiUrl = `${config.API_PREFIX}${api.printTemplate}/${activeId}`
           apiUrl = `${config.API_PREFIX}${api.basicItemBaseInfo}`;
           params.id = activeId;
+          if (inspectionStandardId) {
+            params.inspectionStandardId = inspectionStandardId;
+          }
           msg = '修改成功！';
         } else {
           action = http.post;
           apiUrl = `${config.API_PREFIX}${api.basicItemBaseInfo}`;
           msg = '新增成功！';
+          if (inspectionStandardId) {
+            params.inspectionStandardId = inspectionStandardId;
+          }
         }
         action(apiUrl, params)
           .then((res) => {
