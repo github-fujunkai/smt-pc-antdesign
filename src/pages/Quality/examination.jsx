@@ -777,17 +777,17 @@ const App = () => {
     console.log('itemCodeData', itemCodeData);
     formCreateEnter.setFieldsValue({
       showCache: Array.from({ length: formCreateEnter.getFieldValue('inspectionQty') }, (v, k) => ({
-        inspectionItemsList: [
-          {
-            itemName: '测试1',
-            itemValue: 1,
-          },
-          {
-            itemName: '测试2',
-            itemValue: 1,
-          },
-        ],
-        // inspectionItemsList: inspectionList,
+        // inspectionItemsList: [
+        //   {
+        //     itemName: '测试1',
+        //     itemValue: 1,
+        //   },
+        //   {
+        //     itemName: '测试2',
+        //     itemValue: 1,
+        //   },
+        // ],
+        inspectionItemsList: inspectionList,
         itemName: '',
         itemValue: '',
         ext1: itemCodeData.valueRangeStart || '',
