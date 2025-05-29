@@ -150,10 +150,10 @@ const App = () => {
 
     {
       title: '送检日期',
-      dataIndex: 'inspectionDate',
-      key: 'inspectionDate',
+      dataIndex: 'createTime',
+      key: 'createTime',
       render: (_, record) => {
-        return dayjs(_).format('YYYY-MM-DD');
+        return dayjs(_).format('YYYY-MM-DD HH:mm:ss');
       },
       width: 100,
     },
