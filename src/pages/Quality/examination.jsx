@@ -1239,7 +1239,7 @@ const App = () => {
                                           name={[innerName, 'itemName']}
                                           labelCol={{ span: 10 }}
                                           label={`检测项 ${innerName + 1}`}
-                                          rules={[{ required: true, message: '请输入检测内容' }]}
+                                          rules={[{ required: true, message: '' }]}
                                         >
                                           <Input placeholder="" disabled />
                                         </Form.Item>
@@ -1249,8 +1249,8 @@ const App = () => {
                                           {...restInnerField}
                                           name={[innerName, 'itemValue']}
                                           labelCol={{ span: 10 }}
-                                          label={`检测值 ${innerName + 1}`}
-                                          rules={[{ required: true, message: '请输入检测值' }]}
+                                          label={`结果 ${innerName + 1}`}
+                                          rules={[{ required: true, message: '' }]}
                                         >
                                           {formCreateEnter.getFieldValue([
                                             'showCache',
