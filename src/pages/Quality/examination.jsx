@@ -696,7 +696,7 @@ const App = () => {
   };
   const [itemCodeData, setItemCodeData] = useState({});
   const [inspectionList, setInspectionList] = useState([]);
-
+  const [inspectionArr, setInspectionArr] = useState([]);
   // 用料号获取方案相关信息
   const getSchemeList = () => {
     http
@@ -708,6 +708,7 @@ const App = () => {
       )
       .then((res) => {
         setSchemeList(res.bizData);
+        setInspectionArr(res.bizData[0]?.inspectionItemsList || []);
         setInspectionList(
           res.bizData[0]?.inspectionItemsList.map((item) => {
             return {
@@ -1237,7 +1238,7 @@ const App = () => {
                                           {...restInnerField}
                                           name={[innerName, 'itemName']}
                                           labelCol={{ span: 10 }}
-                                          label={`检测项 ${innerName}`}
+                                          label={`检测项 ${innerName + 1}`}
                                           rules={[{ required: true, message: '请输入检测内容' }]}
                                         >
                                           <Input placeholder="" disabled />
@@ -1248,7 +1249,7 @@ const App = () => {
                                           {...restInnerField}
                                           name={[innerName, 'itemValue']}
                                           labelCol={{ span: 10 }}
-                                          label={`检测值 ${innerName}`}
+                                          label={`检测值 ${innerName + 1}`}
                                           rules={[{ required: true, message: '请输入检测值' }]}
                                         >
                                           {formCreateEnter.getFieldValue([
@@ -1408,28 +1409,32 @@ const App = () => {
                               <Input placeholder="输入备注" />
                             </Form.Item>
                           </Col>
-                          <Col span={7}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'ext1']}
-                              labelCol={{ span: 10 }}
-                              label="量值范围"
-                              rules={[{ required: false }]}
-                            >
-                              <Input placeholder="" disabled />
-                            </Form.Item>
-                          </Col>
-                          <Col span={5}>
-                            <Form.Item
-                              {...restOuterField}
-                              name={[outerName, 'ext2']}
-                              labelCol={{ span: 10 }}
-                              // label="量值结束"
-                              rules={[{ required: false }]}
-                            >
-                              <Input placeholder="" disabled />
-                            </Form.Item>
-                          </Col>
+                          {inspectionArr.includes('量值') && (
+                            <>
+                              <Col span={7}>
+                                <Form.Item
+                                  {...restOuterField}
+                                  name={[outerName, 'ext1']}
+                                  labelCol={{ span: 10 }}
+                                  label="量值范围"
+                                  rules={[{ required: false }]}
+                                >
+                                  <Input placeholder="" disabled />
+                                </Form.Item>
+                              </Col>
+                              <Col span={5}>
+                                <Form.Item
+                                  {...restOuterField}
+                                  name={[outerName, 'ext2']}
+                                  labelCol={{ span: 10 }}
+                                  // label="量值结束"
+                                  rules={[{ required: false }]}
+                                >
+                                  <Input placeholder="" disabled />
+                                </Form.Item>
+                              </Col>
+                            </>
+                          )}
                         </Row>
                         {/* <Button
                           danger
